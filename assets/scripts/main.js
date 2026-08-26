@@ -78,13 +78,13 @@ const DEFAULT_DATA = {
   "meta": {
     "eyebrow": "Marca Gestión · Equipo de Comunicación Digital",
     "periodStart": "2026-08-24",
-    "periodEnd": "2026-11-11",
-    "heroSub": "Plan de 80 días para comunicar la gestión con evidencia: obra terminada, servicio que responde y cuentas verificables. Cubre Instagram, Facebook y TikTok. Quedan fuera la vocería en prensa tradicional y la pauta pagada.",
+    "periodEnd": "2026-11-03",
+    "heroSub": "Plan de 72 días para comunicar la gestión con evidencia: obra terminada, servicio que responde y cuentas verificables. Cubre Instagram, Facebook y TikTok. Quedan fuera la vocería en prensa tradicional y la pauta pagada.",
     "introCard": "Este plan integra tres insumos que hoy viven separados: el inventario de obras y servicios, el registro de reportes ciudadanos y el cronograma de ejecución. La regla principal es una sola: ninguna pieza sale sin un dato verificable —fecha, cifra, ubicación o responsable— ni sin material grabado en el sitio. Lo que no se puede mostrar, no se anuncia.",
     "stats": [
       {
-        "num": "80",
-        "lbl": "Días de plan · 24 ago – 11 nov"
+        "num": "72",
+        "lbl": "Días de plan · 24 ago – 3 nov"
       },
       {
         "num": "4",
@@ -111,7 +111,7 @@ const DEFAULT_DATA = {
     "symbolReflection": "Ninguno de los tres es un logotipo ni se dibuja: aparecen como objetos reales dentro del material grabado. Si en una pieza no hay ni medición, ni ejecución, ni entrega visible, esa pieza todavía no es Marca Gestión.",
     "pilaresNote": "Formatos transversales a los cuatro pilares: el antes / después con la misma toma y el mismo encuadre, el rótulo de datos en pantalla (ubicación, fecha, monto) y el cierre con el nombre del responsable técnico de la obra.",
     "semanalNote": "Producción en bloque: lunes y martes se graba todo lo de la semana en dos rutas de terreno. Ninguna pieza se publica sin el visto bueno del enlace técnico sobre las cifras que aparecen en pantalla.",
-    "metricHero": "Menciones ciudadanas espontáneas que citan un resultado concreto de la gestión —una obra, un servicio o una cifra— sin que la cuenta oficial haya iniciado la conversación. Meta: pasar de 12 a 60 menciones mensuales al día 80.",
+    "metricHero": "Menciones ciudadanas espontáneas que citan un resultado concreto de la gestión —una obra, un servicio o una cifra— sin que la cuenta oficial haya iniciado la conversación. Meta: pasar de 12 a 60 menciones mensuales al día 72.",
     "footer": "MARCA GESTIÓN — PLAN COMUNICACIONAL INTEGRADO<br><b>Confidencial</b> · Para evaluación del equipo estratégico"
   },
   "pillars": [
@@ -364,10 +364,10 @@ const DEFAULT_DATA = {
       "id": "3",
       "order": 3,
       "title": "Cuentas en la mano",
-      "phase": "Fase 4 · 7 nov 2026",
+      "phase": "Fase 4 · 2 nov 2026",
       "format": "Reel de rendición · 90 s",
-      "theme": "Balance de los 80 días grabado en las obras entregadas y no en oficina: cada cifra se dice parado en el lugar que la produjo.",
-      "hook": "«Hace 80 días dijimos que íbamos a entregar esto. Esto fue lo que pasó.»",
+      "theme": "Balance de los 72 días grabado en las obras entregadas y no en oficina: cada cifra se dice parado en el lugar que la produjo.",
+      "hook": "«Hace 72 días dijimos que íbamos a entregar esto. Esto fue lo que pasó.»",
       "development": "Tres bloques: lo entregado, lo que sigue en ejecución con nueva fecha, y lo que no se logró. Cada bloque con su cifra y su fuente en pantalla.",
       "cta": "«El detalle completo, parroquia por parroquia, en el informe fijado» — carrusel de soporte publicado el mismo día."
     }
@@ -409,9 +409,9 @@ const DEFAULT_DATA = {
       "name": "Fase 4",
       "pillar": "Equipo que sostiene",
       "start": "2026-10-13",
-      "end": "2026-11-11",
-      "days": "días 51-80",
-      "milestone": "Serie de oficios completa y rendición de los 80 días publicada el 7 de noviembre."
+      "end": "2026-11-03",
+      "days": "días 51-72",
+      "milestone": "Serie de oficios completa y rendición de los 72 días publicada el 3 de noviembre."
     }
   ],
   "kpiWeekly": [
@@ -720,7 +720,7 @@ const platformRows = [
 const reportRows = [
   ['Semanal (lunes)','KPIs de las 5 piezas + menciones orgánicas detectadas','Director Estratégico + Equipo de Comunicación Digital'],
   ['Mensual (por fase)','KPIs de especiales + crecimiento de seguidores','Director Estratégico — informe ejecutivo de 1 página'],
-  ['Cierre del plan (día 80)','Resumen de los 4 pilares + recomendación para la siguiente fase','Equipo estratégico completo']
+  ['Cierre del plan (día 72)','Resumen de los 4 pilares + recomendación para la siguiente fase','Equipo estratégico completo']
 ];
 
 /* ============ 2 · UTILIDADES ============ */
@@ -835,18 +835,47 @@ function itemChecked(group, idx) {
   return !!localChecks[group.id + ':' + idx];
 }
 
-/* ============ 4 · RENDER ============ */
-function renderMeta() {
-  const m = state.meta || {};
-  document.title = DOC_TITLE;
-  setHTML('brandEyebrow', m.eyebrow || BRAND_NAME);
+/* Días de calendario entre hoy y una fecha límite (ambas a medianoche,
+   para no depender de la hora exacta) -- positivo si falta, 0 si es
+   hoy, negativo si ya pasó. */
+function daysUntil(dateStr) {
+  const end = parseISO(dateStr);
+  if (!end) return null;
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return Math.round((end.getTime() - today.getTime()) / 86400000);
+}
 
+/* Independiente del resto de renderMeta() para poder refrescarse solo
+   (ver boot()): así el recuento de días sigue correcto aunque la
+   pestaña quede abierta de un día para otro, sin re-renderizar todo. */
+function updateDateDisplay() {
+  const m = state.meta || {};
   const s = parseISO(m.periodStart), e = parseISO(m.periodEnd);
   let period = '';
   if (s && e) {
     period = fmtDay(s) + ' — ' + fmtDay(e) + ' ' + e.getFullYear();
   }
   setHTML('brandPeriod', period);
+
+  const daysLeft = m.periodEnd ? daysUntil(m.periodEnd) : null;
+  let countdown = '';
+  if (daysLeft !== null) {
+    if (daysLeft > 1) countdown = daysLeft + ' días para el cierre';
+    else if (daysLeft === 1) countdown = '1 día para el cierre';
+    else if (daysLeft === 0) countdown = 'Hoy es el cierre del plan';
+    else countdown = 'Plan finalizado';
+  }
+  setHTML('brandCountdown', countdown);
+}
+
+/* ============ 4 · RENDER ============ */
+function renderMeta() {
+  const m = state.meta || {};
+  document.title = DOC_TITLE;
+  setHTML('brandEyebrow', m.eyebrow || BRAND_NAME);
+
+  updateDateDisplay();
 
   setHTML('heroSub', m.heroSub);
   setHTML('introCard', m.introCard);
@@ -2123,6 +2152,11 @@ async function boot() {
   wireSymbolModal();
   wireLogoModal();
   wireGate();
+
+  // Refresca el recuento de días por si la pestaña queda abierta de un
+  // día para otro -- cada render normal (carga, Firestore) ya lo hace,
+  // esto solo cubre a quien nunca recarga.
+  setInterval(updateDateDisplay, 60 * 60 * 1000);
 
   if (isGateUnlocked()) {
     document.documentElement.classList.add('gate-unlocked');

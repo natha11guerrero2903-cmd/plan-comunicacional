@@ -71,7 +71,24 @@ h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
   font-size:11.5px;
   color:rgba(255,255,255,.55);
   margin:0;
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:7px;
 }
+.brand .countdown{
+  display:inline-flex;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:10px;
+  font-weight:600;
+  letter-spacing:.02em;
+  color:var(--brand-bright);
+  background:rgba(226,38,247,.15);
+  padding:2px 9px;
+  border-radius:100px;
+  white-space:nowrap;
+}
+.brand .countdown:empty{display:none;}
 .navlist{
   list-style:none;
   margin:0;
