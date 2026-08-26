@@ -794,7 +794,12 @@ function renderPillars() {
     head.innerHTML =
       '<div class="pillar-num">' + String(txt(p.num) || '').padStart(2, '0') + '</div>' +
       '<div class="pillar-head-txt"><h4>' + txt(p.name) + '</h4><p>' + txt(p.sub) + '</p></div>' +
-      (txt(p.phase) ? '<div class="pillar-meta"><span>' + txt(p.phase) + '</span></div>' : '') +
+      '<div class="pillar-meta">' +
+        (txt(p.phase) ? '<span>' + txt(p.phase) + '</span>' : '') +
+        '<button type="button" class="pillar-icon-btn" data-pillar-id="' + txt(p.id) + '" aria-label="Ver símbolo de ' + txt(p.name).replace(/"/g, '&quot;') + '" title="Ver símbolo del pilar">' +
+          '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>' +
+        '</button>' +
+      '</div>' +
       '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
 
     function toggle() {
@@ -806,6 +811,10 @@ function renderPillars() {
     head.addEventListener('click', toggle);
     head.addEventListener('keydown', function (ev) {
       if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); }
+    });
+    head.querySelector('.pillar-icon-btn').addEventListener('click', function (ev) {
+      ev.stopPropagation();
+      openSymbolModal(p.id);
     });
 
     const ideas = Array.isArray(p.ideas) ? p.ideas : [];
@@ -853,6 +862,56 @@ function renderSymbols() {
         '<p>' + txt(s.description) + '</p>' +
       '</div>'));
   });
+}
+
+/* Genera 2 letras a partir del nombre, para el símbolo genérico de los
+   pilares que todavía no tienen un símbolo cargado en Firestore. */
+function initialsFor(name) {
+  const words = txt(name).replace(/[().,]/g, '').split(' ').filter(function (w) { return w.length > 0; });
+  const capWords = words.filter(function (w) { return /^[A-ZÁÉÍÓÚÑ]/.test(w); });
+  const pick = capWords.length >= 2 ? capWords : words;
+  if (pick.length === 0) return txt(name).slice(0, 2).toUpperCase();
+  if (pick.length === 1) return pick[0].slice(0, 2).toUpperCase();
+  return (pick[0][0] + pick[1][0]).toUpperCase();
+}
+
+/* Un símbolo se asocia a un pilar por su "tag" (ej. "Pilar 3 · Cuentas
+   claras"), así el vínculo vive en el contenido y no hay que duplicar
+   el id del pilar dentro de cada símbolo. */
+function findSymbolForPillar(p) {
+  const num = txt(p && p.num).trim();
+  if (!num) return null;
+  const re = new RegExp('\\bPilar\\s+' + num + '\\b', 'i');
+  return sortDocs(state.symbols).find(function (s) { return re.test(txt(s.tag)); }) || null;
+}
+
+function openSymbolModal(pillarId) {
+  const p = state.pillars.find(function (pp) { return String(pp.id) === String(pillarId); });
+  if (!p) return;
+  setHTML('symbolModalEyebrow', 'Pilar ' + String(txt(p.num) || '').padStart(2, '0'));
+  setHTML('symbolModalTitle', p.name);
+  const sym = findSymbolForPillar(p);
+  const body = $('symbolModalBody');
+  if (!sym) {
+    body.innerHTML = '<div class="empty">Este pilar todavía no tiene un símbolo asociado.</div>';
+  } else {
+    const url = safeUrl(sym.imageUrl);
+    body.innerHTML =
+      (url
+        ? '<div class="symbol-tile-img-wrap"><img src="' + url + '" alt="' + txt(sym.name).replace(/"/g, '&quot;') + '"></div>'
+        : '<div class="symbol-tile-img-wrap"><div class="symbol-tile-placeholder">' + initialsFor(sym.name) + '</div></div>') +
+      '<p class="symbol-tile-name">' + txt(sym.name) + '</p>' +
+      '<p class="symbol-tile-desc">' + txt(sym.description) + '</p>' +
+      (url ? '' : '<span class="symbol-tile-pending">Imagen pendiente</span>');
+  }
+  const dialog = $('symbolModal');
+  if (typeof dialog.showModal === 'function') dialog.showModal();
+}
+
+function wireSymbolModal() {
+  const dialog = $('symbolModal');
+  $('symbolModalClose').addEventListener('click', function () { dialog.close(); });
+  dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
 }
 
 function renderWeekly() {
@@ -1689,6 +1748,7 @@ async function boot() {
   renderAllFromState(); // contenido local inmediato: nunca hay pantalla en blanco
   wireStaticButtons();
   wireFbDialog();
+  wireSymbolModal();
   wireGate();
 
   if (isGateUnlocked()) {
