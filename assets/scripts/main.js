@@ -898,7 +898,7 @@ function renderSpecials() {
   });
 }
 
-const PHASE_SHADES = ['#0e9d6b', '#118a63', '#0a7052', '#062821'];
+const PHASE_SHADES = ['#7a26f7', '#a626f7', '#e226f7', '#f726a3'];
 
 function renderPhases() {
   const track = $('tlTrack');
