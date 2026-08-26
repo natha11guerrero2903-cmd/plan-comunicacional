@@ -851,11 +851,11 @@ function daysUntil(dateStr) {
    pestaña quede abierta de un día para otro, sin re-renderizar todo. */
 function updateDateDisplay() {
   const m = state.meta || {};
-  const s = parseISO(m.periodStart), e = parseISO(m.periodEnd);
-  let period = '';
-  if (s && e) {
-    period = fmtDay(s) + ' — ' + fmtDay(e) + ' ' + e.getFullYear();
-  }
+  const e = parseISO(m.periodEnd);
+  const today = new Date();
+
+  let period = 'Hoy: ' + fmtDay(today) + ' ' + today.getFullYear();
+  if (e) period += ' · Cierra el ' + fmtDay(e) + ' ' + e.getFullYear();
   setHTML('brandPeriod', period);
 
   const daysLeft = m.periodEnd ? daysUntil(m.periodEnd) : null;
