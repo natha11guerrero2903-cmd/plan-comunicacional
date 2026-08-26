@@ -577,6 +577,86 @@ const DEFAULT_DATA = {
         }
       ]
     }
+  ],
+  "accountSegments": [
+    {
+      "id": "1", "order": 1, "num": 1, "name": "Seguridad y Paz", "phase": "Fase 1", "symbol": "",
+      "accounts": [
+        { "code": "SEG-01", "name": "Comisión de Seguridad Ciudadana", "status": "candidato", "note": "IG (candidato, sin verificar): @seguridadciudadanatachira" },
+        { "code": "SEG-02", "name": "Procuraduría General del Estado", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
+        { "code": "SEG-03", "name": "Instituto Autónomo de Policía del Estado Táchira", "status": "verificado", "note": "IG: @politachira | X: @policiatachira — verificado" },
+        { "code": "SEG-04", "name": "INAPROCET (Protección Civil Táchira)", "status": "verificado", "note": "IG: @pciviltachira (96K seg.) | X: @PCivilTachira (17.1K seg.) — verificado" },
+        { "code": "SEG-05", "name": "Fundación de Altos Estudios Jurídicos de la Procuraduría (FAEJ)", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" }
+      ]
+    },
+    {
+      "id": "2", "order": 2, "num": 2, "name": "Economía y Desarrollo Productivo", "phase": "Fase 2", "symbol": "",
+      "accounts": [
+        { "code": "ECO-01", "name": "FUNDESTA — Instituto Autónomo para el Desarrollo de la Economía Social", "status": "verificado", "note": "IG: @fundestaoficial | X: @Fundesta_inst — verificado" },
+        { "code": "ECO-02", "name": "IAPRET", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
+        { "code": "ECO-03", "name": "Lotería de Táchira", "status": "verificado", "note": "IG: @lotdeltachira (185K seg.) | X: @LotDelTachira — verificado" },
+        { "code": "ECO-04", "name": "I.V.T", "status": "parcial", "note": "IG (candidato, sin verificar): @ivt_tachira | Facebook: /ivtgbt — verificado" },
+        { "code": "ECO-05", "name": "CORPOTACHIRA", "status": "verificado", "note": "X: @corpotachira — verificado. Sin Instagram propio confirmado." },
+        { "code": "ECO-06", "name": "CORPOINTA", "status": "candidato", "note": "IG (candidato, sin verificar): @corpointa.gobtachira" },
+        { "code": "ECO-07", "name": "COTATUR", "status": "verificado", "note": "IG: @cotaturve (15K seg.) — verificado" },
+        { "code": "ECO-08", "name": "COIMTA", "status": "verificado", "note": "IG: @coimtaoficial (2,156 seg.) — verificado" },
+        { "code": "ECO-09", "name": "MAFET, C.A.", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia (sitio web: mafet.net)" },
+        { "code": "ECO-10", "name": "Agroinsumos del Táchira, C.A", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
+        { "code": "ECO-11", "name": "SEDEBAT", "status": "verificado", "note": "IG: @sedebat_ (6,811 seg.) | X: @Sedebat_ — verificado" }
+      ]
+    },
+    {
+      "id": "3", "order": 3, "num": 3, "name": "Gestión Social y Servicios", "phase": "Fase 3", "symbol": "",
+      "extra": "Incluye 12 oficinas y direcciones internas de la Gobernación que se comunican únicamente a través de @gobernaciondeltachira (no requieren cuenta propia) y 1 empresa inactiva (DESOTA, C.A.).",
+      "accounts": [
+        { "code": "SOC-01", "name": "Secretaría General de Gobierno", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-02", "name": "Consejo Estadal de Planificación y Coordinación de Políticas Públicas", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-03", "name": "Consejo de Gobierno del Estado", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-04", "name": "Gabinetes Sectoriales", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-05", "name": "Dirección de la Secretaría del Despacho del Gobernador", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-06", "name": "Dirección de Comunicación e Información", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-07", "name": "Dirección de Política y Participación Ciudadana", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-08", "name": "Dirección de Sistemas e Informática (DISI)", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-09", "name": "Dirección de Cooperación, Protocolo y Relaciones Institucionales", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-10", "name": "Oficina de Atención Comunitaria y Solidaridad Social (ODACYSS)", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-11", "name": "Oficina Estadal de Archivo", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-12", "name": "Oficina de la Imprenta Social del Estado", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "SOC-13", "name": "CORPOSALUD", "status": "verificado", "note": "IG: @corposalud_tachira (28K seg.) — verificado" },
+        { "code": "SOC-14", "name": "INAPCET", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
+        { "code": "SOC-15", "name": "INTAMUJER", "status": "verificado", "note": "IG: @intamujer | X: @INTAMUJERTACH — verificado" },
+        { "code": "SOC-16", "name": "INTAVI", "status": "candidato", "note": "IG (candidato, sin verificar): @intavienlinea (5,278 seg.)" },
+        { "code": "SOC-17", "name": "Fundación de la Familia Tachirense", "status": "verificado", "note": "IG/X: @famitachirense (27K seg.) — verificado" },
+        { "code": "SOC-18", "name": "FUNDES", "status": "verificado", "note": "IG: @fundes.tachira (1,624 seg.) — verificado" },
+        { "code": "SOC-19", "name": "FUNDACETA", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
+        { "code": "SOC-20", "name": "DESOTA, C.A. (INACTIVA)", "status": "inactiva", "note": "Empresa inactiva — sin red social" }
+      ]
+    },
+    {
+      "id": "4", "order": 4, "num": 4, "name": "Educación y Desarrollo Humano", "phase": "Fase 4", "symbol": "",
+      "accounts": [
+        { "code": "EDU-01", "name": "Dirección de Talento Humano", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "EDU-02", "name": "Dirección de Educación", "status": "verificado", "note": "IG: @diredutachira (4,975 seg.) | X: @DirEduTachira — verificado" },
+        { "code": "EDU-03", "name": "Dirección de Cultura del Estado Táchira", "status": "verificado", "note": "Facebook: /direcciondeculturadelestadotachira (30,605 seg.) — verificado. Sin Instagram propio confirmado." },
+        { "code": "EDU-04", "name": "INTEDUCA", "status": "candidato", "note": "IG (candidato, sin verificar): @inteduca_tachira" },
+        { "code": "EDU-05", "name": "I.D.T (Instituto del Deporte Tachirense)", "status": "verificado", "note": "IG: @idtachirense (2,956 seg.) — verificado" },
+        { "code": "EDU-06", "name": "Fundación Escuela de Gobierno del Estado Táchira", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" }
+      ]
+    }
+  ],
+  "newsSources": [
+    { "id": "1", "order": 1, "scope": "regional", "name": "La Nación (Táchira)", "description": "Diario regional de San Cristóbal — la referencia impresa y digital del estado.", "url": "https://www.lanacion.com.ve" },
+    { "id": "2", "order": 2, "scope": "regional", "name": "Diario Los Andes", "description": "Cobertura de toda la región andina venezolana: Táchira, Mérida y Trujillo.", "url": "https://www.diariolosandes.com.ve" },
+    { "id": "3", "order": 3, "scope": "regional", "name": "Google Noticias · Táchira", "description": "Agregador en vivo: reúne en un solo lugar lo último publicado sobre el estado por cualquier medio.", "url": "https://news.google.com/search?q=T%C3%A1chira&hl=es-419&gl=VE" },
+    { "id": "4", "order": 1, "scope": "nacional", "name": "El Nacional", "description": "Uno de los diarios nacionales de mayor circulación digital.", "url": "https://www.elnacional.com" },
+    { "id": "5", "order": 2, "scope": "nacional", "name": "El Universal", "description": "Diario nacional de referencia, fundado en 1909.", "url": "https://www.eluniversal.com" },
+    { "id": "6", "order": 3, "scope": "nacional", "name": "Efecto Cocuyo", "description": "Medio digital independiente especializado en verificación y datos.", "url": "https://efectococuyo.com" },
+    { "id": "7", "order": 4, "scope": "nacional", "name": "Venezolana de Televisión (VTV)", "description": "Canal oficial del Estado venezolano — la vocería institucional.", "url": "https://www.vtv.gob.ve" },
+    { "id": "8", "order": 5, "scope": "nacional", "name": "Google Noticias · Venezuela", "description": "Agregador en vivo de la conversación nacional del momento.", "url": "https://news.google.com/search?q=Venezuela&hl=es-419&gl=VE" },
+    { "id": "9", "order": 1, "scope": "internacional", "name": "BBC Mundo", "description": "Cobertura internacional en español del servicio mundial de la BBC.", "url": "https://www.bbc.com/mundo" },
+    { "id": "10", "order": 2, "scope": "internacional", "name": "CNN en Español", "description": "Cobertura internacional 24/7 en español.", "url": "https://cnnespanol.cnn.com" },
+    { "id": "11", "order": 3, "scope": "internacional", "name": "DW Español", "description": "Deutsche Welle — perspectiva europea de la agenda internacional.", "url": "https://www.dw.com/es" },
+    { "id": "12", "order": 4, "scope": "internacional", "name": "Reuters", "description": "Agencia de noticias internacional, fuente primaria de gran parte de la prensa mundial.", "url": "https://www.reuters.com" },
+    { "id": "13", "order": 5, "scope": "internacional", "name": "Google Noticias · Mundo", "description": "Portada de titulares internacionales en español, siempre actualizada.", "url": "https://news.google.com/topstories?hl=es-419&gl=VE&ceid=VE:es-419" }
   ]
 };
 
@@ -686,7 +766,9 @@ const state = {
   phases: clone(DEFAULT_DATA.phases),
   kpiWeekly: clone(DEFAULT_DATA.kpiWeekly),
   kpiSpecial: clone(DEFAULT_DATA.kpiSpecial),
-  checklist: clone(DEFAULT_DATA.checklist)
+  checklist: clone(DEFAULT_DATA.checklist),
+  accountSegments: clone(DEFAULT_DATA.accountSegments),
+  newsSources: clone(DEFAULT_DATA.newsSources)
 };
 
 /* Estado local (se usa mientras no haya conexión con Firestore). */
@@ -912,6 +994,163 @@ function wireSymbolModal() {
   const dialog = $('symbolModal');
   $('symbolModalClose').addEventListener('click', function () { dialog.close(); });
   dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+}
+
+/* ============ ECOSISTEMA DE CUENTAS ============
+   Mismo patrón visual y de datos que "Pilares de marca" (acordeón +
+   gráfico de cobertura), aplicado a un inventario distinto: no son ideas
+   de contenido sino cuentas institucionales reales, cada una con su
+   estado de verificación en redes sociales. */
+const accountStatusMeta = {
+  verificado: { label: 'Verificado', cls: 'v' },
+  candidato:  { label: 'Candidato sin verificar', cls: 'c' },
+  parcial:    { label: 'Verificado parcial', cls: 'p' },
+  sin_cuenta: { label: 'Sin cuenta propia', cls: 's' },
+  interno:    { label: 'Usa cuenta central', cls: 'i' },
+  inactiva:   { label: 'Inactiva', cls: 'x' }
+};
+const accountStatusColors = { v: '#0a7052', c: '#b45309', p: '#0e7490', s: '#948ca3', i: '#2f5488', x: '#b91c1c' };
+const openSegments = new Set(['1']); // primer segmento abierto por defecto
+
+function renderAccountSegments() {
+  const list = $('accountsList');
+  const chart = $('accountsChart');
+  const legend = $('accountsStatusLegend');
+  if (!list || !chart) return;
+  list.innerHTML = '';
+  chart.innerHTML = '';
+  if (legend) legend.innerHTML = '';
+
+  const segments = sortDocs(state.accountSegments);
+  const allAccounts = segments.reduce(function (acc, s) { return acc.concat(Array.isArray(s.accounts) ? s.accounts : []); }, []);
+  const total = allAccounts.length;
+  const verifiedCount = allAccounts.filter(function (a) { return a.status === 'verificado'; }).length;
+  setHTML('chipAccountsTotal', total + (total === 1 ? ' ente' : ' entes'));
+  setHTML('chipAccountsVerified', verifiedCount + (verifiedCount === 1 ? ' verificada' : ' verificadas'));
+
+  if (!segments.length) {
+    list.appendChild(el('div', 'empty', 'Sin segmentos cargados todavía.'));
+    chart.appendChild(el('div', 'empty', 'Sin datos para el gráfico de cobertura.'));
+    return;
+  }
+
+  // ---- Gráfico de cobertura, un color de la paleta por segmento ----
+  const counts = segments.map(function (s) { return Array.isArray(s.accounts) ? s.accounts.length : 0; });
+  const maxAccounts = Math.max.apply(null, [1].concat(counts));
+  segments.forEach(function (s, i) {
+    const n = counts[i];
+    const pct = Math.round(pctOf(n, maxAccounts));
+    const shade = PHASE_SHADES[i % PHASE_SHADES.length];
+    chart.appendChild(el('div', 'bar-chart-row',
+      '<span class="bar-chart-lbl">' + String(txt(s.num) || (i + 1)).padStart(2, '0') + ' · ' + txt(s.name) + '</span>' +
+      '<div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + pct + '%;background:' + shade + '"></div></div>' +
+      '<span class="bar-chart-val">' + n + '</span>'));
+  });
+
+  // ---- Leyenda de estado (reutiliza el mismo componente que la línea de tiempo) ----
+  if (legend) {
+    const counts2 = {};
+    allAccounts.forEach(function (a) { counts2[a.status] = (counts2[a.status] || 0) + 1; });
+    Object.keys(accountStatusMeta).forEach(function (key) {
+      const n = counts2[key] || 0;
+      const m = accountStatusMeta[key];
+      legend.appendChild(el('div', 'tl-leg-item',
+        '<span class="sw" style="background:' + accountStatusColors[m.cls] + '"></span>' + m.label + ' · <b>' + n + '</b>'));
+    });
+  }
+
+  // ---- Acordeón (mismas clases que pillar-card/idea-row) ----
+  segments.forEach(function (s, i) {
+    const isOpen = openSegments.has(String(s.id));
+    const card = el('div', 'pillar-card' + (isOpen ? ' open' : ''));
+
+    const head = el('div', 'pillar-head');
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    head.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    const accounts = Array.isArray(s.accounts) ? s.accounts : [];
+    head.innerHTML =
+      '<div class="pillar-num" style="color:' + PHASE_SHADES[i % PHASE_SHADES.length] + '">' + String(txt(s.num) || '').padStart(2, '0') + '</div>' +
+      '<div class="pillar-head-txt"><h4>' + txt(s.name) + '</h4><p>' + accounts.length + (accounts.length === 1 ? ' ente' : ' entes') + '</p></div>' +
+      (txt(s.phase) ? '<div class="pillar-meta"><span>' + txt(s.phase) + '</span></div>' : '') +
+      '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
+
+    function toggle() {
+      const nowOpen = !card.classList.contains('open');
+      card.classList.toggle('open', nowOpen);
+      head.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
+      if (nowOpen) openSegments.add(String(s.id)); else openSegments.delete(String(s.id));
+    }
+    head.addEventListener('click', toggle);
+    head.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); }
+    });
+
+    let inner = '<div class="pillar-body-inner">';
+    if (txt(s.symbol).trim()) inner += '<p class="pillar-symbol">' + txt(s.symbol) + '</p>';
+    if (accounts.length) {
+      accounts.forEach(function (a) {
+        const meta = accountStatusMeta[a.status] || { label: txt(a.status), cls: 's' };
+        inner += '<div class="idea-row">' +
+          '<div class="idea-code">' + txt(a.code) + '</div>' +
+          '<div class="idea-txt">' + txt(a.name) + '<span class="acct-badge ' + meta.cls + '">' + meta.label + '</span></div>' +
+          '<div class="idea-note">' + txt(a.note) + '</div>' +
+          '</div>';
+      });
+    } else {
+      inner += '<div class="empty">Este segmento todavía no tiene cuentas cargadas.</div>';
+    }
+    if (txt(s.extra).trim()) inner += '<div class="note" style="margin-top:14px;">' + txt(s.extra) + '</div>';
+    inner += '</div>';
+
+    const body = el('div', 'pillar-body', inner);
+    card.appendChild(head);
+    card.appendChild(body);
+    list.appendChild(card);
+  });
+}
+
+/* ============ MATRICES DE NOTICIAS ============
+   Directorio curado de enlaces (no un feed embebido: la mayoría de los
+   medios bloquea que su contenido se muestre dentro de otra página vía
+   X-Frame-Options/CSP). Cada tarjeta abre la fuente en una pestaña nueva. */
+function newsInitials(name) {
+  const words = txt(name).split(/[\s·(]+/).filter(function (w) { return w.length > 0; });
+  if (!words.length) return 'news'.slice(0, 2).toUpperCase();
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
+
+function renderNews() {
+  const scopes = [
+    { key: 'regional', gridId: 'newsRegional', countId: 'newsRegionalCount' },
+    { key: 'nacional', gridId: 'newsNacional', countId: 'newsNacionalCount' },
+    { key: 'internacional', gridId: 'newsInternacional', countId: 'newsInternacionalCount' }
+  ];
+  const sources = sortDocs(state.newsSources);
+  scopes.forEach(function (scope) {
+    const grid = $(scope.gridId);
+    if (!grid) return;
+    grid.innerHTML = '';
+    const items = sources.filter(function (s) { return txt(s.scope) === scope.key; });
+    setHTML(scope.countId, items.length + (items.length === 1 ? ' fuente' : ' fuentes'));
+    if (!items.length) {
+      grid.appendChild(el('div', 'empty', 'Sin fuentes cargadas todavía.'));
+      return;
+    }
+    items.forEach(function (s) {
+      const url = safeUrl(s.url);
+      grid.appendChild(el('div', 'news-card',
+        '<div class="news-card-top">' +
+          '<div class="news-card-badge">' + newsInitials(s.name) + '</div>' +
+          '<h5>' + txt(s.name) + '</h5>' +
+        '</div>' +
+        '<p>' + txt(s.description) + '</p>' +
+        (url
+          ? '<a class="news-card-link" href="' + url + '" target="_blank" rel="noopener noreferrer">Abrir sitio <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>'
+          : '<span class="acct-badge s">Sin enlace</span>')));
+    });
+  });
 }
 
 function renderWeekly() {
@@ -1401,8 +1640,10 @@ document.addEventListener('keydown', function (e) {
   if ($('fbDialog') && $('fbDialog').open) return;
 
   const current = navBtns.findIndex(function (b) { return b.classList.contains('active'); });
-  if (e.key >= '1' && e.key <= String(navBtns.length)) {
-    goToSection(Number(e.key) - 1);
+  // '1'-'9' van a las secciones 1-9; '0' es la 10ª (como en el teclado numérico).
+  const digit = e.key === '0' ? 10 : Number(e.key);
+  if (Number.isInteger(digit) && digit >= 1 && digit <= navBtns.length) {
+    goToSection(digit - 1);
   } else if (e.key === 'ArrowRight') {
     goToSection(Math.min(current + 1, navBtns.length - 1));
   } else if (e.key === 'ArrowLeft') {
@@ -1421,6 +1662,8 @@ document.addEventListener('keydown', function (e) {
      kpiWeekly/{1..5}
      kpiSpecial/{1..3}
      checklist/{grupo1..grupo3}
+     accountSegments/{1..4}
+     newsSources/{1..13}
    platformRows y reportRows son iguales para las tres marcas y quedan
    fijas en el código (no viven en Firestore).
    ================================================================ */
@@ -1493,6 +1736,8 @@ function attachListeners() {
   watchCollection('kpiWeekly', 'kpiWeekly', function () { renderKpis(); });
   watchCollection('kpiSpecial', 'kpiSpecial', function () { renderKpis(); });
   watchCollection('checklist', 'checklist', function () { renderChecklist(); });
+  watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); });
+  watchCollection('newsSources', 'newsSources', function () { renderNews(); });
 }
 
 let firstPaintPending = 0;
@@ -1580,6 +1825,8 @@ async function seedFirestore() {
   DEFAULT_DATA.kpiWeekly.forEach(function (k) { const d = clone(k); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'kpiWeekly', k.id), d)); });
   DEFAULT_DATA.kpiSpecial.forEach(function (k) { const d = clone(k); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'kpiSpecial', k.id), d)); });
   DEFAULT_DATA.checklist.forEach(function (g) { const d = clone(g); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'checklist', g.id), d)); });
+  DEFAULT_DATA.accountSegments.forEach(function (s) { const d = clone(s); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'accountSegments', s.id), d)); });
+  DEFAULT_DATA.newsSources.forEach(function (n) { const d = clone(n); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'newsSources', n.id), d)); });
   try {
     fbMsg('Cargando contenido inicial en Firestore…', 'ok');
     await Promise.all(ops);
@@ -1679,6 +1926,8 @@ function renderAllFromState() {
   renderPhases();
   renderKpis();
   renderChecklist();
+  renderAccountSegments();
+  renderNews();
 }
 
 /* ============ 10 · ARRANQUE ============ */

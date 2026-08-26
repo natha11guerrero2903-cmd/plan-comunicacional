@@ -17,6 +17,8 @@
   --ok:#12a06a;
   --warn:#d97706;
   --alert:#dc2626;
+  --info:#2f5488;
+  --neutral-status:#0e7490;
   --radius:14px;
   --shadow:0 1px 2px rgba(27,10,61,.05), 0 8px 24px rgba(27,10,61,.08);
 }
@@ -397,6 +399,20 @@ h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
 .idea-txt{font-size:13px;line-height:1.5;color:var(--black);}
 .idea-note{font-size:11.5px;line-height:1.45;color:var(--gray);font-style:italic;}
 @media(max-width:700px){.idea-row{grid-template-columns:50px 1fr;}.idea-note{grid-column:2/3;}}
+
+/* Insignias de estado de cuenta (Ecosistema de cuentas) */
+.acct-badge{
+  display:inline-block;margin-left:8px;
+  font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;
+  letter-spacing:.04em;text-transform:uppercase;
+  padding:2px 8px;border-radius:100px;white-space:nowrap;
+}
+.acct-badge.v{background:#e2f3ec;color:#0a7052;}
+.acct-badge.c{background:#fef3c7;color:#b45309;}
+.acct-badge.p{background:#e0f2fe;color:var(--neutral-status);}
+.acct-badge.s{background:#f1f1ef;color:var(--gray);}
+.acct-badge.i{background:#e6edf7;color:var(--info);}
+.acct-badge.x{background:#fde8e8;color:#b91c1c;}
 
 /* Weekly pieces */
 .week-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
@@ -923,3 +939,27 @@ html.gate-unlocked .gate-overlay{display:none !important;}
   60%{transform:translateX(-5px);}
   80%{transform:translateX(5px);}
 }
+
+/* Matrices de noticias */
+.news-card{
+  background:var(--white);border:1px solid var(--border);border-radius:var(--radius);
+  padding:16px 18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;
+}
+.news-card-top{display:flex;align-items:center;gap:10px;}
+.news-card-badge{
+  width:34px;height:34px;border-radius:9px;flex-shrink:0;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Space Grotesk',sans-serif;font-size:12.5px;font-weight:700;
+  background:var(--brand-core);
+}
+.news-card h5{margin:0;font-size:14px;font-weight:600;color:var(--black);}
+.news-card p{margin:0;font-size:12px;line-height:1.5;color:var(--gray);flex:1;}
+.news-card-link{
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  background:var(--paper-2);color:var(--brand-deep-2);border:1px solid var(--border);
+  font-family:'Inter',sans-serif;font-weight:600;font-size:12px;
+  padding:8px 14px;border-radius:100px;text-decoration:none;
+  transition:background .15s ease,border-color .15s ease;
+}
+.news-card-link:hover{background:#f0e6fe;border-color:var(--brand-core);}
+.news-card-link svg{flex-shrink:0;}
