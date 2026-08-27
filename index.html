@@ -43,7 +43,7 @@
       <li><button type="button" class="navbtn" data-target="cuentas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Segmentos de la gestión<span class="tag">03</span></button></li>
       <li><button type="button" class="navbtn" data-target="calendario"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 10h18M8 2v4M16 2v4M8 15h.01M12 15h.01M16 15h.01"/></svg>Calendario de gestión<span class="tag">04</span></button></li>
       <li><button type="button" class="navbtn" data-target="metricas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-5 3 3 5-7"/></svg>Métricas &amp; KPIs<span class="tag">05</span></button></li>
-      <li><button type="button" class="navbtn" data-target="matrices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Matrices<span class="tag">06</span></button></li>
+      <li><button type="button" class="navbtn" data-target="matrices"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>Matrices de opinión<span class="tag">06</span></button></li>
     </ul>
 
     <div class="sidebar-foot">
@@ -293,14 +293,19 @@
     <section class="panel" id="matrices">
       <div class="topline">
         <div>
-          <h2>Matrices de noticias</h2>
-          <p class="sub">Directorio curado de fuentes confiables para monitorear la conversación pública en tres niveles. Cada tarjeta abre el sitio original en una pestaña nueva.</p>
+          <h2>Matrices de opinión sobre la gestión</h2>
+          <p class="sub">Qué dicen los medios sobre la gestión, y un directorio de fuentes confiables para monitorear la conversación pública en tres niveles.</p>
         </div>
       </div>
 
+      <div class="section-title first-title"><h3>Noticias sobre la gestión</h3><span class="num" id="opinionNewsCount">0 noticias cargadas</span></div>
+      <div class="note">Cada noticia se carga a mano cuando aparece una cobertura real y verificable: primero se ve como tarjeta (foto, titular, medio, fecha y un resumen breve) y solo si hace falta más contexto se abre la nota original con "Leer noticia". No es un feed automático ni se muestran noticias de ejemplo.</div>
+      <div class="grid grid-3" id="opinionNewsList"></div>
+
+      <div class="section-title"><h3>Directorio de fuentes de monitoreo</h3></div>
       <div class="note">Esto no es un feed en vivo embebido: la mayoría de los medios bloquea que su contenido se incruste dentro de otra página. En su lugar, cada tarjeta enlaza directo a la fuente para ver sus titulares del momento con un clic. La lista se edita como el resto del contenido, desde la Consola de Firebase.</div>
 
-      <div class="section-title first-title"><h3>Regional · Táchira</h3><span class="num" id="newsRegionalCount">0 fuentes</span></div>
+      <div class="section-title"><h3>Regional · Táchira</h3><span class="num" id="newsRegionalCount">0 fuentes</span></div>
       <div class="grid grid-3" id="newsRegional"></div>
 
       <div class="section-title"><h3>Nacional · Venezuela</h3><span class="num" id="newsNacionalCount">0 fuentes</span></div>

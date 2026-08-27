@@ -713,6 +713,7 @@ const DEFAULT_DATA = {
     { "id": "12", "order": 4, "scope": "internacional", "name": "Reuters", "description": "Agencia de noticias internacional, fuente primaria de gran parte de la prensa mundial.", "url": "https://www.reuters.com" },
     { "id": "13", "order": 5, "scope": "internacional", "name": "Google Noticias · Mundo", "description": "Portada de titulares internacionales en español, siempre actualizada.", "url": "https://news.google.com/topstories?hl=es-419&gl=VE&ceid=VE:es-419" }
   ],
+  "newsItems": [],
   "contentSummaries": [
     { "id": "1", "order": 1, "type": "Resumen semanal", "title": "", "note": "Se propone para los lunes. Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
     { "id": "2", "order": 2, "type": "Resumen mensual", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
@@ -830,6 +831,7 @@ const state = {
   checklist: clone(DEFAULT_DATA.checklist),
   accountSegments: clone(DEFAULT_DATA.accountSegments),
   newsSources: clone(DEFAULT_DATA.newsSources),
+  newsItems: clone(DEFAULT_DATA.newsItems),
   contentSummaries: clone(DEFAULT_DATA.contentSummaries),
   /* Las publicaciones del calendario no vienen de DEFAULT_DATA: se
      generan en vivo a partir de weekly/specials (ver
@@ -1469,6 +1471,50 @@ function renderNews() {
           ? '<a class="news-card-link" href="' + url + '" target="_blank" rel="noopener noreferrer">Abrir sitio <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>'
           : '<span class="acct-badge s">Sin enlace</span>')));
     });
+  });
+}
+
+/* ============ NOTICIAS SOBRE LA GESTIÓN (matrices de opinión) ============
+   Cobertura real y verificada, no un feed automático: cada noticia se
+   carga a mano (foto, titular, medio, fecha, resumen breve y el enlace
+   real a la nota) desde la Consola de Firebase cuando aparece. Empieza
+   vacía a propósito -- no se inventa ninguna noticia ni cifra de
+   percepción mientras no exista contenido real cargado. */
+function formatNewsDate(iso) {
+  const s = txt(iso).trim();
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  const [y, m, d] = s.split('-');
+  const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const mi = Number(m) - 1;
+  return d + ' ' + (meses[mi] || m) + '. ' + y;
+}
+
+function renderOpinionNews() {
+  const grid = $('opinionNewsList');
+  const countEl = $('opinionNewsCount');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const items = sortDocs(state.newsItems);
+  if (countEl) setHTML('opinionNewsCount', items.length + (items.length === 1 ? ' noticia cargada' : ' noticias cargadas'));
+  if (!items.length) {
+    grid.appendChild(el('div', 'empty', 'Aún no se ha cargado ninguna noticia real sobre la gestión. Se agregan desde la Consola de Firebase (colección "newsItems") a medida que aparecen coberturas verificables -- con foto, medio, fecha, resumen y enlace real a la nota. No se muestran noticias de ejemplo.'));
+    return;
+  }
+  items.forEach(function (n) {
+    const url = safeUrl(n.url);
+    const photo = safeUrl(n.photo);
+    grid.appendChild(el('div', 'opinion-card',
+      (photo
+        ? '<div class="opinion-card-photo" style="background-image:url(&quot;' + photo + '&quot;);"></div>'
+        : '<div class="opinion-card-photo opinion-card-photo--empty">' + newsInitials(n.medio) + '</div>') +
+      '<div class="opinion-card-body">' +
+        '<p class="opinion-card-meta">' + txt(n.medio) + (n.fecha ? ' · ' + formatNewsDate(n.fecha) : '') + '</p>' +
+        '<h5>' + txt(n.titular) + '</h5>' +
+        '<p class="opinion-card-summary">' + txt(n.resumen) + '</p>' +
+        (url
+          ? '<a class="news-card-link" href="' + url + '" target="_blank" rel="noopener noreferrer">Leer noticia <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>'
+          : '<span class="acct-badge s">Sin enlace todavía</span>') +
+      '</div>'));
   });
 }
 
@@ -2258,6 +2304,10 @@ document.addEventListener('keydown', function (e) {
      checklist/{grupo1..grupo3}
      accountSegments/{1..4}
      newsSources/{1..13}
+     newsItems/{id}       (curadas a mano: cada una es una noticia real
+                            con foto, titular, medio, fecha, resumen breve
+                            y enlace real a la nota; empieza vacía a
+                            propósito -- no se cargan noticias de ejemplo)
      contentSummaries/{1..4}
      publications/{fecha_tipo}   (solo el campo "status" -- las
                                   publicaciones se generan en vivo desde
@@ -2341,6 +2391,7 @@ function attachListeners() {
   watchCollection('checklist', 'checklist', function () { renderChecklist(); });
   watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); });
   watchCollection('newsSources', 'newsSources', function () { renderNews(); });
+  watchCollection('newsItems', 'newsItems', function () { renderOpinionNews(); });
   watchCollection('contentSummaries', 'contentSummaries', function () { renderContentSummaries(); });
 }
 
@@ -2431,6 +2482,7 @@ async function seedFirestore() {
   DEFAULT_DATA.checklist.forEach(function (g) { const d = clone(g); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'checklist', g.id), d)); });
   DEFAULT_DATA.accountSegments.forEach(function (s) { const d = clone(s); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'accountSegments', s.id), d)); });
   DEFAULT_DATA.newsSources.forEach(function (n) { const d = clone(n); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'newsSources', n.id), d)); });
+  DEFAULT_DATA.newsItems.forEach(function (n) { const d = clone(n); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'newsItems', n.id), d)); });
   DEFAULT_DATA.contentSummaries.forEach(function (c) { const d = clone(c); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'contentSummaries', c.id), d)); });
   try {
     fbMsg('Cargando contenido inicial en Firestore…', 'ok');
@@ -2530,6 +2582,7 @@ function renderAllFromState() {
   renderChecklist();
   renderAccountSegments();
   renderNews();
+  renderOpinionNews();
   renderContentSummaries();
   renderComplianceChart();
   renderMilestones();
