@@ -413,6 +413,19 @@ h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
   text-align:center;
   height:fit-content;
 }
+/* Logo de ente en "Segmentos de la gestión" -- reemplaza el cuadro con
+   el código (SEG-01, etc.) que usan las filas de "Banco de contenidos". */
+.ente-logo{
+  width:56px;height:56px;border-radius:8px;overflow:hidden;flex-shrink:0;
+  background:#fff;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+}
+.ente-logo img{width:100%;height:100%;object-fit:contain;padding:4px;box-sizing:border-box;}
+.ente-logo--pending{
+  background:var(--paper-2);border-style:dashed;
+  font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.04em;
+  color:var(--gray-soft);text-align:center;
+}
 .idea-txt{font-size:13px;line-height:1.5;color:var(--black);}
 .idea-note{font-size:11.5px;line-height:1.45;color:var(--gray);font-style:italic;}
 @media(max-width:700px){.idea-row{grid-template-columns:50px 1fr;}.idea-note{grid-column:2/3;}}
