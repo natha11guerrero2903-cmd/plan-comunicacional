@@ -1046,6 +1046,15 @@ html.gate-unlocked .gate-overlay{display:none !important;}
 .opinion-card-summary{margin:0;font-size:12px;line-height:1.5;color:var(--gray);flex:1;}
 .opinion-card-body .news-card-link{align-self:flex-start;}
 
+/* Percepción sobre la gestión */
+.perception-metodologia{margin:0 0 4px;color:var(--gray);font-size:14px;max-width:560px;}
+.perception-medicion{margin:0 0 16px;color:var(--gray-soft);font-size:11.5px;font-family:'IBM Plex Mono',monospace;}
+.perception-stats{display:flex;flex-wrap:wrap;gap:22px;}
+.perception-stat{display:flex;align-items:center;gap:8px;min-width:140px;}
+.perception-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+.perception-label{font-size:13px;color:var(--black);font-weight:600;}
+.perception-value{margin-left:auto;font-family:'Space Grotesk',sans-serif;font-size:16px;font-weight:700;color:var(--black);}
+
 /* Modal "Logos del segmento" */
 .logo-modal{
   border:none;border-radius:var(--radius);padding:0;max-width:640px;width:calc(100% - 32px);

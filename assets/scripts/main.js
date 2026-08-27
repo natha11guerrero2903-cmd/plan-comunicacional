@@ -719,7 +719,18 @@ const DEFAULT_DATA = {
     { "id": "2", "order": 2, "type": "Resumen mensual", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
     { "id": "3", "order": 3, "type": "Resumen trimestral", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
     { "id": "4", "order": 4, "type": "Resumen semestral", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false }
-  ]
+  ],
+  /* Percepción ciudadana sobre la gestión: estructura preparada a propósito
+     sin metodología ni cifras inventadas. positiva/negativa/neutra quedan
+     en null hasta que exista una metodología real (encuesta, escucha
+     social, etc.) que las alimente -- ver nota en renderPerception(). */
+  "perception": {
+    "metodologia": "",
+    "ultimaMedicion": "",
+    "positiva": null,
+    "negativa": null,
+    "neutra": null
+  }
 };
 
 /* Tablas iguales para las tres marcas — se quedan fijas en el código. */
@@ -833,6 +844,7 @@ const state = {
   newsSources: clone(DEFAULT_DATA.newsSources),
   newsItems: clone(DEFAULT_DATA.newsItems),
   contentSummaries: clone(DEFAULT_DATA.contentSummaries),
+  perception: clone(DEFAULT_DATA.perception),
   /* Las publicaciones del calendario no vienen de DEFAULT_DATA: se
      generan en vivo a partir de weekly/specials (ver
      buildScheduleOccurrences). Aquí solo vive el ESTADO de cada una
@@ -1116,6 +1128,26 @@ const SOCIAL_PLATFORMS = [
   { key: 'facebook', label: 'Facebook' }
 ];
 
+/* Redes del DIRECTOR de un ente -- estructura separada de las redes del
+   ente (punto 16). No hay datos reales todavía para ningún director; esto
+   solo prepara la conversión handle→link real para cuando se carguen
+   (ver openEnteModal y la nota de "preparación para scraping/API"). */
+const DIRECTOR_SOCIAL_BASE = {
+  instagram: 'https://instagram.com/',
+  x: 'https://x.com/',
+  facebook: 'https://facebook.com/',
+  tiktok: 'https://tiktok.com/@'
+};
+function directorSocialLink(key, raw) {
+  const s = txt(raw).trim();
+  if (!s) return null;
+  if (/^https?:\/\//i.test(s)) return { handle: s.replace(/^https?:\/\/(www\.)?/i, ''), url: s };
+  const handle = s.replace(/^@/, '');
+  const base = DIRECTOR_SOCIAL_BASE[key];
+  if (!base || !handle) return null;
+  return { handle: '@' + handle, url: base + handle };
+}
+
 function parseAccountSocial(a) {
   const info = { instagram: null, x: null, facebook: null, tiktok: null, central: null };
   const note = txt(a && a.note);
@@ -1208,21 +1240,55 @@ function openEnteModal(segNum, code) {
     });
   }
 
-  const metricRows = ['Publicaciones (histórico)', 'Publicaciones último mes', 'Likes', 'Comentarios', 'Compartidos', 'Alcance', 'Impresiones', 'Frecuencia de publicación']
-    .map(function (label) {
-      return '<div class="pub-detail-row"><span class="k">' + label + '</span><span class="v" style="color:var(--gray-soft);font-weight:500;">Sin datos cargados</span></div>';
-    }).join('');
+  const METRIC_FIELDS = [
+    { key: 'publicacionesHistorico', label: 'Publicaciones (histórico)' },
+    { key: 'publicacionesUltimoMes', label: 'Publicaciones último mes' },
+    { key: 'likes', label: 'Likes' },
+    { key: 'comentarios', label: 'Comentarios' },
+    { key: 'compartidos', label: 'Compartidos' },
+    { key: 'alcance', label: 'Alcance' },
+    { key: 'impresiones', label: 'Impresiones' },
+    { key: 'frecuenciaPublicacion', label: 'Frecuencia de publicación' }
+  ];
+  const metrics = (a && typeof a.metrics === 'object' && a.metrics) || {};
+  const hasAnyMetric = METRIC_FIELDS.some(function (f) { return metrics[f.key] !== undefined && metrics[f.key] !== null && metrics[f.key] !== ''; });
+  const metricRows = METRIC_FIELDS.map(function (f) {
+    const v = metrics[f.key];
+    const has = v !== undefined && v !== null && v !== '';
+    return '<div class="pub-detail-row"><span class="k">' + f.label + '</span><span class="v"' +
+      (has ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' +
+      (has ? txt(v) : 'Sin datos cargados') + '</span></div>';
+  }).join('');
+
+  const director = (a && typeof a.director === 'object' && a.director) || null;
+  const hasDirector = !!(director && txt(director.nombre).trim());
+  let directorHtml;
+  if (hasDirector) {
+    directorHtml = '<div class="pub-detail-row"><span class="k">Director</span><span class="v">' + txt(director.nombre) + '</span></div>';
+    SOCIAL_PLATFORMS.forEach(function (p) {
+      const link = directorSocialLink(p.key, director[p.key]);
+      directorHtml += '<div class="pub-detail-row"><span class="k">' + p.label + ' (director)</span><span class="v">' +
+        (link ? '<a href="' + link.url + '" target="_blank" rel="noopener noreferrer">' + link.handle + '</a>' : '<span style="color:var(--gray-soft);font-weight:500;">Sin cuenta</span>') +
+        '</span></div>';
+    });
+  } else {
+    directorHtml = '<div class="pub-detail-row"><span class="k">Director</span><span class="v" style="color:var(--gray-soft);font-weight:500;">Sin datos cargados</span></div>';
+  }
 
   $('enteModalBody').innerHTML =
     '<div class="pub-detail-row"><span class="k">Tipo</span><span class="v">' + tipo +
       (a.status === 'interno' ? '' : ' <span style="color:var(--gray-soft);font-weight:500;font-style:italic;">(inferido, confirmar)</span>') +
     '</span></div>' +
-    '<div class="pub-detail-row"><span class="k">Director</span><span class="v" style="color:var(--gray-soft);font-weight:500;">Sin datos cargados</span></div>' +
-    '<p class="symbol-tag" style="margin-top:16px;">Redes sociales</p>' +
+    directorHtml +
+    '<p class="symbol-tag" style="margin-top:16px;">Redes sociales del ente</p>' +
     socialHtml +
-    '<p class="symbol-tag" style="margin-top:16px;">Métricas (pendiente de conectar)</p>' +
+    '<p class="symbol-tag" style="margin-top:16px;">Métricas' + (hasAnyMetric ? '' : ' (pendiente de conectar)') + '</p>' +
     metricRows +
-    '<p class="pub-objective" style="font-style:italic;color:var(--gray);">Estos campos se completan cuando se conecte un mecanismo real de obtención de datos (scraping o API). No se muestran cifras estimadas.</p>';
+    '<p class="pub-objective" style="font-style:italic;color:var(--gray);">' +
+      (hasAnyMetric
+        ? 'Estos valores provienen del mecanismo de obtención de datos ya conectado para este ente. Los campos que sigan en "Sin datos cargados" aún no llegan por esa vía.'
+        : 'Estos campos se completan cuando se conecte un mecanismo real de obtención de datos (scraping o API). No se muestran cifras estimadas.') +
+    '</p>';
 
   const dialog = $('enteModal');
   if (typeof dialog.showModal === 'function') dialog.showModal();
@@ -1472,6 +1538,44 @@ function renderNews() {
           : '<span class="acct-badge s">Sin enlace</span>')));
     });
   });
+}
+
+/* ============ PERCEPCIÓN SOBRE LA GESTIÓN ============
+   Estructura preparada a propósito, sin metodología ni cifras inventadas.
+   positiva/negativa/neutra solo se muestran si alguien las carga desde
+   Firestore (perception/main) tras aplicar una metodología real (encuesta,
+   escucha social, etc.). Mientras eso no exista, la sección explica por
+   qué está vacía en vez de simular un dato. */
+function renderPerception() {
+  const p = state.perception || {};
+  const body = $('perceptionBody');
+  if (!body) return;
+  const hasData = p.positiva !== null && p.positiva !== undefined
+    || p.negativa !== null && p.negativa !== undefined
+    || p.neutra !== null && p.neutra !== undefined;
+  const rows = [
+    { key: 'positiva', label: 'Positiva', color: 'var(--ok)' },
+    { key: 'negativa', label: 'Negativa', color: 'var(--alert)' },
+    { key: 'neutra', label: 'Neutra', color: 'var(--neutral-status)' }
+  ];
+  body.innerHTML = rows.map(function (r) {
+    const v = p[r.key];
+    const hasVal = v !== null && v !== undefined && v !== '';
+    return '<div class="perception-stat">' +
+      '<span class="perception-dot" style="background:' + r.color + ';"></span>' +
+      '<span class="perception-label">' + r.label + '</span>' +
+      '<span class="perception-value" style="' + (hasVal ? '' : 'color:var(--gray-soft);font-style:italic;') + '">' +
+        (hasVal ? txt(v) + '%' : 'Sin datos') +
+      '</span></div>';
+  }).join('');
+  setHTML('perceptionMetodologia', txt(p.metodologia).trim() || 'Aún no se ha definido ni aplicado una metodología real de medición de percepción ciudadana.');
+  setHTML('perceptionUltimaMedicion', txt(p.ultimaMedicion).trim() ? 'Última medición: ' + txt(p.ultimaMedicion) : 'Sin mediciones registradas todavía.');
+  const note = $('perceptionNote');
+  if (note) {
+    note.textContent = hasData
+      ? 'Estas cifras provienen de la metodología descrita arriba. Se actualizan desde la Consola de Firebase cada vez que hay una nueva medición.'
+      : 'Esta sección queda sin cifras a propósito: no existe todavía una metodología real de medición de percepción ciudadana. Cuando el equipo defina una (encuesta, escucha social u otra), se carga aquí -- no se muestran porcentajes estimados mientras tanto.';
+  }
 }
 
 /* ============ NOTICIAS SOBRE LA GESTIÓN (matrices de opinión) ============
@@ -2207,8 +2311,25 @@ function buildPrintReport() {
     timeStr = now.toISOString().slice(11, 16);
   }
 
+  const occurrences = buildScheduleOccurrences();
+  const statusCounts = {};
+  PUBLICATION_STATES.forEach(function (s) { statusCounts[s.key] = 0; });
+  occurrences.forEach(function (o) { statusCounts[o.status] = (statusCounts[o.status] || 0) + 1; });
+
+  const reportSegments = sortDocs(state.accountSegments);
+  const segMap = (state.meta && state.meta.weekdaySegments) || {};
+
+  const newsByScope = { regional: 0, nacional: 0, internacional: 0 };
+  state.newsSources.forEach(function (n) { if (newsByScope[n.scope] !== undefined) newsByScope[n.scope]++; });
+  const opinionCount = state.newsItems.length;
+
+  const perc = state.perception || {};
+  const hasPerception = (perc.positiva !== null && perc.positiva !== undefined && perc.positiva !== '')
+    || (perc.negativa !== null && perc.negativa !== undefined && perc.negativa !== '')
+    || (perc.neutra !== null && perc.neutra !== undefined && perc.neutra !== '');
+
   let html =
-    '<h1>Reporte de progreso — Plan Comunicacional Integrado</h1>' +
+    '<h1>Informe mensual de actividades de comunicación de gestión</h1>' +
     '<p class="rep-meta">' + txt(state.meta && state.meta.eyebrow) + '</p>' +
     '<p class="rep-meta">Generado el ' + dateStr + ' · ' + timeStr + '</p>' +
     '<p class="rep-meta">Origen de los datos: ' + (fb.live ? 'Firestore · proyecto ' + FIREBASE_PROJECT : 'almacenamiento local de este equipo') + '</p>' +
@@ -2242,6 +2363,38 @@ function buildPrintReport() {
     }).join('');
     html += '<h2><span>' + txt(g.title) + '</span><span class="rep-cnt">' + groupChecked + '/' + items.length + '</span></h2><ul>' + li + '</ul>';
   });
+
+  html += '<h2><span>Calendario del período · piezas por estado</span></h2><ul>';
+  PUBLICATION_STATES.forEach(function (s) {
+    html += '<li>' + s.label + ' — <b>' + (statusCounts[s.key] || 0) + '</b></li>';
+  });
+  html += '</ul>';
+
+  html += '<h2><span>Segmentos de la gestión y entes</span></h2><ul>';
+  reportSegments.forEach(function (s) {
+    const accounts = Array.isArray(s.accounts) ? s.accounts : [];
+    const activeCount = accounts.filter(hasActiveSocial).length;
+    const days = Object.keys(segMap).filter(function (k) { return segMap[k] && String(segMap[k]) === String(s.num); });
+    const freq = days.length ? days.map(function (d) { return WEEKDAY_LABELS[d]; }).join(', ') : 'sin día asignado todavía';
+    html += '<li>' + txt(s.name) + ' — ' + accounts.length + ' entes, ' + activeCount + ' con redes activas · frecuencia planificada: ' + freq + '</li>';
+  });
+  html += '</ul>';
+
+  html += '<h2><span>Medios y matrices de opinión</span></h2><ul>' +
+    '<li>Directorio de fuentes — Regional (Táchira): <b>' + newsByScope.regional + '</b> · Nacional: <b>' + newsByScope.nacional + '</b> · Internacional: <b>' + newsByScope.internacional + '</b></li>' +
+    '<li>Noticias reales cargadas sobre la gestión: <b>' + opinionCount + '</b></li>' +
+  '</ul>';
+
+  html += '<h2><span>Percepción sobre la gestión</span></h2>';
+  if (hasPerception) {
+    html += '<ul>' +
+      '<li>Positiva — <b>' + (perc.positiva !== null && perc.positiva !== undefined && perc.positiva !== '' ? txt(perc.positiva) + '%' : 'sin datos') + '</b></li>' +
+      '<li>Negativa — <b>' + (perc.negativa !== null && perc.negativa !== undefined && perc.negativa !== '' ? txt(perc.negativa) + '%' : 'sin datos') + '</b></li>' +
+      '<li>Neutra — <b>' + (perc.neutra !== null && perc.neutra !== undefined && perc.neutra !== '' ? txt(perc.neutra) + '%' : 'sin datos') + '</b></li>' +
+    '</ul>';
+  } else {
+    html += '<p class="rep-meta">Sin metodología de medición todavía -- no se muestran cifras estimadas.</p>';
+  }
 
   $('printReport').innerHTML = html;
 }
@@ -2313,8 +2466,30 @@ document.addEventListener('keydown', function (e) {
                                   publicaciones se generan en vivo desde
                                   weekly+specials+meta.weekdaySegments;
                                   ver buildScheduleOccurrences())
+     perception/main      (documento único; positiva/negativa/neutra
+                            quedan en null hasta que exista una
+                            metodología real de medición -- no se
+                            inventan cifras de percepción ciudadana)
    platformRows y reportRows son iguales para las tres marcas y quedan
    fijas en el código (no viven en Firestore).
+
+   ---- Preparación para scraping/API (puntos 37-39 de la corrección) ----
+   Nada de esto está implementado todavía -- son los campos que la UI ya
+   sabe leer en cuanto exista un mecanismo real (scraping o API) que los
+   escriba en Firestore. No se simula ninguna conexión ni se inventa
+   ningún valor mientras tanto:
+     accountSegments/{seg}.accounts[].director = {
+       nombre, instagram, tiktok, x, facebook   (handles "@usuario" o URL)
+     }
+     accountSegments/{seg}.accounts[].metrics = {
+       publicacionesHistorico, publicacionesUltimoMes, likes, comentarios,
+       compartidos, alcance, impresiones, frecuenciaPublicacion
+     }
+   openEnteModal() ya muestra estos dos objetos con datos reales en cuanto
+   existan en el documento del ente; si no existen, sigue mostrando
+   "Sin datos cargados" (nunca un cero ni un estimado). No hay ninguna
+   dependencia adicional que agregar en el código para "activar" esto --
+   solo falta que el mecanismo de obtención de datos escriba ahí.
    ================================================================ */
 const fb = { app: null, db: null, api: null, auth: null, authApi: null, user: null, live: false, unsubs: [], connecting: false };
 
@@ -2369,6 +2544,13 @@ function attachListeners() {
     renderSegmentDiagnostics();
     scheduleFirstPaintDone();
   }, function (err) { onFsError('meta', err); }));
+
+  // perception: documento único (estructura preparada, sin metodología aún)
+  fb.unsubs.push(api.onSnapshot(api.doc(db, BRAND_SLUG, 'plan', 'perception', 'main'), function (snap) {
+    state.perception = Object.assign({}, DEFAULT_DATA.perception, docOr({}, snap.data()));
+    renderPerception();
+    scheduleFirstPaintDone();
+  }, function (err) { onFsError('perception', err); }));
 
   function watchCollection(col, targetKey, onAfter) {
     fb.unsubs.push(api.onSnapshot(root(col), function (snap) {
@@ -2472,6 +2654,7 @@ async function seedFirestore() {
   const api = fb.api, db = fb.db;
   const ops = [];
   ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'meta', 'main'), DEFAULT_DATA.meta));
+  ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'perception', 'main'), DEFAULT_DATA.perception));
   DEFAULT_DATA.pillars.forEach(function (p) { const d = clone(p); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'pillars', p.id), d)); });
   DEFAULT_DATA.symbols.forEach(function (s) { const d = clone(s); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'symbols', s.id), d)); });
   DEFAULT_DATA.weekly.forEach(function (w) { const d = clone(w); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'weekly', w.id), d)); });
@@ -2583,6 +2766,7 @@ function renderAllFromState() {
   renderAccountSegments();
   renderNews();
   renderOpinionNews();
+  renderPerception();
   renderContentSummaries();
   renderComplianceChart();
   renderMilestones();
