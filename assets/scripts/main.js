@@ -79,6 +79,15 @@ const DEFAULT_DATA = {
     "eyebrow": "Marca Gestión · Equipo de Comunicación Digital",
     "periodStart": "2026-08-24",
     "periodEnd": "2026-11-03",
+    "weekdaySegments": {
+      "lunes": null,
+      "martes": null,
+      "miercoles": "1",
+      "jueves": "2",
+      "viernes": "3",
+      "sabado": "4",
+      "domingo": null
+    },
     "heroSub": "Plan de 72 días para comunicar la gestión con evidencia: obra terminada, servicio que responde y cuentas verificables. Cubre Instagram, Facebook y TikTok. Quedan fuera la vocería en prensa tradicional y la pauta pagada.",
     "introCard": "Este plan integra tres insumos que hoy viven separados: el inventario de obras y servicios, el registro de reportes ciudadanos y el cronograma de ejecución. La regla principal es una sola: ninguna pieza sale sin un dato verificable —fecha, cifra, ubicación o responsable— ni sin material grabado en el sitio. Lo que no se puede mostrar, no se anuncia.",
     "stats": [
@@ -821,7 +830,12 @@ const state = {
   checklist: clone(DEFAULT_DATA.checklist),
   accountSegments: clone(DEFAULT_DATA.accountSegments),
   newsSources: clone(DEFAULT_DATA.newsSources),
-  contentSummaries: clone(DEFAULT_DATA.contentSummaries)
+  contentSummaries: clone(DEFAULT_DATA.contentSummaries),
+  /* Las publicaciones del calendario no vienen de DEFAULT_DATA: se
+     generan en vivo a partir de weekly/specials (ver
+     buildScheduleOccurrences). Aquí solo vive el ESTADO de cada una
+     (Diseñada..Métricas cargadas), igual que kpiWeekly/kpiSpecial. */
+  publications: safeStorage.get(LS_PREFIX + 'publications_v1') || []
 };
 
 /* Estado local (se usa mientras no haya conexión con Firestore). */
@@ -924,7 +938,6 @@ function renderMeta() {
   $('diagCount').style.display = found.length ? '' : 'none';
   $('resumenNote').style.display = txt(m.resumenNote).trim() ? '' : 'none';
   $('pilaresNote').style.display = txt(m.pilaresNote).trim() ? '' : 'none';
-  $('semanalNote').style.display = txt(m.semanalNote).trim() ? '' : 'none';
 }
 
 function renderPillars() {
@@ -1442,77 +1455,294 @@ const logoImages = {
   "SOC-20": "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"
 };
 
-function renderPhases() {
-  const track = $('tlTrack');
-  const legend = $('tlLegend');
-  const list = $('phaseList');
-  track.innerHTML = '';
-  legend.innerHTML = '';
-  list.innerHTML = '';
+/* ============ CALENDARIO REAL + CUMPLIMIENTO POR SEGMENTO ============
+   Punto 6/7/18/19 de la corrección: ya no hay Fase 1->2->3->4. Las
+   publicaciones se generan a partir de lo que ya existe (weekly,
+   specials y el resumen semanal de los lunes) proyectado sobre fechas
+   reales -- no se inventa contenido nuevo. Solo el ESTADO de cada
+   publicación (Diseñada..Métricas cargadas) se guarda en Firestore,
+   un documento pequeño por ocurrencia, igual que ya hacían los KPI. */
+const WEEKDAY_KEYS = ['domingo', 'lunes', 'martes', 'miercoles', 'jueves', 'viernes', 'sabado']; // índice = Date.getDay()
+const WEEKDAY_LABELS = { domingo: 'Domingo', lunes: 'Lunes', martes: 'Martes', miercoles: 'Miércoles', jueves: 'Jueves', viernes: 'Viernes', sabado: 'Sábado' };
+const MONTH_LABELS = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+const MES_ABBR = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
+const PUBLICATION_STATES = [
+  { key: 'disenada', label: 'Diseñada' },
+  { key: 'revisada', label: 'Revisada' },
+  { key: 'aprobada', label: 'Aprobada' },
+  { key: 'publicada', label: 'Publicada' },
+  { key: 'reposteada', label: 'Reposteada' },
+  { key: 'metricas', label: 'Métricas cargadas' }
+];
 
-  const phases = sortDocs(state.phases).map(function (p) {
-    return { raw: p, s: parseISO(p.start), e: parseISO(p.end) };
+function normalizeAccents(s) { return txt(s).trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+function isoOf(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function addDays(d, n) { const r = new Date(d.getTime()); r.setDate(r.getDate() + n); return r; }
+
+/* "Fase 4 · 2 nov 2026" -> "2026-11-02" (null si no puede leerla). */
+function parseSpanishDate(s) {
+  const m = /(\d{1,2})\s+([a-z]{3,})\.?\s+(\d{4})/i.exec(normalizeAccents(s));
+  if (!m) return null;
+  const day = Number(m[1]);
+  const month = MES_ABBR[m[2].slice(0, 3)];
+  if (month === undefined) return null;
+  return Number(m[3]) + '-' + String(month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+}
+
+function publicationStatus(id) {
+  const found = state.publications.find(function (p) { return p.id === id; });
+  return (found && found.status) || 'disenada';
+}
+
+/* Genera cada casilla real del calendario dentro del período del plan. */
+function buildScheduleOccurrences() {
+  const start = parseISO(state.meta && state.meta.periodStart);
+  const end = parseISO(state.meta && state.meta.periodEnd);
+  if (!start || !end) return [];
+
+  const weeklyByDay = {};
+  state.weekly.forEach(function (w) { weeklyByDay[normalizeAccents(w.day)] = w; });
+  const segMap = (state.meta && state.meta.weekdaySegments) || {};
+
+  const specialsByDate = {};
+  state.specials.forEach(function (s) {
+    const iso = parseSpanishDate(s.phase);
+    if (iso) specialsByDate[iso] = s;
   });
 
-  if (!phases.length) {
-    list.appendChild(el('div', 'empty', 'Sin fases cargadas todavía.'));
-    legend.appendChild(el('div', 'tl-leg-item', 'Sin fechas de fase cargadas.'));
-    return;
-  }
+  const out = [];
+  for (let d = new Date(start.getTime()); d <= end; d = addDays(d, 1)) {
+    const iso = isoOf(d);
+    const wd = WEEKDAY_KEYS[d.getDay()];
 
-  // Rango del plan: meta si es válido, si no el mínimo/máximo de las fases.
-  let planStart = parseISO(state.meta && state.meta.periodStart);
-  let planEnd = parseISO(state.meta && state.meta.periodEnd);
-  const valid = phases.filter(function (p) { return p.s && p.e; });
-  if (!planStart && valid.length) planStart = valid.reduce(function (a, b) { return a.s < b.s ? a : b; }).s;
-  if (!planEnd && valid.length) planEnd = valid.reduce(function (a, b) { return a.e > b.e ? a : b; }).e;
-
-  const totalMs = (planStart && planEnd) ? (planEnd.getTime() - planStart.getTime()) : 0;
-  const today = new Date();
-
-  phases.forEach(function (p, i) {
-    const shade = PHASE_SHADES[i % PHASE_SHADES.length];
-    const d = p.raw;
-
-    // --- Segmento de la línea de tiempo (proporcional a su duración) ---
-    if (p.s && p.e && totalMs > 0) {
-      const spanMs = Math.max(0, p.e.getTime() - p.s.getTime());
-      const widthPct = pctOf(spanMs, totalMs);
-      if (widthPct > 0) {
-        const seg = el('div', 'tl-seg', txt(d.name).replace('Fase ', 'F'));
-        seg.style.width = widthPct.toFixed(2) + '%';
-        seg.style.background = shade;
-        track.appendChild(seg);
-      }
+    if (wd === 'lunes') {
+      const id = iso + '_resumen-semanal';
+      out.push({
+        id: id, date: iso, weekday: wd, kind: 'resumen', segment: null,
+        title: 'Resumen semanal de gestión (propuesta)', format: 'Carrusel o video corto',
+        objective: 'Cierre de la semana: lo más relevante de los 4 segmentos en una sola pieza.',
+        time: '', status: publicationStatus(id)
+      });
     }
 
-    legend.appendChild(el('div', 'tl-leg-item',
-      '<span class="sw" style="background:' + shade + '"></span>' +
-      txt(d.name) + (txt(d.pillar).trim() ? ' · ' + txt(d.pillar) : '') +
-      (p.s && p.e ? ' · ' + fmtDay(p.s) + '–' + fmtDay(p.e) : '')));
+    const w = weeklyByDay[wd];
+    if (w) {
+      const id = iso + '_' + wd;
+      out.push({
+        id: id, date: iso, weekday: wd, kind: 'semanal', segment: segMap[wd] || null,
+        title: txt(w.title), format: txt(w.format), objective: txt(w.objective), time: txt(w.time),
+        status: publicationStatus(id)
+      });
+    }
 
-    // --- Bloque de calendario ---
-    const isToday = !!(p.s && p.e && today >= p.s && today <= new Date(p.e.getTime() + 86399000));
-    const block = el('div', 'phase-block' + (isToday ? ' today' : ''));
-    block.innerHTML =
-      '<div class="phase-row-top">' +
-        '<h4>' + txt(d.name) + (txt(d.days).trim() ? ' · ' + txt(d.days) : '') + '</h4>' +
-        (p.s && p.e ? '<span class="phase-dates mono">' + fmtDay(p.s) + ' — ' + fmtDay(p.e) + '</span>' : '') +
-        (isToday ? '<span class="today-pill">Fase en curso</span>' : '') +
-      '</div>' +
-      (txt(d.pillar).trim() ? '<p class="phase-pillar">Pilar: ' + txt(d.pillar) + '</p>' : '') +
-      '<p class="phase-milestone">' + txt(d.milestone) + '</p>';
-    list.appendChild(block);
+    const sp = specialsByDate[iso];
+    if (sp) {
+      const id = iso + '_especial-' + txt(sp.id);
+      out.push({
+        id: id, date: iso, weekday: wd, kind: 'especial', segment: null,
+        title: txt(sp.title), format: txt(sp.format), objective: txt(sp.theme), time: '',
+        status: publicationStatus(id)
+      });
+    }
+  }
+  return out;
+}
+
+function kindLabel(kind) {
+  return kind === 'semanal' ? 'Pieza semanal' : kind === 'especial' ? 'Publicación especial' : 'Resumen de gestión';
+}
+
+/* ---- Gráfico: piezas planificadas por segmento y mes (Resumen) ---- */
+function renderComplianceChart() {
+  const box = $('complianceChart');
+  if (!box) return;
+  box.innerHTML = '';
+
+  const start = parseISO(state.meta && state.meta.periodStart);
+  const end = parseISO(state.meta && state.meta.periodEnd);
+  if (!start || !end) { box.appendChild(el('div', 'empty', 'Sin período de plan cargado todavía.')); return; }
+
+  const months = [];
+  for (let c = new Date(start.getFullYear(), start.getMonth(), 1); c <= new Date(end.getFullYear(), end.getMonth(), 1); c = new Date(c.getFullYear(), c.getMonth() + 1, 1)) {
+    months.push({ key: c.getFullYear() + '-' + String(c.getMonth() + 1).padStart(2, '0'), label: MONTH_LABELS[c.getMonth()].slice(0, 3) });
+  }
+
+  const occurrences = buildScheduleOccurrences();
+  const counts = {};
+  occurrences.forEach(function (o) {
+    if (!o.segment) return;
+    counts[o.segment] = counts[o.segment] || {};
+    const mk = o.date.slice(0, 7);
+    counts[o.segment][mk] = (counts[o.segment][mk] || 0) + 1;
   });
 
-  // --- Marcador HOY: solo si la fecha actual cae dentro del plan ---
-  if (totalMs > 0 && today >= planStart && today <= planEnd) {
-    const pct = pctOf(today.getTime() - planStart.getTime(), totalMs);
-    const marker = el('div', 'tl-marker');
-    marker.style.left = pct.toFixed(2) + '%';
-    marker.setAttribute('data-label', 'HOY · ' + fmtDay(today));
-    track.appendChild(marker);
+  const segments = sortDocs(state.accountSegments);
+  if (!segments.length) { box.appendChild(el('div', 'empty', 'Sin segmentos cargados todavía.')); return; }
+
+  const maxCount = Math.max.apply(null, [1].concat(segments.map(function (s) {
+    return Math.max.apply(null, [0].concat(months.map(function (mo) { return (counts[s.num] && counts[s.num][mo.key]) || 0; })));
+  })));
+
+  segments.forEach(function (s, i) {
+    const shade = PHASE_SHADES[i % PHASE_SHADES.length];
+    let html = '<h5>' + String(txt(s.num)).padStart(2, '0') + ' · ' + txt(s.name) + '</h5>';
+    months.forEach(function (mo) {
+      const n = (counts[s.num] && counts[s.num][mo.key]) || 0;
+      const pct = Math.round(pctOf(n, maxCount));
+      html += '<div class="bar-chart-row">' +
+        '<span class="bar-chart-lbl" style="width:56px;">' + mo.label + '</span>' +
+        '<div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + pct + '%;background:' + shade + '"></div></div>' +
+        '<span class="bar-chart-val">' + n + '</span>' +
+      '</div>';
+    });
+    box.appendChild(el('div', 'compliance-seg', html));
+  });
+}
+
+/* ---- Hitos de gestión (antes: bloques de "Fase N", ahora sin encadenarlos) ---- */
+function renderMilestones() {
+  const list = $('milestonesList');
+  if (!list) return;
+  list.innerHTML = '';
+  const phases = sortDocs(state.phases);
+  if (!phases.length) { list.appendChild(el('div', 'empty', 'Sin hitos cargados todavía.')); return; }
+  phases.forEach(function (p) {
+    const s = parseISO(p.start), e = parseISO(p.end);
+    list.appendChild(el('div', 'card',
+      '<div class="symbol-tag">' + (s && e ? fmtDay(s) + ' – ' + fmtDay(e) : '') + '</div>' +
+      (txt(p.pillar).trim() ? '<p style="margin:0 0 6px;font-size:11.5px;font-weight:600;color:var(--brand-deep-2);">' + txt(p.pillar) + '</p>' : '') +
+      '<p style="margin:0;font-size:13px;color:var(--black);">' + txt(p.milestone) + '</p>'));
+  });
+}
+
+/* ---- Calendario mensual real (lunes primero) ---- */
+let calendarViewDate = null;
+
+function initCalendarView() {
+  const start = parseISO(state.meta && state.meta.periodStart);
+  const end = parseISO(state.meta && state.meta.periodEnd);
+  const today = new Date();
+  let ref = today;
+  if (start && today < start) ref = start;
+  if (end && today > end) ref = end;
+  calendarViewDate = { year: ref.getFullYear(), month: ref.getMonth() };
+}
+
+function shiftCalendarMonth(delta) {
+  if (!calendarViewDate) initCalendarView();
+  let m = calendarViewDate.month + delta, y = calendarViewDate.year;
+  while (m < 0) { m += 12; y--; }
+  while (m > 11) { m -= 12; y++; }
+  calendarViewDate = { year: y, month: m };
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const grid = $('calGrid');
+  const legend = $('calLegend');
+  if (!grid) return;
+  if (!calendarViewDate) initCalendarView();
+
+  const occurrences = buildScheduleOccurrences();
+  const byDate = {};
+  occurrences.forEach(function (o) { (byDate[o.date] = byDate[o.date] || []).push(o); });
+
+  const y = calendarViewDate.year, m = calendarViewDate.month;
+  setHTML('calMonthLabel', MONTH_LABELS[m].charAt(0).toUpperCase() + MONTH_LABELS[m].slice(1) + ' ' + y);
+
+  const firstOfMonth = new Date(y, m, 1);
+  const startOffset = (firstOfMonth.getDay() + 6) % 7; // lunes = 0
+  const gridStart = addDays(firstOfMonth, -startOffset);
+  const todayIso = isoOf(new Date());
+
+  grid.innerHTML = '';
+  for (let i = 0; i < 42; i++) {
+    const d = addDays(gridStart, i);
+    const iso = isoOf(d);
+    const inMonth = d.getMonth() === m;
+    const dayItems = byDate[iso] || [];
+    const cell = el('div', 'cal-day' + (inMonth ? '' : ' outside') + (iso === todayIso ? ' today' : ''));
+    let html = '<span class="num">' + d.getDate() + '</span>';
+    dayItems.forEach(function (o) {
+      const shade = o.segment ? PHASE_SHADES[(Number(o.segment) - 1) % PHASE_SHADES.length] : '#948ca3';
+      html += '<button type="button" class="cal-pub" style="border-left-color:' + shade + '" data-pub="' + o.id + '">' + txt(o.title) + '</button>';
+    });
+    cell.innerHTML = html;
+    grid.appendChild(cell);
   }
+  grid.querySelectorAll('.cal-pub').forEach(function (btn) {
+    btn.addEventListener('click', function () { openPubModal(btn.dataset.pub, occurrences); });
+  });
+
+  if (legend) {
+    legend.innerHTML = '';
+    sortDocs(state.accountSegments).forEach(function (s, i) {
+      legend.appendChild(el('span', '', '<span class="sw" style="background:' + PHASE_SHADES[i % PHASE_SHADES.length] + '"></span>' + txt(s.name)));
+    });
+    legend.appendChild(el('span', '', '<span class="sw" style="background:#948ca3"></span>Resumen / especial transversal'));
+  }
+}
+
+function wireCalendarNav() {
+  $('calPrevBtn').addEventListener('click', function () { shiftCalendarMonth(-1); });
+  $('calNextBtn').addEventListener('click', function () { shiftCalendarMonth(1); });
+}
+
+/* ---- Modal de detalle + estado de la publicación ---- */
+function openPubModal(pubId, occurrencesCache) {
+  const list = occurrencesCache || buildScheduleOccurrences();
+  const pub = list.find(function (o) { return o.id === pubId; });
+  if (!pub) return;
+  const segObj = pub.segment ? state.accountSegments.find(function (s) { return String(s.num) === String(pub.segment); }) : null;
+  const d = parseISO(pub.date);
+
+  setHTML('pubModalDate', d ? WEEKDAY_LABELS[pub.weekday] + ' · ' + fmtDay(d) + ' de ' + d.getFullYear() : '');
+  setHTML('pubModalDay', pub.title);
+
+  const body = $('pubModalBody');
+  body.innerHTML =
+    '<div class="pub-detail-row"><span class="k">Tipo</span><span class="v">' + kindLabel(pub.kind) + '</span></div>' +
+    (segObj ? '<div class="pub-detail-row"><span class="k">Segmento</span><span class="v">' + txt(segObj.name) + '</span></div>' : '') +
+    (txt(pub.format).trim() ? '<div class="pub-detail-row"><span class="k">Formato</span><span class="v">' + txt(pub.format) + '</span></div>' : '') +
+    (txt(pub.time).trim() ? '<div class="pub-detail-row"><span class="k">Horario</span><span class="v">' + txt(pub.time) + '</span></div>' : '') +
+    '<p class="pub-objective">' + txt(pub.objective) + '</p>' +
+    '<div class="pub-status-steps" id="pubStatusSteps"></div>';
+
+  const steps = $('pubStatusSteps');
+  PUBLICATION_STATES.forEach(function (st) {
+    const btn = el('button', 'pub-status-btn' + (pub.status === st.key ? ' active' : ''), txt(st.label));
+    btn.type = 'button';
+    btn.addEventListener('click', function () { setPublicationStatus(pub.id, st.key); });
+    steps.appendChild(btn);
+  });
+
+  const dialog = $('pubModal');
+  if (typeof dialog.showModal === 'function') dialog.showModal();
+}
+
+function setPublicationStatus(pubId, status) {
+  const existing = state.publications.find(function (p) { return p.id === pubId; });
+  const prev = existing ? existing.status : 'disenada';
+  const next = (prev === status) ? 'disenada' : status; // volver a pulsar = reiniciar
+
+  if (existing) existing.status = next;
+  else state.publications.push({ id: pubId, status: next });
+
+  renderCalendar();
+  openPubModal(pubId);
+
+  if (fb.live) {
+    fb.api.setDoc(fb.api.doc(fb.db, BRAND_SLUG, 'plan', 'publications', pubId), { status: next }, { merge: true })
+      .catch(function (err) { toast('No se pudo guardar en Firestore: ' + (err && err.code ? err.code : 'error')); });
+  } else {
+    safeStorage.set(LS_PREFIX + 'publications_v1', state.publications);
+  }
+}
+
+function wirePubModal() {
+  const dialog = $('pubModal');
+  $('pubModalClose').addEventListener('click', function () { dialog.close(); });
+  dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
 }
 
 function renderStaticTables() {
@@ -1914,6 +2144,10 @@ document.addEventListener('keydown', function (e) {
      accountSegments/{1..4}
      newsSources/{1..13}
      contentSummaries/{1..4}
+     publications/{fecha_tipo}   (solo el campo "status" -- las
+                                  publicaciones se generan en vivo desde
+                                  weekly+specials+meta.weekdaySegments;
+                                  ver buildScheduleOccurrences())
    platformRows y reportRows son iguales para las tres marcas y quedan
    fijas en el código (no viven en Firestore).
    ================================================================ */
@@ -1964,7 +2198,9 @@ function attachListeners() {
   fb.unsubs.push(api.onSnapshot(api.doc(db, BRAND_SLUG, 'plan', 'meta', 'main'), function (snap) {
     state.meta = Object.assign({}, DEFAULT_DATA.meta, docOr({}, snap.data()));
     renderMeta();
-    renderPhases(); // el rango de fechas de meta afecta la línea de tiempo
+    // el rango de fechas y el mapa día->segmento de meta afectan al calendario
+    renderComplianceChart();
+    renderCalendar();
     scheduleFirstPaintDone();
   }, function (err) { onFsError('meta', err); }));
 
@@ -1980,9 +2216,10 @@ function attachListeners() {
 
   watchCollection('pillars', 'pillars', function () { renderPillars(); });
   watchCollection('symbols', 'symbols', function () { renderSymbols(); });
-  watchCollection('weekly', 'weekly', function () { renderWeekly(); });
-  watchCollection('specials', 'specials', function () { renderSpecials(); });
-  watchCollection('phases', 'phases', function () { renderPhases(); });
+  watchCollection('weekly', 'weekly', function () { renderComplianceChart(); renderCalendar(); });
+  watchCollection('specials', 'specials', function () { renderComplianceChart(); renderCalendar(); });
+  watchCollection('phases', 'phases', function () { renderMilestones(); });
+  watchCollection('publications', 'publications', function () { renderCalendar(); });
   watchCollection('kpiWeekly', 'kpiWeekly', function () { renderKpis(); });
   watchCollection('kpiSpecial', 'kpiSpecial', function () { renderKpis(); });
   watchCollection('checklist', 'checklist', function () { renderChecklist(); });
@@ -2173,14 +2410,14 @@ function renderAllFromState() {
   renderMeta();
   renderPillars();
   renderSymbols();
-  renderWeekly();
-  renderSpecials();
-  renderPhases();
   renderKpis();
   renderChecklist();
   renderAccountSegments();
   renderNews();
   renderContentSummaries();
+  renderComplianceChart();
+  renderMilestones();
+  renderCalendar();
 }
 
 /* ============ 10 · ARRANQUE ============ */
@@ -2189,7 +2426,7 @@ function wireStaticButtons() {
   $('printChecklistBtn').addEventListener('click', printReport);
   $('resetChecklistBtn').addEventListener('click', resetChecklist);
   $('goToChecklistBtn').addEventListener('click', function () {
-    const idx = navBtns.findIndex(function (b) { return b.dataset.target === 'checklist'; });
+    const idx = navBtns.findIndex(function (b) { return b.dataset.target === 'calendario'; });
     if (idx >= 0) goToSection(idx);
   });
   window.addEventListener('afterprint', function () { document.body.classList.remove('print-mode'); });
@@ -2252,6 +2489,8 @@ async function boot() {
   wireFbDialog();
   wireSymbolModal();
   wireLogoModal();
+  wireCalendarNav();
+  wirePubModal();
   wireGate();
 
   // Refresca el recuento de días por si la pestaña queda abierta de un
