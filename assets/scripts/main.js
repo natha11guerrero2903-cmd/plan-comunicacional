@@ -88,7 +88,7 @@ const DEFAULT_DATA = {
       },
       {
         "num": "4",
-        "lbl": "Pilares de gestión"
+        "lbl": "Categorías del banco de contenidos"
       },
       {
         "num": "20",
@@ -703,6 +703,12 @@ const DEFAULT_DATA = {
     { "id": "11", "order": 3, "scope": "internacional", "name": "DW Español", "description": "Deutsche Welle — perspectiva europea de la agenda internacional.", "url": "https://www.dw.com/es" },
     { "id": "12", "order": 4, "scope": "internacional", "name": "Reuters", "description": "Agencia de noticias internacional, fuente primaria de gran parte de la prensa mundial.", "url": "https://www.reuters.com" },
     { "id": "13", "order": 5, "scope": "internacional", "name": "Google Noticias · Mundo", "description": "Portada de titulares internacionales en español, siempre actualizada.", "url": "https://news.google.com/topstories?hl=es-419&gl=VE&ceid=VE:es-419" }
+  ],
+  "contentSummaries": [
+    { "id": "1", "order": 1, "type": "Resumen semanal", "title": "", "note": "Se propone para los lunes. Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
+    { "id": "2", "order": 2, "type": "Resumen mensual", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
+    { "id": "3", "order": 3, "type": "Resumen trimestral", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
+    { "id": "4", "order": 4, "type": "Resumen semestral", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false }
   ]
 };
 
@@ -814,7 +820,8 @@ const state = {
   kpiSpecial: clone(DEFAULT_DATA.kpiSpecial),
   checklist: clone(DEFAULT_DATA.checklist),
   accountSegments: clone(DEFAULT_DATA.accountSegments),
-  newsSources: clone(DEFAULT_DATA.newsSources)
+  newsSources: clone(DEFAULT_DATA.newsSources),
+  contentSummaries: clone(DEFAULT_DATA.contentSummaries)
 };
 
 /* Estado local (se usa mientras no haya conexión con Firestore). */
@@ -888,14 +895,21 @@ function renderMeta() {
   setHTML('symbolReflection', m.symbolReflection);
   setHTML('docFoot', m.footer);
 
-  // Tarjetas de estadísticas
+  // Tarjetas de estadísticas -- la del banco de contenidos NUNCA se
+  // muestra fija: se cuenta en vivo cuántas ideas hay realmente
+  // cargadas, para no mentir sobre la cantidad (punto 3 de la corrección).
   const grid = $('statGrid');
   grid.innerHTML = '';
   const stats = Array.isArray(m.stats) ? m.stats : [];
+  const realIdeasCount = state.pillars.reduce(function (sum, p) {
+    return sum + (Array.isArray(p.ideas) ? p.ideas.length : 0);
+  }, 0);
   stats.forEach(function (st) {
+    const lbl = txt(st && st.lbl);
+    const num = /banco de contenido/i.test(lbl) ? String(realIdeasCount) : txt(st && st.num);
     grid.appendChild(el('div', 'card stat-card',
-      '<div class="num">' + txt(st && st.num) + '</div>' +
-      '<div class="lbl">' + txt(st && st.lbl) + '</div>'));
+      '<div class="num">' + num + '</div>' +
+      '<div class="lbl">' + lbl + '</div>'));
   });
 
   // Diagnóstico
@@ -1076,15 +1090,64 @@ function wireSymbolModal() {
    gráfico de cobertura), aplicado a un inventario distinto: no son ideas
    de contenido sino cuentas institucionales reales, cada una con su
    estado de verificación en redes sociales. */
-const accountStatusMeta = {
-  verificado: { label: 'Verificado', cls: 'v' },
-  candidato:  { label: 'Candidato sin verificar', cls: 'c' },
-  parcial:    { label: 'Verificado parcial', cls: 'p' },
-  sin_cuenta: { label: 'Sin cuenta propia', cls: 's' },
-  interno:    { label: 'Usa cuenta central', cls: 'i' },
-  inactiva:   { label: 'Inactiva', cls: 'x' }
-};
-const accountStatusColors = { v: '#0a7052', c: '#b45309', p: '#0e7490', s: '#948ca3', i: '#2f5488', x: '#b91c1c' };
+/* Ya no usamos un único "estado de verificación" por ente (ver punto
+   13 del brief de corrección): cada red social se muestra por separado,
+   Activa o no, con su link real -- parseado del texto de "note" que ya
+   existe (no se inventa ningún dato nuevo, ni se toca Firestore). */
+const SOCIAL_PLATFORMS = [
+  { key: 'instagram', label: 'Instagram' },
+  { key: 'tiktok', label: 'TikTok' },
+  { key: 'x', label: 'X' },
+  { key: 'facebook', label: 'Facebook' }
+];
+
+function parseAccountSocial(a) {
+  const info = { instagram: null, x: null, facebook: null, tiktok: null, central: null };
+  const note = txt(a && a.note);
+  if (a && a.status === 'interno') {
+    const m = /@([\w.]+)/.exec(note);
+    if (m) info.central = { handle: '@' + m[1], url: 'https://instagram.com/' + m[1] };
+    return info;
+  }
+  if (!a || a.status === 'sin_cuenta' || a.status === 'inactiva') return info;
+  note.split('|').forEach(function (rawChunk) {
+    const chunk = rawChunk.trim();
+    let m;
+    if ((m = /^IG\/X\s*:?\s*@([\w.]+)/i.exec(chunk))) {
+      info.instagram = { handle: '@' + m[1], url: 'https://instagram.com/' + m[1] };
+      info.x = { handle: '@' + m[1], url: 'https://x.com/' + m[1] };
+    } else if ((m = /^IG\b[^:]*:\s*@([\w.]+)/i.exec(chunk))) {
+      info.instagram = { handle: '@' + m[1], url: 'https://instagram.com/' + m[1] };
+    } else if ((m = /^X\s*:?\s*@([\w.]+)/i.exec(chunk))) {
+      info.x = { handle: '@' + m[1], url: 'https://x.com/' + m[1] };
+    } else if ((m = /^Facebook\s*:?\s*\/?([\w.\-]+)/i.exec(chunk))) {
+      info.facebook = { handle: '/' + m[1], url: 'https://facebook.com/' + m[1] };
+    }
+  });
+  return info;
+}
+
+/* Una fila de pastillas Activo/Inactivo por plataforma, con link real en
+   las activas. Nunca marca "Activo" sin un handle real detrás (punto 14). */
+function socialPillsHtml(a) {
+  const info = parseAccountSocial(a);
+  if (info.central) {
+    return '<a class="social-pill central" href="' + info.central.url + '" target="_blank" rel="noopener noreferrer">Usa cuenta central (' + info.central.handle + ')</a>';
+  }
+  const anyActive = info.instagram || info.x || info.facebook || info.tiktok;
+  if (!anyActive) return '<span class="social-pill">Sin presencia en redes propias</span>';
+  return SOCIAL_PLATFORMS.map(function (p) {
+    const d = info[p.key];
+    if (d) return '<a class="social-pill active" href="' + d.url + '" target="_blank" rel="noopener noreferrer">' + p.label + '</a>';
+    return '<span class="social-pill">' + p.label + '</span>';
+  }).join('');
+}
+
+function hasActiveSocial(a) {
+  const info = parseAccountSocial(a);
+  return !!(info.instagram || info.x || info.facebook || info.tiktok);
+}
+
 const openSegments = new Set(['1']); // primer segmento abierto por defecto
 
 function renderAccountSegments() {
@@ -1099,11 +1162,11 @@ function renderAccountSegments() {
   const segments = sortDocs(state.accountSegments);
   const allAccounts = segments.reduce(function (acc, s) { return acc.concat(Array.isArray(s.accounts) ? s.accounts : []); }, []);
   const total = allAccounts.length;
-  const verifiedCount = allAccounts.filter(function (a) { return a.status === 'verificado'; }).length;
+  const activeCount = allAccounts.filter(hasActiveSocial).length;
   setHTML('chipAccountsTotal', total + (total === 1 ? ' ente' : ' entes'));
-  setHTML('chipAccountsVerified', verifiedCount + (verifiedCount === 1 ? ' verificada' : ' verificadas'));
+  setHTML('chipAccountsVerified', activeCount + ' con redes activas');
   setHTML('chipResumenEntes', total + (total === 1 ? ' ente' : ' entes'));
-  setHTML('chipResumenVerificadas', verifiedCount + (verifiedCount === 1 ? ' verificada' : ' verificadas'));
+  setHTML('chipResumenVerificadas', activeCount + ' con redes activas');
 
   if (!segments.length) {
     list.appendChild(el('div', 'empty', 'Sin segmentos cargados todavía.'));
@@ -1124,15 +1187,18 @@ function renderAccountSegments() {
       '<span class="bar-chart-val">' + n + '</span>'));
   });
 
-  // ---- Leyenda de estado (reutiliza el mismo componente que la línea de tiempo) ----
+  // ---- Leyenda de cobertura real (sin la etiqueta "Verificado") ----
   if (legend) {
-    const counts2 = {};
-    allAccounts.forEach(function (a) { counts2[a.status] = (counts2[a.status] || 0) + 1; });
-    Object.keys(accountStatusMeta).forEach(function (key) {
-      const n = counts2[key] || 0;
-      const m = accountStatusMeta[key];
+    const central = allAccounts.filter(function (a) { return a.status === 'interno'; }).length;
+    const noOwn = allAccounts.filter(function (a) { return a.status === 'sin_cuenta' || a.status === 'inactiva'; }).length;
+    const active = total - central - noOwn;
+    [
+      { label: 'Con redes activas', n: active, color: '#0a7052' },
+      { label: 'Sin cuenta propia', n: noOwn, color: '#948ca3' },
+      { label: 'Usa cuenta central', n: central, color: '#2f5488' }
+    ].forEach(function (row) {
       legend.appendChild(el('div', 'tl-leg-item',
-        '<span class="sw" style="background:' + accountStatusColors[m.cls] + '"></span>' + m.label + ' · <b>' + n + '</b>'));
+        '<span class="sw" style="background:' + row.color + '"></span>' + row.label + ' · <b>' + row.n + '</b>'));
     });
   }
 
@@ -1176,10 +1242,9 @@ function renderAccountSegments() {
     if (txt(s.symbol).trim()) inner += '<p class="pillar-symbol">' + txt(s.symbol) + '</p>';
     if (accounts.length) {
       accounts.forEach(function (a) {
-        const meta = accountStatusMeta[a.status] || { label: txt(a.status), cls: 's' };
         inner += '<div class="idea-row">' +
           '<div class="idea-code">' + txt(a.code) + '</div>' +
-          '<div class="idea-txt">' + txt(a.name) + '<span class="acct-badge ' + meta.cls + '">' + meta.label + '</span></div>' +
+          '<div class="idea-txt">' + txt(a.name) + '<div class="ente-social">' + socialPillsHtml(a) + '</div></div>' +
           '<div class="idea-note">' + txt(a.note) + '</div>' +
           '</div>';
       });
@@ -1276,6 +1341,33 @@ function renderNews() {
           ? '<a class="news-card-link" href="' + url + '" target="_blank" rel="noopener noreferrer">Abrir sitio <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M8 7h9v9"/></svg></a>'
           : '<span class="acct-badge s">Sin enlace</span>')));
     });
+  });
+}
+
+/* ============ RESÚMENES DE GESTIÓN (banco de contenidos) ============
+   Semanal/mensual/trimestral/semestral. Quedan como estructura --
+   "linked" pasará a true cuando el calendario (próxima corrección)
+   permita vincular cada resumen a una publicación real; no se inventa
+   contenido ni fecha de publicación mientras tanto. */
+function renderContentSummaries() {
+  const list = $('summariesList');
+  if (!list) return;
+  list.innerHTML = '';
+  const items = sortDocs(state.contentSummaries);
+  const linkedCount = items.filter(function (it) { return !!it.linked; }).length;
+  setHTML('summariesCount', linkedCount + ' de ' + items.length + ' vinculados al calendario');
+  if (!items.length) {
+    list.appendChild(el('div', 'empty', 'Sin resúmenes cargados todavía.'));
+    return;
+  }
+  items.forEach(function (it) {
+    const hasTitle = txt(it.title).trim() !== '';
+    list.appendChild(el('div', 'card',
+      '<div class="symbol-tag">' + txt(it.type) + '</div>' +
+      '<p style="margin:8px 0 0;font-size:13px;color:' + (hasTitle ? 'var(--black)' : 'var(--gray-soft)') + ';">' +
+        (hasTitle ? txt(it.title) : 'Sin redactar todavía') +
+      '</p>' +
+      '<p style="margin:8px 0 0;font-size:11.5px;color:var(--gray);font-style:italic;">' + txt(it.note) + '</p>'));
   });
 }
 
@@ -1424,12 +1516,17 @@ function renderPhases() {
 }
 
 function renderStaticTables() {
+  // "Multiplataforma" dejó de ser una pestaña propia (punto 25 de la
+  // corrección): platformRows queda aquí sin usar hasta que se
+  // re-asocie a entes/publicaciones en el calendario.
   const pb = $('platformBody');
-  pb.innerHTML = '';
-  platformRows.forEach(function (r) {
-    pb.appendChild(el('tr', '',
-      '<td class="rowlabel">' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td>'));
-  });
+  if (pb) {
+    pb.innerHTML = '';
+    platformRows.forEach(function (r) {
+      pb.appendChild(el('tr', '',
+        '<td class="rowlabel">' + r[0] + '</td><td>' + r[1] + '</td><td>' + r[2] + '</td><td>' + r[3] + '</td>'));
+    });
+  }
   const rb = $('reportBody');
   rb.innerHTML = '';
   reportRows.forEach(function (r) {
@@ -1816,6 +1913,7 @@ document.addEventListener('keydown', function (e) {
      checklist/{grupo1..grupo3}
      accountSegments/{1..4}
      newsSources/{1..13}
+     contentSummaries/{1..4}
    platformRows y reportRows son iguales para las tres marcas y quedan
    fijas en el código (no viven en Firestore).
    ================================================================ */
@@ -1890,6 +1988,7 @@ function attachListeners() {
   watchCollection('checklist', 'checklist', function () { renderChecklist(); });
   watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); });
   watchCollection('newsSources', 'newsSources', function () { renderNews(); });
+  watchCollection('contentSummaries', 'contentSummaries', function () { renderContentSummaries(); });
 }
 
 let firstPaintPending = 0;
@@ -1979,6 +2078,7 @@ async function seedFirestore() {
   DEFAULT_DATA.checklist.forEach(function (g) { const d = clone(g); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'checklist', g.id), d)); });
   DEFAULT_DATA.accountSegments.forEach(function (s) { const d = clone(s); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'accountSegments', s.id), d)); });
   DEFAULT_DATA.newsSources.forEach(function (n) { const d = clone(n); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'newsSources', n.id), d)); });
+  DEFAULT_DATA.contentSummaries.forEach(function (c) { const d = clone(c); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'contentSummaries', c.id), d)); });
   try {
     fbMsg('Cargando contenido inicial en Firestore…', 'ok');
     await Promise.all(ops);
@@ -2080,6 +2180,7 @@ function renderAllFromState() {
   renderChecklist();
   renderAccountSegments();
   renderNews();
+  renderContentSummaries();
 }
 
 /* ============ 10 · ARRANQUE ============ */
