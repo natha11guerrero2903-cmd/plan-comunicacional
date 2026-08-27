@@ -162,6 +162,15 @@
         <div class="tl-legend" id="accountsStatusLegend" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border);"></div>
       </div>
 
+      <div class="section-title"><h3>Diagnóstico digital por segmento</h3></div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Segmento</th><th>Entes</th><th>Con redes activas</th><th>Sin redes propias</th><th>Redes utilizadas</th><th>Frecuencia planificada</th><th>Rendimiento</th></tr></thead>
+          <tbody id="segmentDiagBody"></tbody>
+        </table>
+      </div>
+      <div class="note" style="margin:14px 0 22px;">"Rendimiento" queda sin datos a propósito: no hay todavía ningún mecanismo conectado que mida resultados reales de las publicaciones. Esta columna se activará cuando exista esa conexión.</div>
+
       <div class="note" style="margin:0 0 22px;">Los 4 segmentos no comparten elementos visuales entre sí — cada uno tiene su propio color de identificación y su propio conjunto de logos institucionales. Usa el ícono <b>⊞</b> junto a cada segmento para ver los logos de sus entes.</div>
 
       <div id="accountsList"></div>
@@ -376,6 +385,18 @@
     <h4 id="pubModalDay"></h4>
   </div>
   <div class="sm-body" id="pubModalBody"></div>
+</dialog>
+
+<!-- Modal "Ficha del ente" -->
+<dialog class="pub-modal ente-modal" id="enteModal">
+  <div class="sm-head">
+    <button type="button" class="sm-close" id="enteModalClose" aria-label="Cerrar">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
+    <p class="sm-eyebrow" id="enteModalEyebrow">Código</p>
+    <h4 id="enteModalTitle"></h4>
+  </div>
+  <div class="sm-body" id="enteModalBody"></div>
 </dialog>
 <script src="assets/scripts/main.js"></script>
 </body>

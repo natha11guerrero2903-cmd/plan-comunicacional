@@ -1161,6 +1161,113 @@ function hasActiveSocial(a) {
   return !!(info.instagram || info.x || info.facebook || info.tiktok);
 }
 
+/* ============ TIPO DE ENTE (punto 11 de la corrección) ============
+   No todo ente es "descentralizado". La regla es transparente y se basa
+   en el nombre propio de cada institución (Dirección/Oficina/Secretaría
+   -> dependencia; Comisión/Consejo -> coordinación especial; Instituto
+   Autónomo/Corporación/Fundación/C.A. -> descentralizado). No es una
+   clasificación legal verificada -- se marca como tal para que el
+   equipo administrativo la confirme, nunca se presenta como un hecho. */
+function inferEnteType(a) {
+  if (a && a.status === 'interno') return 'Dependencia de la Gobernación';
+  const n = txt(a && a.name);
+  if (/^(Direcci[oó]n|Oficina|Secretar[ií]a|Consejo|Gabinete)/i.test(n)) return 'Dependencia de la Gobernación';
+  if (/Comisi[oó]n/i.test(n)) return 'Comisión / coordinación especial';
+  if (/Instituto Aut[oó]nomo|Corporaci[oó]n|Fundaci[oó]n|Servicio Desconcentrado|C\.A\./i.test(n)) return 'Ente descentralizado';
+  return 'Por confirmar';
+}
+
+/* ============ FICHA DE ENTE: tipo, director, redes y métricas ============
+   Punto 10/16/26-28: la jerarquía Segmento->Ente->Director->Redes->
+   Publicaciones->Métricas vive aquí. Director y métricas no tienen
+   ningún dato real todavía en ningún lado -- se muestran como campos
+   vacíos y listos, nunca con cifras inventadas (punto 38). */
+function openEnteModal(segNum, code) {
+  const seg = state.accountSegments.find(function (s) { return Number(s.num) === Number(segNum); });
+  if (!seg) return;
+  const a = (seg.accounts || []).find(function (x) { return txt(x.code) === txt(code); });
+  if (!a) return;
+
+  setHTML('enteModalEyebrow', txt(a.code) + ' · ' + txt(seg.name));
+  setHTML('enteModalTitle', a.name);
+
+  const tipo = inferEnteType(a);
+  const social = parseAccountSocial(a);
+
+  let socialHtml = '';
+  if (social.central) {
+    socialHtml = '<div class="pub-detail-row"><span class="k">Cuenta central</span><span class="v"><a href="' + social.central.url + '" target="_blank" rel="noopener noreferrer">' + social.central.handle + '</a></span></div>';
+  } else {
+    SOCIAL_PLATFORMS.forEach(function (p) {
+      const d = social[p.key];
+      socialHtml += '<div class="pub-detail-row"><span class="k">' + p.label + '</span><span class="v">' +
+        (d ? '<a href="' + d.url + '" target="_blank" rel="noopener noreferrer">' + d.handle + '</a>' : '<span style="color:var(--gray-soft);font-weight:500;">Sin cuenta</span>') +
+        '</span></div>';
+    });
+  }
+
+  const metricRows = ['Publicaciones (histórico)', 'Publicaciones último mes', 'Likes', 'Comentarios', 'Compartidos', 'Alcance', 'Impresiones', 'Frecuencia de publicación']
+    .map(function (label) {
+      return '<div class="pub-detail-row"><span class="k">' + label + '</span><span class="v" style="color:var(--gray-soft);font-weight:500;">Sin datos cargados</span></div>';
+    }).join('');
+
+  $('enteModalBody').innerHTML =
+    '<div class="pub-detail-row"><span class="k">Tipo</span><span class="v">' + tipo +
+      (a.status === 'interno' ? '' : ' <span style="color:var(--gray-soft);font-weight:500;font-style:italic;">(inferido, confirmar)</span>') +
+    '</span></div>' +
+    '<div class="pub-detail-row"><span class="k">Director</span><span class="v" style="color:var(--gray-soft);font-weight:500;">Sin datos cargados</span></div>' +
+    '<p class="symbol-tag" style="margin-top:16px;">Redes sociales</p>' +
+    socialHtml +
+    '<p class="symbol-tag" style="margin-top:16px;">Métricas (pendiente de conectar)</p>' +
+    metricRows +
+    '<p class="pub-objective" style="font-style:italic;color:var(--gray);">Estos campos se completan cuando se conecte un mecanismo real de obtención de datos (scraping o API). No se muestran cifras estimadas.</p>';
+
+  const dialog = $('enteModal');
+  if (typeof dialog.showModal === 'function') dialog.showModal();
+}
+
+function wireEnteModal() {
+  const dialog = $('enteModal');
+  $('enteModalClose').addEventListener('click', function () { dialog.close(); });
+  dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+}
+
+/* ============ DIAGNÓSTICO DIGITAL POR SEGMENTO (punto 29) ============
+   Comparación real entre los 4 segmentos: nada de "rendimiento" inventado
+   -- solo lo que se puede calcular de datos que ya existen (entes,
+   redes activas, frecuencia planificada del calendario). */
+function renderSegmentDiagnostics() {
+  const body = $('segmentDiagBody');
+  if (!body) return;
+  body.innerHTML = '';
+  const segMap = (state.meta && state.meta.weekdaySegments) || {};
+  const segments = sortDocs(state.accountSegments);
+  if (!segments.length) {
+    body.appendChild(el('tr', '', '<td colspan="7">Sin segmentos cargados todavía.</td>'));
+    return;
+  }
+  segments.forEach(function (s) {
+    const accounts = Array.isArray(s.accounts) ? s.accounts : [];
+    const activeCount = accounts.filter(hasActiveSocial).length;
+    const inactiveCount = accounts.filter(function (a) { return a.status === 'sin_cuenta' || a.status === 'inactiva'; }).length;
+    const platformsUsed = SOCIAL_PLATFORMS.filter(function (p) {
+      return accounts.some(function (a) { return !!parseAccountSocial(a)[p.key]; });
+    }).map(function (p) { return p.label; });
+    const days = Object.keys(segMap).filter(function (k) { return segMap[k] && String(segMap[k]) === String(s.num); });
+    const freq = days.length
+      ? days.length + (days.length === 1 ? ' vez/semana · ' : ' veces/semana · ') + days.map(function (d) { return WEEKDAY_LABELS[d]; }).join(', ')
+      : 'Sin día asignado todavía';
+    body.appendChild(el('tr', '',
+      '<td class="rowlabel">' + txt(s.name) + '</td>' +
+      '<td>' + accounts.length + '</td>' +
+      '<td>' + activeCount + '</td>' +
+      '<td>' + inactiveCount + '</td>' +
+      '<td>' + (platformsUsed.length ? platformsUsed.join(', ') : 'Ninguna') + '</td>' +
+      '<td>' + freq + '</td>' +
+      '<td style="color:var(--gray-soft);font-style:italic;">Sin datos reales</td>'));
+  });
+}
+
 const openSegments = new Set(['1']); // primer segmento abierto por defecto
 
 function renderAccountSegments() {
@@ -1180,6 +1287,7 @@ function renderAccountSegments() {
   setHTML('chipAccountsVerified', activeCount + ' con redes activas');
   setHTML('chipResumenEntes', total + (total === 1 ? ' ente' : ' entes'));
   setHTML('chipResumenVerificadas', activeCount + ' con redes activas');
+  renderSegmentDiagnostics();
 
   if (!segments.length) {
     list.appendChild(el('div', 'empty', 'Sin segmentos cargados todavía.'));
@@ -1257,7 +1365,11 @@ function renderAccountSegments() {
       accounts.forEach(function (a) {
         inner += '<div class="idea-row">' +
           '<div class="idea-code">' + txt(a.code) + '</div>' +
-          '<div class="idea-txt">' + txt(a.name) + '<div class="ente-social">' + socialPillsHtml(a) + '</div></div>' +
+          '<div class="idea-txt">' + txt(a.name) +
+            '<span class="ente-type-tag">' + inferEnteType(a) + '</span>' +
+            '<div class="ente-social">' + socialPillsHtml(a) + '</div>' +
+            '<button type="button" class="ente-detail-btn" data-seg="' + txt(s.num) + '" data-code="' + txt(a.code).replace(/"/g, '&quot;') + '">Ver ficha completa →</button>' +
+          '</div>' +
           '<div class="idea-note">' + txt(a.note) + '</div>' +
           '</div>';
       });
@@ -1270,6 +1382,9 @@ function renderAccountSegments() {
     const body = el('div', 'pillar-body', inner);
     card.appendChild(head);
     card.appendChild(body);
+    body.querySelectorAll('.ente-detail-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () { openEnteModal(btn.dataset.seg, btn.dataset.code); });
+    });
     list.appendChild(card);
   });
 }
@@ -2201,6 +2316,7 @@ function attachListeners() {
     // el rango de fechas y el mapa día->segmento de meta afectan al calendario
     renderComplianceChart();
     renderCalendar();
+    renderSegmentDiagnostics();
     scheduleFirstPaintDone();
   }, function (err) { onFsError('meta', err); }));
 
@@ -2491,6 +2607,7 @@ async function boot() {
   wireLogoModal();
   wireCalendarNav();
   wirePubModal();
+  wireEnteModal();
   wireGate();
 
   // Refresca el recuento de días por si la pestaña queda abierta de un
