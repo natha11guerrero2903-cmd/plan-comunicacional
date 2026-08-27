@@ -956,29 +956,14 @@ function renderMeta() {
 
 function renderPillars() {
   const list = $('pillarList');
-  const chart = $('pilarChart');
   list.innerHTML = '';
-  chart.innerHTML = '';
 
   const pillars = sortDocs(state.pillars);
 
   if (!pillars.length) {
     list.appendChild(el('div', 'empty', 'Sin pilares cargados todavía.'));
-    chart.appendChild(el('div', 'empty', 'Sin datos para el gráfico de cobertura.'));
     return;
   }
-
-  // ---- Gráfico de cobertura: Math.max(1, ...) evita NaN% con 0 ideas ----
-  const counts = pillars.map(function (p) { return Array.isArray(p.ideas) ? p.ideas.length : 0; });
-  const maxIdeas = Math.max.apply(null, [1].concat(counts));
-  pillars.forEach(function (p, i) {
-    const n = counts[i];
-    const pct = Math.round(pctOf(n, maxIdeas));
-    chart.appendChild(el('div', 'bar-chart-row',
-      '<span class="bar-chart-lbl">' + String(txt(p.num) || (i + 1)).padStart(2, '0') + ' · ' + txt(p.name) + '</span>' +
-      '<div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + pct + '%"></div></div>' +
-      '<span class="bar-chart-val">' + n + '</span>'));
-  });
 
   // ---- Acordeón (animación 100% CSS con grid-template-rows) ----
   pillars.forEach(function (p) {
@@ -1036,29 +1021,6 @@ function renderPillars() {
     card.appendChild(head);
     card.appendChild(body);
     list.appendChild(card);
-  });
-}
-
-function renderSymbols() {
-  const grid = $('symbolGrid');
-  grid.innerHTML = '';
-  const symbols = sortDocs(state.symbols);
-  if (!symbols.length) {
-    grid.appendChild(el('div', 'empty', 'Sin símbolos cargados todavía.'));
-    return;
-  }
-  symbols.forEach(function (s) {
-    const url = safeUrl(s.imageUrl);
-    const media = url
-      ? '<div class="symbol-img-box"><img src="' + url + '" alt="' + txt(s.name).replace(/"/g, '&quot;') + '" loading="lazy"></div>'
-      : '<div class="symbol-ph"><span>[Imagen del símbolo]</span></div>';
-    grid.appendChild(el('div', 'symbol-item',
-      media +
-      '<div class="symbol-txt">' +
-        '<span class="symbol-tag">' + txt(s.tag) + '</span>' +
-        '<h5>' + txt(s.name) + '</h5>' +
-        '<p>' + txt(s.description) + '</p>' +
-      '</div>'));
   });
 }
 
@@ -2563,7 +2525,10 @@ function attachListeners() {
   }
 
   watchCollection('pillars', 'pillars', function () { renderPillars(); });
-  watchCollection('symbols', 'symbols', function () { renderSymbols(); });
+  /* "symbols" ya no tiene una vista propia (se eliminó la comparación de
+     los 3 símbolos) -- solo se sincroniza el dato porque openSymbolModal()
+     sigue usándolo para el símbolo individual de cada categoría. */
+  watchCollection('symbols', 'symbols');
   watchCollection('weekly', 'weekly', function () { renderComplianceChart(); renderCalendar(); });
   watchCollection('specials', 'specials', function () { renderComplianceChart(); renderCalendar(); });
   watchCollection('phases', 'phases', function () { renderMilestones(); });
@@ -2760,7 +2725,6 @@ function wireFbDialog() {
 function renderAllFromState() {
   renderMeta();
   renderPillars();
-  renderSymbols();
   renderKpis();
   renderChecklist();
   renderAccountSegments();
