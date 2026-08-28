@@ -547,6 +547,9 @@ td.rowlabel{font-weight:600;color:var(--brand-deep-2);white-space:nowrap;}
 /* KPI */
 .kpi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;box-shadow:var(--shadow);}
 .kpi-card .piece{font-size:13px;font-weight:600;margin:0 0 8px;}
+.kpi-card-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.kpi-card-head .piece{margin:0;}
+.kpi-card-head .ente-logo{width:36px;height:36px;flex-shrink:0;}
 .kpi-row{display:flex;justify-content:space-between;gap:10px;font-size:12px;padding:6px 0;border-top:1px solid var(--border);}
 .kpi-row:first-of-type{border-top:none;}
 .kpi-row .k{color:var(--gray);}

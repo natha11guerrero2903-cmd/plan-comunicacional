@@ -2211,7 +2211,7 @@ function institutionKpiCardHtml(a) {
   const likes = metrics.likes;
   const hasSeg = seguidores !== undefined && seguidores !== null && seguidores !== '';
   const hasLikes = likes !== undefined && likes !== null && likes !== '';
-  return '<p class="piece">' + txt(a.name) + '</p>' +
+  return '<div class="kpi-card-head">' + enteLogoHtml(a) + '<p class="piece">' + txt(a.name) + '</p></div>' +
     '<div class="kpi-row"><span class="k">Seguidores</span><span class="v"' +
       (hasSeg ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' + (hasSeg ? txt(seguidores) : 'Sin datos cargados') + '</span></div>' +
     '<div class="kpi-row"><span class="k">Likes</span><span class="v"' +
