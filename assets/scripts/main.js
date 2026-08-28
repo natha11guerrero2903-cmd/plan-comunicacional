@@ -1174,6 +1174,20 @@ function inferEnteType(a) {
   return 'Por confirmar';
 }
 
+/* Fila "Publicación con más interacción y likes": metrics.publicacionDestacada
+   = {titulo, likes}, cargado a mano o por un futuro scraping/API. Sin
+   datos reales todavía para ningún ente -- se muestra vacío, nunca con
+   un título o cifra inventados. */
+function destacadaRowHtml(pd, rowClass) {
+  const titulo = pd && txt(pd.titulo).trim();
+  const likes = pd && pd.likes;
+  const has = !!titulo;
+  return '<div class="' + (rowClass || 'pub-detail-row') + '"><span class="k">Publicación con más interacción</span><span class="v"' +
+    (has ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' +
+    (has ? titulo + (likes !== undefined && likes !== null && likes !== '' ? ' — ' + txt(likes) + ' likes' : '') : 'Sin datos cargados') +
+    '</span></div>';
+}
+
 /* ============ FICHA DE ENTE: tipo, director, redes y métricas ============
    Punto 10/16/26-28: la jerarquía Segmento->Ente->Director->Redes->
    Publicaciones->Métricas vive aquí. Director y métricas no tienen
@@ -1204,6 +1218,7 @@ function openEnteModal(segNum, code) {
   }
 
   const METRIC_FIELDS = [
+    { key: 'seguidores', label: 'Seguidores' },
     { key: 'publicacionesHistorico', label: 'Publicaciones (histórico)' },
     { key: 'publicacionesUltimoMes', label: 'Publicaciones último mes' },
     { key: 'likes', label: 'Likes' },
@@ -1214,14 +1229,15 @@ function openEnteModal(segNum, code) {
     { key: 'frecuenciaPublicacion', label: 'Frecuencia de publicación' }
   ];
   const metrics = (a && typeof a.metrics === 'object' && a.metrics) || {};
-  const hasAnyMetric = METRIC_FIELDS.some(function (f) { return metrics[f.key] !== undefined && metrics[f.key] !== null && metrics[f.key] !== ''; });
+  const hasAnyMetric = METRIC_FIELDS.some(function (f) { return metrics[f.key] !== undefined && metrics[f.key] !== null && metrics[f.key] !== ''; })
+    || !!(metrics.publicacionDestacada && txt(metrics.publicacionDestacada.titulo).trim());
   const metricRows = METRIC_FIELDS.map(function (f) {
     const v = metrics[f.key];
     const has = v !== undefined && v !== null && v !== '';
     return '<div class="pub-detail-row"><span class="k">' + f.label + '</span><span class="v"' +
       (has ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' +
       (has ? txt(v) : 'Sin datos cargados') + '</span></div>';
-  }).join('');
+  }).join('') + destacadaRowHtml(metrics.publicacionDestacada);
 
   const director = (a && typeof a.director === 'object' && a.director) || null;
   const hasDirector = !!(director && txt(director.nombre).trim());
@@ -2183,6 +2199,42 @@ function renderKpis() {
   renderStatusSummary();
 }
 
+/* Una tarjeta igual en estilo a las de "KPI por pieza semanal", pero con
+   la medición real por institución que pidió el usuario: seguidores,
+   likes y la publicación con más interacción. No lleva botones de
+   Bien/Proceso/Atención -- esos califican una pieza contra una meta
+   definida, y aquí no hay meta que calificar, solo una cifra medida (o,
+   por ahora, sin medir todavía -- nunca un cero inventado). */
+function institutionKpiCardHtml(a) {
+  const metrics = (a && typeof a.metrics === 'object' && a.metrics) || {};
+  const seguidores = metrics.seguidores;
+  const likes = metrics.likes;
+  const hasSeg = seguidores !== undefined && seguidores !== null && seguidores !== '';
+  const hasLikes = likes !== undefined && likes !== null && likes !== '';
+  return '<p class="piece">' + txt(a.name) + '</p>' +
+    '<div class="kpi-row"><span class="k">Seguidores</span><span class="v"' +
+      (hasSeg ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' + (hasSeg ? txt(seguidores) : 'Sin datos cargados') + '</span></div>' +
+    '<div class="kpi-row"><span class="k">Likes</span><span class="v"' +
+      (hasLikes ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' + (hasLikes ? txt(likes) : 'Sin datos cargados') + '</span></div>' +
+    destacadaRowHtml(metrics.publicacionDestacada, 'kpi-row');
+}
+
+function renderInstitutionKpis() {
+  const c = $('kpiInstitutions');
+  if (!c) return;
+  c.innerHTML = '';
+  const accounts = sortDocs(state.accountSegments).reduce(function (acc, s) {
+    return acc.concat(Array.isArray(s.accounts) ? s.accounts : []);
+  }, []);
+  if (!accounts.length) {
+    c.appendChild(el('div', 'empty', 'Sin instituciones cargadas todavía.'));
+    return;
+  }
+  accounts.forEach(function (a) {
+    c.appendChild(el('div', 'card kpi-card', institutionKpiCardHtml(a)));
+  });
+}
+
 function setStatus(kind, id, status) {
   const arr = kind === 'w' ? state.kpiWeekly : state.kpiSpecial;
   const item = arr.filter(function (k) { return txt(k.id) === txt(id); })[0];
@@ -2544,11 +2596,14 @@ document.addEventListener('keydown', function (e) {
        nombre, instagram, tiktok, x, facebook   (handles "@usuario" o URL)
      }
      accountSegments/{seg}.accounts[].metrics = {
-       publicacionesHistorico, publicacionesUltimoMes, likes, comentarios,
-       compartidos, alcance, impresiones, frecuenciaPublicacion
+       seguidores, publicacionesHistorico, publicacionesUltimoMes, likes,
+       comentarios, compartidos, alcance, impresiones, frecuenciaPublicacion,
+       publicacionDestacada: { titulo, likes }   (la publicación con más
+                                                   interacción y likes)
      }
-   openEnteModal() ya muestra estos dos objetos con datos reales en cuanto
-   existan en el documento del ente; si no existen, sigue mostrando
+   openEnteModal() y las tarjetas de "KPI semanal por institución"
+   (institutionKpiCardHtml()) ya muestran estos datos reales en cuanto
+   existan en el documento del ente; si no existen, siguen mostrando
    "Sin datos cargados" (nunca un cero ni un estimado). No hay ninguna
    dependencia adicional que agregar en el código para "activar" esto --
    solo falta que el mecanismo de obtención de datos escriba ahí.
@@ -2636,7 +2691,7 @@ function attachListeners() {
   watchCollection('kpiWeekly', 'kpiWeekly', function () { renderKpis(); });
   watchCollection('kpiSpecial', 'kpiSpecial', function () { renderKpis(); });
   watchCollection('checklist', 'checklist', function () { renderChecklist(); });
-  watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); });
+  watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); renderInstitutionKpis(); });
   watchCollection('newsSources', 'newsSources', function () { renderNews(); });
   watchCollection('newsItems', 'newsItems', function () { renderOpinionNews(); });
   watchCollection('contentSummaries', 'contentSummaries', function () { renderContentSummaries(); });
@@ -2826,6 +2881,7 @@ function renderAllFromState() {
   renderMeta();
   renderPillars();
   renderKpis();
+  renderInstitutionKpis();
   renderChecklist();
   renderAccountSegments();
   renderNews();
