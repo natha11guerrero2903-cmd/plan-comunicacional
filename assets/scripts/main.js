@@ -640,7 +640,7 @@ const DEFAULT_DATA = {
         { "code": "SEG-01", "name": "Comisión de Seguridad Ciudadana", "status": "candidato", "note": "IG (candidato, sin verificar): @seguridadciudadanatachira" },
         { "code": "SEG-02", "name": "Procuraduría General del Estado", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
         { "code": "SEG-03", "name": "Instituto Autónomo de Policía del Estado Táchira", "status": "verificado", "note": "IG: @politachira | X: @policiatachira — verificado" },
-        { "code": "SEG-04", "name": "INAPROCET (Protección Civil Táchira)", "status": "verificado", "note": "IG: @pciviltachira (96K seg.) | X: @PCivilTachira (17.1K seg.) — verificado" },
+        { "code": "SEG-04", "name": "INAPROCET (Protección Civil Táchira)", "status": "verificado", "note": "IG: @pcsancristobal | X: @PCivilTachira (17.1K seg.) — verificado" },
         { "code": "SEG-05", "name": "Fundación de Altos Estudios Jurídicos de la Procuraduría (FAEJ)", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" }
       ]
     },
