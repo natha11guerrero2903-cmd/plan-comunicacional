@@ -1157,6 +1157,16 @@ function hasActiveSocial(a) {
   return !!(info.instagram || info.x || info.facebook || info.tiktok);
 }
 
+/* Cuántas de las 4 plataformas (Instagram/TikTok/X/Facebook) tiene el
+   ente con cuenta PROPIA real -- 0 para "interno" (usa la cuenta
+   central, no es suya) y para "sin_cuenta"/"inactiva", igual que
+   hasActiveSocial. Se usa para el desglose por ente de "Cobertura de
+   entes por segmento institucional". */
+function activeSocialCount(a) {
+  const info = parseAccountSocial(a);
+  return SOCIAL_PLATFORMS.filter(function (p) { return !!info[p.key]; }).length;
+}
+
 /* ============ TIPO DE ENTE (punto 11 de la corrección) ============
    No todo ente es "descentralizado". La regla es transparente y se basa
    en el nombre propio de cada institución (Dirección/Oficina/Secretaría
@@ -1326,16 +1336,39 @@ function renderAccountSegments() {
   }
 
   // ---- Gráfico de cobertura, un color de la paleta por segmento ----
+  // Se mantiene la barra general por segmento y, debajo, un desglose real
+  // por cada ente (redes propias activas de 4 posibles) -- a pedido del
+  // usuario, sin quitar la vista general.
   const counts = segments.map(function (s) { return Array.isArray(s.accounts) ? s.accounts.length : 0; });
   const maxAccounts = Math.max.apply(null, [1].concat(counts));
   segments.forEach(function (s, i) {
     const n = counts[i];
     const pct = Math.round(pctOf(n, maxAccounts));
     const shade = PHASE_SHADES[i % PHASE_SHADES.length];
-    chart.appendChild(el('div', 'bar-chart-row',
+    const group = el('div', 'chart-seg-group');
+    group.appendChild(el('div', 'bar-chart-row',
       '<span class="bar-chart-lbl">' + String(txt(s.num) || (i + 1)).padStart(2, '0') + ' · ' + txt(s.name) + '</span>' +
       '<div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + pct + '%;background:' + shade + '"></div></div>' +
       '<span class="bar-chart-val">' + n + '</span>'));
+
+    const accountsOfSeg = Array.isArray(s.accounts) ? s.accounts : [];
+    if (accountsOfSeg.length) {
+      const breakdown = el('div', 'chart-ente-breakdown',
+        '<span class="chart-ente-breakdown-lbl">Cobertura por ente (redes propias activas, de 4 posibles)</span>');
+      accountsOfSeg.forEach(function (a) {
+        const c = activeSocialCount(a);
+        const entePct = Math.round(pctOf(c, 4));
+        let tag = '';
+        if (a.status === 'interno') tag = '<span class="acct-badge i">Usa cuenta central</span>';
+        else if (a.status === 'sin_cuenta' || a.status === 'inactiva') tag = '<span class="acct-badge s">Sin cuenta propia</span>';
+        breakdown.appendChild(el('div', 'bar-chart-row bar-chart-row--sm',
+          '<span class="bar-chart-lbl">' + txt(a.name) + '</span>' +
+          '<div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + entePct + '%;background:' + shade + '"></div></div>' +
+          '<span class="bar-chart-val">' + c + '</span>' + tag));
+      });
+      group.appendChild(breakdown);
+    }
+    chart.appendChild(group);
   });
 
   // ---- Leyenda de cobertura real (sin la etiqueta "Verificado") ----
@@ -1846,7 +1879,22 @@ function renderComplianceChart() {
         '<span class="bar-chart-val">' + n + '</span>' +
       '</div>';
     });
-    box.appendChild(el('div', 'compliance-seg', html));
+    const segEl = el('div', 'compliance-seg', html);
+
+    // Las piezas se planifican por segmento (día de la semana -> segmento),
+    // no por ente específico -- no existe un dato real de "cuántas piezas
+    // le tocan a cada organismo". En vez de inventar ese reparto, se lista
+    // aquí, a pedido del usuario, cada organismo real del segmento.
+    const accountsOfSeg = Array.isArray(s.accounts) ? s.accounts : [];
+    if (accountsOfSeg.length) {
+      const chipsHtml = accountsOfSeg.map(function (a) {
+        return '<span class="compliance-ente-chip" style="border-color:' + shade + '55;">' + txt(a.name) + '</span>';
+      }).join('');
+      segEl.appendChild(el('div', 'chart-ente-breakdown',
+        '<span class="chart-ente-breakdown-lbl">Organismos de este segmento (' + accountsOfSeg.length + ') -- las piezas se planifican por segmento, no todavía por organismo individual</span>' +
+        '<div class="compliance-ente-chips">' + chipsHtml + '</div>'));
+    }
+    box.appendChild(segEl);
   });
 }
 
