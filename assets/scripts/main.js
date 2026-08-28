@@ -1157,15 +1157,6 @@ function hasActiveSocial(a) {
   return !!(info.instagram || info.x || info.facebook || info.tiktok);
 }
 
-/* Cuántas de las 4 plataformas (Instagram/TikTok/X/Facebook) tiene el
-   ente con cuenta PROPIA real -- 0 para "interno" (usa la cuenta
-   central, no es suya) y para "sin_cuenta"/"inactiva", igual que
-   hasActiveSocial. Se usa para el desglose por ente de "Cobertura de
-   entes por segmento institucional". */
-function activeSocialCount(a) {
-  const info = parseAccountSocial(a);
-  return SOCIAL_PLATFORMS.filter(function (p) { return !!info[p.key]; }).length;
-}
 
 /* ============ TIPO DE ENTE (punto 11 de la corrección) ============
    No todo ente es "descentralizado". La regla es transparente y se basa
@@ -1336,11 +1327,13 @@ function renderAccountSegments() {
   }
 
   // ---- Gráfico de cobertura, un color de la paleta por segmento ----
-  // Se mantiene la barra general por segmento y, debajo, un desglose real
-  // por cada ente (redes propias activas de 4 posibles) -- a pedido del
-  // usuario, sin quitar la vista general.
+  // Se mantiene la barra general por segmento y, debajo, una tabla real
+  // mes x organismo -- a pedido del usuario: primero los meses
+  // (encabezado, con el mes real de hoy resaltado), luego una fila por
+  // cada organismo del segmento.
   const counts = segments.map(function (s) { return Array.isArray(s.accounts) ? s.accounts.length : 0; });
   const maxAccounts = Math.max.apply(null, [1].concat(counts));
+  const monthDefs = complianceMonthDefs();
   segments.forEach(function (s, i) {
     const n = counts[i];
     const pct = Math.round(pctOf(n, maxAccounts));
@@ -1352,21 +1345,31 @@ function renderAccountSegments() {
       '<span class="bar-chart-val">' + n + '</span>'));
 
     const accountsOfSeg = Array.isArray(s.accounts) ? s.accounts : [];
-    if (accountsOfSeg.length) {
-      const breakdown = el('div', 'chart-ente-breakdown',
-        '<span class="chart-ente-breakdown-lbl">Cobertura por ente (redes propias activas, de 4 posibles)</span>');
+    if (accountsOfSeg.length && monthDefs) {
+      const theadHtml = '<thead><tr><th>Organismo</th>' +
+        monthDefs.map(function (mo) { return '<th class="compliance-month-col' + (mo.isCurrent ? ' is-current' : '') + '">' + mo.label + (mo.isCurrent ? ' <span class="compliance-current-tag">actual</span>' : '') + '</th>'; }).join('') +
+        '</tr></thead>';
+      let tbodyHtml = '<tbody>';
       accountsOfSeg.forEach(function (a) {
-        const c = activeSocialCount(a);
-        const entePct = Math.round(pctOf(c, 4));
-        let tag = '';
-        if (a.status === 'interno') tag = '<span class="acct-badge i">Usa cuenta central</span>';
-        else if (a.status === 'sin_cuenta' || a.status === 'inactiva') tag = '<span class="acct-badge s">Sin cuenta propia</span>';
-        breakdown.appendChild(el('div', 'bar-chart-row bar-chart-row--sm',
-          '<span class="bar-chart-lbl">' + txt(a.name) + '</span>' +
-          '<div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + entePct + '%;background:' + shade + '"></div></div>' +
-          '<span class="bar-chart-val">' + c + '</span>' + tag));
+        tbodyHtml += '<tr><td class="compliance-seg-name">' + txt(a.name) + '</td>';
+        monthDefs.forEach(function (mo) {
+          // Ninguna pieza está asignada todavía a un organismo específico
+          // (se planifican por segmento, ver buildScheduleOccurrences) --
+          // el valor real hoy es 0 para cada organismo, no se inventa
+          // ninguna cifra mayor.
+          const nMonth = 0;
+          tbodyHtml += '<td class="' + (mo.isCurrent ? 'is-current' : '') + '">' +
+            '<div class="compliance-cell">' +
+              '<div class="compliance-cell-track"><div class="compliance-cell-fill" style="width:0%;background:' + shade + '"></div></div>' +
+              '<span class="compliance-cell-val">' + nMonth + '</span>' +
+            '</div></td>';
+        });
+        tbodyHtml += '</tr>';
       });
-      group.appendChild(breakdown);
+      tbodyHtml += '</tbody>';
+      group.appendChild(el('div', 'chart-ente-breakdown',
+        '<span class="chart-ente-breakdown-lbl">Seguimiento mensual por organismo -- todas las piezas se planifican por segmento, no hay todavía ninguna asignada a un organismo específico (por eso el 0 real en cada celda)</span>' +
+        '<div class="table-wrap"><table class="compliance-table">' + theadHtml + tbodyHtml + '</table></div>'));
     }
     chart.appendChild(group);
   });
@@ -1837,15 +1840,13 @@ function kindLabel(kind) {
 }
 
 /* ---- Gráfico: piezas planificadas por segmento y mes (Resumen) ---- */
-function renderComplianceChart() {
-  const box = $('complianceChart');
-  if (!box) return;
-  box.innerHTML = '';
-
+/* Lista de meses del período del plan, con el mes real de hoy marcado
+   -- se reutiliza en la tabla de "Piezas planificadas por segmento y
+   mes" y en la tabla de seguimiento mensual por organismo. */
+function complianceMonthDefs() {
   const start = parseISO(state.meta && state.meta.periodStart);
   const end = parseISO(state.meta && state.meta.periodEnd);
-  if (!start || !end) { box.appendChild(el('div', 'empty', 'Sin período de plan cargado todavía.')); return; }
-
+  if (!start || !end) return null;
   const todayKey = (function () { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); })();
   const months = [];
   for (let c = new Date(start.getFullYear(), start.getMonth(), 1); c <= new Date(end.getFullYear(), end.getMonth(), 1); c = new Date(c.getFullYear(), c.getMonth() + 1, 1)) {
@@ -1853,6 +1854,16 @@ function renderComplianceChart() {
     const lbl = MONTH_LABELS[c.getMonth()];
     months.push({ key: key, label: lbl.charAt(0).toUpperCase() + lbl.slice(1), isCurrent: key === todayKey });
   }
+  return months;
+}
+
+function renderComplianceChart() {
+  const box = $('complianceChart');
+  if (!box) return;
+  box.innerHTML = '';
+
+  const months = complianceMonthDefs();
+  if (!months) { box.appendChild(el('div', 'empty', 'Sin período de plan cargado todavía.')); return; }
 
   const occurrences = buildScheduleOccurrences();
   const counts = {};
