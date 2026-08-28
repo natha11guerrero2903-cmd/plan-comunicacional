@@ -1846,9 +1846,12 @@ function renderComplianceChart() {
   const end = parseISO(state.meta && state.meta.periodEnd);
   if (!start || !end) { box.appendChild(el('div', 'empty', 'Sin período de plan cargado todavía.')); return; }
 
+  const todayKey = (function () { const t = new Date(); return t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0'); })();
   const months = [];
   for (let c = new Date(start.getFullYear(), start.getMonth(), 1); c <= new Date(end.getFullYear(), end.getMonth(), 1); c = new Date(c.getFullYear(), c.getMonth() + 1, 1)) {
-    months.push({ key: c.getFullYear() + '-' + String(c.getMonth() + 1).padStart(2, '0'), label: MONTH_LABELS[c.getMonth()].slice(0, 3) });
+    const key = c.getFullYear() + '-' + String(c.getMonth() + 1).padStart(2, '0');
+    const lbl = MONTH_LABELS[c.getMonth()];
+    months.push({ key: key, label: lbl.charAt(0).toUpperCase() + lbl.slice(1), isCurrent: key === todayKey });
   }
 
   const occurrences = buildScheduleOccurrences();
@@ -1867,35 +1870,49 @@ function renderComplianceChart() {
     return Math.max.apply(null, [0].concat(months.map(function (mo) { return (counts[s.num] && counts[s.num][mo.key]) || 0; })));
   })));
 
+  // ---- Tabla segmento x mes: se recalcula en cada render con la fecha
+  // real del navegador, así que el mes "actual" resaltado avanza solo
+  // con el calendario, sin tocar código. ----
+  const theadHtml = '<thead><tr><th></th>' +
+    months.map(function (mo) { return '<th class="compliance-month-col' + (mo.isCurrent ? ' is-current' : '') + '">' + mo.label + (mo.isCurrent ? ' <span class="compliance-current-tag">actual</span>' : '') + '</th>'; }).join('') +
+    '</tr></thead>';
+
+  let tbodyHtml = '<tbody>';
   segments.forEach(function (s, i) {
     const shade = PHASE_SHADES[i % PHASE_SHADES.length];
-    let html = '<h5>' + String(txt(s.num)).padStart(2, '0') + ' · ' + txt(s.name) + '</h5>';
+    tbodyHtml += '<tr><td class="compliance-seg-name">' + String(txt(s.num)).padStart(2, '0') + ' · ' + txt(s.name) + '</td>';
     months.forEach(function (mo) {
       const n = (counts[s.num] && counts[s.num][mo.key]) || 0;
       const pct = Math.round(pctOf(n, maxCount));
-      html += '<div class="bar-chart-row">' +
-        '<span class="bar-chart-lbl" style="width:56px;">' + mo.label + '</span>' +
-        '<div class="bar-chart-track"><div class="bar-chart-fill" style="width:' + pct + '%;background:' + shade + '"></div></div>' +
-        '<span class="bar-chart-val">' + n + '</span>' +
-      '</div>';
+      tbodyHtml += '<td class="' + (mo.isCurrent ? 'is-current' : '') + '">' +
+        '<div class="compliance-cell">' +
+          '<div class="compliance-cell-track"><div class="compliance-cell-fill" style="width:' + pct + '%;background:' + shade + '"></div></div>' +
+          '<span class="compliance-cell-val">' + n + '</span>' +
+        '</div></td>';
     });
-    const segEl = el('div', 'compliance-seg', html);
-
-    // Las piezas se planifican por segmento (día de la semana -> segmento),
-    // no por ente específico -- no existe un dato real de "cuántas piezas
-    // le tocan a cada organismo". En vez de inventar ese reparto, se lista
-    // aquí, a pedido del usuario, cada organismo real del segmento.
-    const accountsOfSeg = Array.isArray(s.accounts) ? s.accounts : [];
-    if (accountsOfSeg.length) {
-      const chipsHtml = accountsOfSeg.map(function (a) {
-        return '<span class="compliance-ente-chip" style="border-color:' + shade + '55;">' + txt(a.name) + '</span>';
-      }).join('');
-      segEl.appendChild(el('div', 'chart-ente-breakdown',
-        '<span class="chart-ente-breakdown-lbl">Organismos de este segmento (' + accountsOfSeg.length + ') -- las piezas se planifican por segmento, no todavía por organismo individual</span>' +
-        '<div class="compliance-ente-chips">' + chipsHtml + '</div>'));
-    }
-    box.appendChild(segEl);
+    tbodyHtml += '</tr>';
   });
+  tbodyHtml += '</tbody>';
+
+  box.appendChild(el('div', 'table-wrap', '<table class="compliance-table">' + theadHtml + tbodyHtml + '</table>'));
+
+  // Las piezas se planifican por segmento (día de la semana -> segmento),
+  // no por ente específico -- no existe un dato real de "cuántas piezas
+  // le tocan a cada organismo". En vez de inventar ese reparto, se lista
+  // aquí, a pedido del usuario, cada organismo real de cada segmento.
+  const rosterBox = el('div', 'compliance-roster');
+  segments.forEach(function (s, i) {
+    const shade = PHASE_SHADES[i % PHASE_SHADES.length];
+    const accountsOfSeg = Array.isArray(s.accounts) ? s.accounts : [];
+    if (!accountsOfSeg.length) return;
+    const chipsHtml = accountsOfSeg.map(function (a) {
+      return '<span class="compliance-ente-chip" style="border-color:' + shade + '55;">' + txt(a.name) + '</span>';
+    }).join('');
+    rosterBox.appendChild(el('div', 'chart-ente-breakdown',
+      '<span class="chart-ente-breakdown-lbl">' + String(txt(s.num)).padStart(2, '0') + ' · ' + txt(s.name) + ' -- organismos de este segmento (' + accountsOfSeg.length + '); las piezas se planifican por segmento, no todavía por organismo individual</span>' +
+      '<div class="compliance-ente-chips">' + chipsHtml + '</div>'));
+  });
+  box.appendChild(rosterBox);
 }
 
 /* ---- Hitos de gestión (antes: bloques de "Fase N", ahora sin encadenarlos) ---- */
