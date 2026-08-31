@@ -926,7 +926,6 @@ function renderMeta() {
   updateDateDisplay();
 
   setHTML('heroSub', m.heroSub);
-  setHTML('introCard', m.introCard);
   setHTML('quoteTxt', m.quote);
   setHTML('metricHero', m.metricHero);
   setHTML('resumenNote', m.resumenNote);
@@ -934,23 +933,6 @@ function renderMeta() {
   setHTML('symbolDiff', m.symbolDiff);
   setHTML('symbolReflection', m.symbolReflection);
   setHTML('docFoot', m.footer);
-
-  // Tarjetas de estadísticas -- "Ideas en el banco de contenido" NUNCA se
-  // muestra fija: se cuenta en vivo cuántas ideas hay realmente
-  // cargadas, para no mentir sobre la cantidad (punto 3 de la corrección).
-  const grid = $('statGrid');
-  grid.innerHTML = '';
-  const stats = Array.isArray(m.stats) ? m.stats : [];
-  const realIdeasCount = state.pillars.reduce(function (sum, p) {
-    return sum + (Array.isArray(p.ideas) ? p.ideas.length : 0);
-  }, 0);
-  stats.forEach(function (st) {
-    const lbl = txt(st && st.lbl);
-    const num = /^ideas en el banco/i.test(lbl) ? String(realIdeasCount) : txt(st && st.num);
-    grid.appendChild(el('div', 'card stat-card',
-      '<div class="num">' + num + '</div>' +
-      '<div class="lbl">' + lbl + '</div>'));
-  });
 
   // Diagnóstico
   const diag = $('diagGrid');
@@ -2802,11 +2784,12 @@ function attachListeners() {
     }, function (err) { onFsError(col, err); }));
   }
 
-  /* Las 4 categorías del banco de contenidos ya no tienen una vista
-     propia en "Banco de contenidos" (a pedido del usuario) -- se sigue
-     sincronizando "pillars" porque el conteo real de ideas en Resumen
-     (renderMeta) depende de esos datos. */
-  watchCollection('pillars', 'pillars', function () { renderMeta(); });
+  /* Las 4 categorías del banco de contenidos ya no tienen ninguna vista
+     que las use (se quitaron de "Banco de contenidos" y del conteo de
+     "Ideas" en Centro de Control, ambos a pedido del usuario) -- se
+     conserva la sincronización de "pillars" sin tocar los datos, por si
+     se vuelve a mostrar. */
+  watchCollection('pillars', 'pillars');
   /* "symbols" no tiene ninguna vista que lo use por ahora -- se conserva
      la sincronización sin tocar los datos, por si se vuelve a mostrar. */
   watchCollection('symbols', 'symbols');
