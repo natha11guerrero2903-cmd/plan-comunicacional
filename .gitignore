@@ -1,0 +1,5 @@
+node_modules/
+.env
+*.env
+scripts/serviceAccountKey.json
+scripts/*.key.json

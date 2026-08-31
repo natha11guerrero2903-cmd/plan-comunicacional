@@ -1,0 +1,13 @@
+{
+  "name": "marca-gestion-scraping",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Scripts que alimentan el Centro de Control con métricas reales de redes sociales (API oficial de X por ahora).",
+  "type": "commonjs",
+  "scripts": {
+    "sync-x": "node sync-x-metrics.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.7.0"
+  }
+}
