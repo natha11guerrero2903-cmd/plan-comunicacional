@@ -1477,6 +1477,24 @@ function renderPerception() {
       ? 'Estas cifras provienen de la metodología descrita arriba. Se actualizan desde la Consola de Firebase cada vez que hay una nueva medición.'
       : 'Esta sección queda sin cifras a propósito: no existe todavía una metodología real de medición de percepción ciudadana. Cuando el equipo defina una (encuesta, escucha social u otra), se carga aquí -- no se muestran porcentajes estimados mientras tanto.';
   }
+
+  // Mismo dato de arriba, mostrado en miniatura dentro de "Centro de
+  // Control" -- no es un sistema paralelo, es la misma state.perception.
+  const ring = $('perceptionMiniRing');
+  if (ring) {
+    if (hasData) {
+      const pos = Number(p.positiva) || 0, neg = Number(p.negativa) || 0, neu = Number(p.neutra) || 0;
+      const total = pos + neg + neu || 1;
+      const posPct = pos / total * 100, negPct = neg / total * 100;
+      ring.style.background = 'conic-gradient(var(--ok) 0% ' + posPct + '%, var(--alert) ' + posPct + '% ' + (posPct + negPct) + '%, var(--neutral-status) ' + (posPct + negPct) + '% 100%)';
+      setHTML('perceptionMiniValue', Math.round(pos) + '%');
+      setHTML('perceptionMiniLabel', 'Positiva');
+    } else {
+      ring.style.background = 'var(--paper-2)';
+      setHTML('perceptionMiniValue', '—');
+      setHTML('perceptionMiniLabel', 'Sin medir');
+    }
+  }
 }
 
 /* ============ NOTICIAS SOBRE LA GESTIÓN (matrices de opinión) ============
@@ -1740,6 +1758,132 @@ function buildScheduleOccurrences() {
 
 function kindLabel(kind) {
   return kind === 'semanal' ? 'Pieza semanal' : kind === 'especial' ? 'Publicación especial' : 'Resumen de gestión';
+}
+
+/* ============ CENTRO DE CONTROL ============
+   Widgets de la nueva página de aterrizaje (antes "Resumen"). Reutilizan
+   exactamente los mismos datos reales que ya alimentan el calendario, los
+   segmentos y la percepción -- no son un sistema paralelo. Donde el
+   dashboard de referencia mostraba "Alcance acumulado", "Engagement",
+   "Rendimiento de la semana" o "Top contenidos" con cifras de ejemplo,
+   aquí se deja honestamente sin datos: no hay todavía ningún scraping/API
+   conectado que mida resultados reales de publicaciones (mismo principio
+   que en Métricas y en la ficha de ente). "Campañas activas" y
+   "Proyectos en desarrollo" del dashboard de referencia no se
+   implementaron: ese concepto no existe en los datos reales de este
+   plan (no hay campañas ni proyectos cargados en ningún lado). */
+function pubStateLabel(key) {
+  const found = PUBLICATION_STATES.find(function (s) { return s.key === key; });
+  return found ? found.label : 'Diseñada';
+}
+function pubStateBadgeClass(key) {
+  if (key === 'publicada' || key === 'reposteada' || key === 'metricas') return 'v';
+  if (key === 'aprobada') return 'p';
+  if (key === 'revisada') return 'c';
+  return 's';
+}
+function controlOccurrenceRowHtml(o) {
+  return '<div class="control-item">' +
+    '<span class="control-item-time">' + (txt(o.time).trim() || '—') + '</span>' +
+    '<div class="control-item-body">' +
+      '<p class="control-item-title">' + txt(o.title) + '</p>' +
+      '<span class="control-item-tag">' + kindLabel(o.kind) + '</span>' +
+    '</div>' +
+    '<span class="acct-badge ' + pubStateBadgeClass(o.status) + '">' + pubStateLabel(o.status) + '</span>' +
+  '</div>';
+}
+
+function renderTodayPriorities() {
+  const c = $('todayPriorities');
+  if (!c) return;
+  c.innerHTML = '';
+  const today = isoOf(new Date());
+  const items = buildScheduleOccurrences().filter(function (o) { return o.date === today; });
+  if (!items.length) {
+    c.appendChild(el('div', 'empty', 'Sin piezas del calendario programadas para hoy.'));
+    return;
+  }
+  items.forEach(function (o) { c.appendChild(el('div', '', controlOccurrenceRowHtml(o))); });
+}
+
+function renderUpcoming7Days() {
+  const c = $('upcoming7Days');
+  if (!c) return;
+  c.innerHTML = '';
+  const today = new Date();
+  const todayIso = isoOf(today);
+  const limitIso = isoOf(addDays(today, 7));
+  const items = buildScheduleOccurrences().filter(function (o) { return o.date > todayIso && o.date <= limitIso; });
+  if (!items.length) {
+    c.appendChild(el('div', 'empty', 'Sin piezas del calendario en los próximos 7 días.'));
+    return;
+  }
+  let lastDate = '';
+  items.forEach(function (o) {
+    if (o.date !== lastDate) {
+      lastDate = o.date;
+      const d = parseISO(o.date);
+      c.appendChild(el('div', 'control-day-hdr', d ? fmtDay(d) : o.date));
+    }
+    c.appendChild(el('div', '', controlOccurrenceRowHtml(o)));
+  });
+}
+
+function renderControlAlerts() {
+  const c = $('controlAlerts');
+  if (!c) return;
+  c.innerHTML = '';
+  const today = isoOf(new Date());
+  const occurrences = buildScheduleOccurrences();
+  const overdue = occurrences.filter(function (o) { return o.date < today && o.status === 'disenada'; }).length;
+  const todayPending = occurrences.filter(function (o) { return o.date === today && (o.status === 'disenada' || o.status === 'revisada'); }).length;
+
+  const allAccounts = sortDocs(state.accountSegments).reduce(function (acc, s) { return acc.concat(Array.isArray(s.accounts) ? s.accounts : []); }, []);
+  const sinRedesPropias = allAccounts.filter(function (a) { return a.status === 'sin_cuenta' || a.status === 'inactiva'; }).length;
+
+  const perc = state.perception || {};
+  const percMeasured = (perc.positiva !== null && perc.positiva !== undefined && perc.positiva !== '')
+    || (perc.negativa !== null && perc.negativa !== undefined && perc.negativa !== '')
+    || (perc.neutra !== null && perc.neutra !== undefined && perc.neutra !== '');
+
+  const alerts = [];
+  if (overdue > 0) alerts.push({ label: 'Piezas vencidas sin avanzar de estado', n: overdue, kind: 'r' });
+  if (todayPending > 0) alerts.push({ label: 'Piezas de hoy sin aprobar todavía', n: todayPending, kind: 'c' });
+  if (sinRedesPropias > 0) alerts.push({ label: 'Entes sin redes propias', n: sinRedesPropias, kind: 's' });
+  if (!percMeasured) alerts.push({ label: 'Percepción sin metodología de medición', n: null, kind: 's' });
+
+  if (!alerts.length) {
+    c.appendChild(el('div', 'empty', 'Sin alertas activas por ahora.'));
+    return;
+  }
+  alerts.forEach(function (a) {
+    c.appendChild(el('div', 'control-item',
+      '<div class="control-item-body"><p class="control-item-title">' + a.label + '</p></div>' +
+      (a.n !== null ? '<span class="acct-badge ' + a.kind + '">' + a.n + '</span>' : '<span class="acct-badge ' + a.kind + '">Pendiente</span>')));
+  });
+}
+
+/* "Informes disponibles" reutiliza el generador de informe ya existente
+   (buildPrintReport/printReport) y el banco real de resúmenes -- no crea
+   un segundo sistema de reportes. */
+function renderReportsAvailable() {
+  const c = $('reportsAvailable');
+  if (!c) return;
+  c.innerHTML = '';
+  c.appendChild(el('div', 'control-item',
+    '<div class="control-item-body"><p class="control-item-title">Informe mensual de actividades de comunicación de gestión</p>' +
+    '<span class="control-item-tag">Calendario, segmentos, medios, percepción</span></div>' +
+    '<button type="button" class="link-btn" id="controlPrintReportBtn">Generar →</button>'));
+  const summaries = sortDocs(state.contentSummaries);
+  summaries.forEach(function (s) {
+    const linked = !!s.linked;
+    c.appendChild(el('div', 'control-item',
+      '<div class="control-item-body"><p class="control-item-title">' + txt(s.type) + '</p>' +
+      '<span class="control-item-tag">' + (linked ? 'Vinculado al calendario' : 'Aún no redactado') + '</span></div>' +
+      '<span class="acct-badge ' + (linked ? 'v' : 's') + '">' + (linked ? 'Listo' : 'Pendiente') + '</span>'));
+  });
+  const btn = $('controlPrintReportBtn');
+  if (btn) btn.addEventListener('click', printReport);
 }
 
 /* ---- Gráfico: piezas planificadas por segmento y mes (Resumen) ---- */
@@ -2546,6 +2690,9 @@ function attachListeners() {
     renderComplianceChart();
     renderCalendar();
     renderSegmentDiagnostics();
+    renderTodayPriorities();
+    renderUpcoming7Days();
+    renderControlAlerts();
     scheduleFirstPaintDone();
   }, function (err) { onFsError('meta', err); }));
 
@@ -2553,6 +2700,7 @@ function attachListeners() {
   fb.unsubs.push(api.onSnapshot(api.doc(db, BRAND_SLUG, 'plan', 'perception', 'main'), function (snap) {
     state.perception = Object.assign({}, DEFAULT_DATA.perception, docOr({}, snap.data()));
     renderPerception();
+    renderControlAlerts();
     scheduleFirstPaintDone();
   }, function (err) { onFsError('perception', err); }));
 
@@ -2574,17 +2722,17 @@ function attachListeners() {
   /* "symbols" no tiene ninguna vista que lo use por ahora -- se conserva
      la sincronización sin tocar los datos, por si se vuelve a mostrar. */
   watchCollection('symbols', 'symbols');
-  watchCollection('weekly', 'weekly', function () { renderComplianceChart(); renderCalendar(); });
-  watchCollection('specials', 'specials', function () { renderComplianceChart(); renderCalendar(); });
+  watchCollection('weekly', 'weekly', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); });
+  watchCollection('specials', 'specials', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); });
   watchCollection('phases', 'phases', function () { renderMilestones(); });
-  watchCollection('publications', 'publications', function () { renderCalendar(); });
+  watchCollection('publications', 'publications', function () { renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); });
   watchCollection('kpiWeekly', 'kpiWeekly', function () { renderKpis(); });
   watchCollection('kpiSpecial', 'kpiSpecial', function () { renderKpis(); });
   watchCollection('checklist', 'checklist', function () { renderChecklist(); });
-  watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); renderInstitutionKpis(); });
+  watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); renderInstitutionKpis(); renderControlAlerts(); });
   watchCollection('newsSources', 'newsSources', function () { renderNews(); });
   watchCollection('newsItems', 'newsItems', function () { renderOpinionNews(); });
-  watchCollection('contentSummaries', 'contentSummaries', function () { renderContentSummaries(); });
+  watchCollection('contentSummaries', 'contentSummaries', function () { renderContentSummaries(); renderReportsAvailable(); });
 }
 
 let firstPaintPending = 0;
@@ -2780,6 +2928,10 @@ function renderAllFromState() {
   renderComplianceChart();
   renderMilestones();
   renderCalendar();
+  renderTodayPriorities();
+  renderUpcoming7Days();
+  renderControlAlerts();
+  renderReportsAvailable();
 }
 
 /* ============ 10 · ARRANQUE ============ */
