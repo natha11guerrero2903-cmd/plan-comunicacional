@@ -730,7 +730,19 @@ const DEFAULT_DATA = {
     "positiva": null,
     "negativa": null,
     "neutra": null
-  }
+  },
+  /* Campañas y proyectos: conceptos nuevos que pidió el usuario para el
+     Centro de Control, tomados del dashboard de referencia. Empiezan
+     vacíos a propósito -- no existe ninguna campaña ni proyecto real
+     cargado todavía. Se agregan desde la Consola de Firebase, igual que
+     el resto del contenido; el conteo que se ve en el Centro de Control
+     es siempre el real de lo que haya en Firestore, nunca inventado. */
+  "campaigns": [],
+  "projects": [],
+  /* Radar de coyuntura: temas reales en monitoreo (menciones, sentimiento,
+     tendencia). Empieza vacío -- requiere un monitoreo real de medios o
+     redes conectado; no se inventan temas ni cifras de ejemplo. */
+  "coyuntura": []
 };
 
 /* Tablas iguales para las tres marcas — se quedan fijas en el código. */
@@ -845,6 +857,9 @@ const state = {
   newsItems: clone(DEFAULT_DATA.newsItems),
   contentSummaries: clone(DEFAULT_DATA.contentSummaries),
   perception: clone(DEFAULT_DATA.perception),
+  campaigns: clone(DEFAULT_DATA.campaigns),
+  projects: clone(DEFAULT_DATA.projects),
+  coyuntura: clone(DEFAULT_DATA.coyuntura),
   /* Las publicaciones del calendario no vienen de DEFAULT_DATA: se
      generan en vivo a partir de weekly/specials (ver
      buildScheduleOccurrences). Aquí solo vive el ESTADO de cada una
@@ -1829,10 +1844,7 @@ function renderUpcoming7Days() {
   });
 }
 
-function renderControlAlerts() {
-  const c = $('controlAlerts');
-  if (!c) return;
-  c.innerHTML = '';
+function computeControlAlerts() {
   const today = isoOf(new Date());
   const occurrences = buildScheduleOccurrences();
   const overdue = occurrences.filter(function (o) { return o.date < today && o.status === 'disenada'; }).length;
@@ -1851,7 +1863,14 @@ function renderControlAlerts() {
   if (todayPending > 0) alerts.push({ label: 'Piezas de hoy sin aprobar todavía', n: todayPending, kind: 'c' });
   if (sinRedesPropias > 0) alerts.push({ label: 'Entes sin redes propias', n: sinRedesPropias, kind: 's' });
   if (!percMeasured) alerts.push({ label: 'Percepción sin metodología de medición', n: null, kind: 's' });
+  return alerts;
+}
 
+function renderControlAlerts() {
+  const c = $('controlAlerts');
+  if (!c) return;
+  c.innerHTML = '';
+  const alerts = computeControlAlerts();
   if (!alerts.length) {
     c.appendChild(el('div', 'empty', 'Sin alertas activas por ahora.'));
     return;
@@ -1884,6 +1903,65 @@ function renderReportsAvailable() {
   });
   const btn = $('controlPrintReportBtn');
   if (btn) btn.addEventListener('click', printReport);
+}
+
+/* Fila de estadísticas operativas del Centro de Control. Programadas /
+   realizadas / eventos próximos / alertas se calculan de datos reales
+   del calendario y segmentos. Campañas y proyectos son conteos reales
+   de colecciones nuevas (empiezan vacías). Alcance y engagement quedan
+   honestamente sin dato: no hay scraping/API conectado todavía. */
+function renderControlStats() {
+  const c = $('controlStatGrid');
+  if (!c) return;
+  c.innerHTML = '';
+  const today = new Date();
+  const dow = today.getDay();
+  const weekStart = addDays(today, dow === 0 ? -6 : 1 - dow);
+  const weekEnd = addDays(weekStart, 6);
+  const weekStartIso = isoOf(weekStart), weekEndIso = isoOf(weekEnd);
+  const todayIso = isoOf(today);
+
+  const occurrences = buildScheduleOccurrences();
+  const thisWeek = occurrences.filter(function (o) { return o.date >= weekStartIso && o.date <= weekEndIso; });
+  const done = thisWeek.filter(function (o) { return o.status === 'publicada' || o.status === 'reposteada' || o.status === 'metricas'; }).length;
+  const scheduled = thisWeek.length - done;
+  const upcomingEvents = occurrences.filter(function (o) { return o.kind === 'especial' && o.date > todayIso; }).length;
+  const alerts = computeControlAlerts();
+
+  [
+    { num: String(scheduled), lbl: 'Publicaciones programadas (semana)' },
+    { num: String(done), lbl: 'Publicaciones realizadas (semana)' },
+    { num: String(upcomingEvents), lbl: 'Eventos próximos' },
+    { num: String(state.campaigns.length), lbl: 'Campañas activas' },
+    { num: String(state.projects.length), lbl: 'Proyectos en desarrollo' },
+    { num: '—', lbl: 'Alcance acumulado (sin datos)' },
+    { num: '—', lbl: 'Engagement (sin datos)' },
+    { num: String(alerts.length), lbl: 'Alertas pendientes' }
+  ].forEach(function (st) {
+    c.appendChild(el('div', 'card stat-card', '<div class="num">' + st.num + '</div><div class="lbl">' + st.lbl + '</div>'));
+  });
+}
+
+/* Radar de coyuntura: temas reales en monitoreo. Colección "coyuntura"
+   nueva, vacía a propósito -- se carga desde Firestore cuando exista un
+   monitoreo real de medios/redes por tema. No se inventan temas. */
+function renderCoyuntura() {
+  const c = $('coyunturaGrid');
+  if (!c) return;
+  c.innerHTML = '';
+  const items = sortDocs(state.coyuntura);
+  if (!items.length) {
+    c.appendChild(el('div', 'empty', 'Estructura preparada, sin datos todavía: requiere un monitoreo real de medios/redes por tema, que no está conectado. No se muestran temas ni menciones de ejemplo.'));
+    return;
+  }
+  items.forEach(function (t) {
+    const sentimiento = txt(t.sentimiento);
+    const badge = /positiv/i.test(sentimiento) ? 'v' : /negativ/i.test(sentimiento) ? 'x' : 's';
+    c.appendChild(el('div', 'coyuntura-tile',
+      '<div><p class="coyuntura-tema">' + txt(t.tema) + '</p>' +
+      '<p class="coyuntura-menciones">Menciones: <b>' + txt(t.menciones) + '</b></p></div>' +
+      '<span class="acct-badge ' + badge + '">' + (sentimiento || 'Sin dato') + '</span>'));
+  });
 }
 
 /* ---- Gráfico: piezas planificadas por segmento y mes (Resumen) ---- */
@@ -2615,6 +2693,14 @@ document.addEventListener('keydown', function (e) {
                             quedan en null hasta que exista una
                             metodología real de medición -- no se
                             inventan cifras de percepción ciudadana)
+     campaigns/{id}        (Campañas activas del Centro de Control;
+                            {nombre, estado, ...} -- empieza vacía)
+     projects/{id}         (Proyectos en desarrollo del Centro de
+                            Control; {nombre, estado, ...} -- empieza
+                            vacía)
+     coyuntura/{id}        (Radar de coyuntura; {tema, menciones,
+                            sentimiento} -- empieza vacía, requiere
+                            monitoreo real de medios/redes)
    platformRows y reportRows son iguales para las tres marcas y quedan
    fijas en el código (no viven en Firestore).
 
@@ -2693,6 +2779,7 @@ function attachListeners() {
     renderTodayPriorities();
     renderUpcoming7Days();
     renderControlAlerts();
+    renderControlStats();
     scheduleFirstPaintDone();
   }, function (err) { onFsError('meta', err); }));
 
@@ -2701,6 +2788,7 @@ function attachListeners() {
     state.perception = Object.assign({}, DEFAULT_DATA.perception, docOr({}, snap.data()));
     renderPerception();
     renderControlAlerts();
+    renderControlStats();
     scheduleFirstPaintDone();
   }, function (err) { onFsError('perception', err); }));
 
@@ -2722,17 +2810,20 @@ function attachListeners() {
   /* "symbols" no tiene ninguna vista que lo use por ahora -- se conserva
      la sincronización sin tocar los datos, por si se vuelve a mostrar. */
   watchCollection('symbols', 'symbols');
-  watchCollection('weekly', 'weekly', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); });
-  watchCollection('specials', 'specials', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); });
+  watchCollection('weekly', 'weekly', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); });
+  watchCollection('specials', 'specials', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); });
   watchCollection('phases', 'phases', function () { renderMilestones(); });
-  watchCollection('publications', 'publications', function () { renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); });
+  watchCollection('publications', 'publications', function () { renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); });
   watchCollection('kpiWeekly', 'kpiWeekly', function () { renderKpis(); });
   watchCollection('kpiSpecial', 'kpiSpecial', function () { renderKpis(); });
   watchCollection('checklist', 'checklist', function () { renderChecklist(); });
-  watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); renderInstitutionKpis(); renderControlAlerts(); });
+  watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); renderInstitutionKpis(); renderControlAlerts(); renderControlStats(); });
   watchCollection('newsSources', 'newsSources', function () { renderNews(); });
   watchCollection('newsItems', 'newsItems', function () { renderOpinionNews(); });
   watchCollection('contentSummaries', 'contentSummaries', function () { renderContentSummaries(); renderReportsAvailable(); });
+  watchCollection('campaigns', 'campaigns', function () { renderControlStats(); });
+  watchCollection('projects', 'projects', function () { renderControlStats(); });
+  watchCollection('coyuntura', 'coyuntura', function () { renderCoyuntura(); });
 }
 
 let firstPaintPending = 0;
@@ -2825,6 +2916,9 @@ async function seedFirestore() {
   DEFAULT_DATA.newsSources.forEach(function (n) { const d = clone(n); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'newsSources', n.id), d)); });
   DEFAULT_DATA.newsItems.forEach(function (n) { const d = clone(n); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'newsItems', n.id), d)); });
   DEFAULT_DATA.contentSummaries.forEach(function (c) { const d = clone(c); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'contentSummaries', c.id), d)); });
+  DEFAULT_DATA.campaigns.forEach(function (c) { const d = clone(c); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'campaigns', c.id), d)); });
+  DEFAULT_DATA.projects.forEach(function (pr) { const d = clone(pr); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'projects', pr.id), d)); });
+  DEFAULT_DATA.coyuntura.forEach(function (t) { const d = clone(t); delete d.id; ops.push(api.setDoc(api.doc(db, BRAND_SLUG, 'plan', 'coyuntura', t.id), d)); });
   try {
     fbMsg('Cargando contenido inicial en Firestore…', 'ok');
     await Promise.all(ops);
@@ -2931,6 +3025,8 @@ function renderAllFromState() {
   renderTodayPriorities();
   renderUpcoming7Days();
   renderControlAlerts();
+  renderControlStats();
+  renderCoyuntura();
   renderReportsAvailable();
 }
 

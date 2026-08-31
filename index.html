@@ -93,6 +93,8 @@
       <div class="grid grid-4" id="statGrid"></div>
 
       <div class="section-title"><h3>Centro de control operativo</h3></div>
+      <div class="grid grid-4" id="controlStatGrid"></div>
+
       <div class="grid grid-3">
         <div class="chart-card control-widget">
           <h4>Prioridades de hoy</h4>
@@ -123,18 +125,26 @@
         </div>
         <div class="chart-card control-widget">
           <h4>Rendimiento de la semana</h4>
-          <div class="empty">Sin datos reales todavía: no hay un mecanismo de scraping/API conectado que mida alcance, impresiones o engagement. Se activa cuando exista esa conexión (ver Métricas &amp; KPIs).</div>
+          <div class="mini-stat-row">
+            <div class="mini-stat"><span class="mini-stat-val">—</span><span class="mini-stat-lbl">Alcance</span></div>
+            <div class="mini-stat"><span class="mini-stat-val">—</span><span class="mini-stat-lbl">Impresiones</span></div>
+            <div class="mini-stat"><span class="mini-stat-val">—</span><span class="mini-stat-lbl">Engagement</span></div>
+            <div class="mini-stat"><span class="mini-stat-val">—</span><span class="mini-stat-lbl">Nuevos seguidores</span></div>
+          </div>
+          <div class="empty" style="margin-top:12px;">Sin datos reales todavía: no hay un mecanismo de scraping/API conectado. Se activa cuando exista esa conexión (ver Métricas &amp; KPIs).</div>
         </div>
         <div class="chart-card control-widget">
           <h4>Top contenidos de la semana</h4>
-          <div class="empty">Sin datos reales todavía: requiere métricas de interacción por publicación, que hoy no vienen de ninguna fuente conectada.</div>
+          <div id="topContentsList">
+            <div class="empty">Sin publicaciones con métricas registradas todavía: requiere datos de interacción por publicación, que hoy no vienen de ninguna fuente conectada.</div>
+          </div>
         </div>
       </div>
 
       <div class="grid grid-2">
         <div class="chart-card control-widget">
           <h4>Radar de coyuntura</h4>
-          <div class="empty">Estructura preparada, sin datos todavía: requiere un monitoreo real de medios/redes por tema, que no está conectado. No se muestran temas ni menciones de ejemplo.</div>
+          <div id="coyunturaGrid"></div>
         </div>
         <div class="chart-card control-widget">
           <h4>Informes disponibles</h4>
