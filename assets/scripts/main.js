@@ -856,8 +856,6 @@ const state = {
 let localStatus = safeStorage.get(LS_PREFIX + 'status_v1') || {};
 let localChecks = safeStorage.get(LS_PREFIX + 'checklist_v1') || {};
 
-const openPillars = new Set(['1']); // primer pilar abierto por defecto
-
 function kpiStatus(kind, item) {
   if (fb.live) return normStatus(item.status);
   return normStatus(localStatus[kind + ':' + item.id]);
@@ -917,13 +915,12 @@ function renderMeta() {
   setHTML('quoteTxt', m.quote);
   setHTML('metricHero', m.metricHero);
   setHTML('resumenNote', m.resumenNote);
-  setHTML('pilaresNote', m.pilaresNote);
   setHTML('semanalNote', m.semanalNote);
   setHTML('symbolDiff', m.symbolDiff);
   setHTML('symbolReflection', m.symbolReflection);
   setHTML('docFoot', m.footer);
 
-  // Tarjetas de estadísticas -- la del banco de contenidos NUNCA se
+  // Tarjetas de estadísticas -- "Ideas en el banco de contenido" NUNCA se
   // muestra fija: se cuenta en vivo cuántas ideas hay realmente
   // cargadas, para no mentir sobre la cantidad (punto 3 de la corrección).
   const grid = $('statGrid');
@@ -934,7 +931,7 @@ function renderMeta() {
   }, 0);
   stats.forEach(function (st) {
     const lbl = txt(st && st.lbl);
-    const num = /banco de contenido/i.test(lbl) ? String(realIdeasCount) : txt(st && st.num);
+    const num = /^ideas en el banco/i.test(lbl) ? String(realIdeasCount) : txt(st && st.num);
     grid.appendChild(el('div', 'card stat-card',
       '<div class="num">' + num + '</div>' +
       '<div class="lbl">' + lbl + '</div>'));
@@ -951,77 +948,6 @@ function renderMeta() {
   setHTML('diagCount', found.length + (found.length === 1 ? ' hallazgo' : ' hallazgos'));
   $('diagCount').style.display = found.length ? '' : 'none';
   $('resumenNote').style.display = txt(m.resumenNote).trim() ? '' : 'none';
-  $('pilaresNote').style.display = txt(m.pilaresNote).trim() ? '' : 'none';
-}
-
-function renderPillars() {
-  const list = $('pillarList');
-  list.innerHTML = '';
-
-  const pillars = sortDocs(state.pillars);
-
-  if (!pillars.length) {
-    list.appendChild(el('div', 'empty', 'Sin pilares cargados todavía.'));
-    return;
-  }
-
-  // ---- Acordeón (animación 100% CSS con grid-template-rows) ----
-  pillars.forEach(function (p) {
-    const isOpen = openPillars.has(String(p.id));
-    const card = el('div', 'pillar-card' + (isOpen ? ' open' : ''));
-
-    const head = el('div', 'pillar-head');
-    head.setAttribute('role', 'button');
-    head.setAttribute('tabindex', '0');
-    head.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    head.innerHTML =
-      '<div class="pillar-num">' + String(txt(p.num) || '').padStart(2, '0') + '</div>' +
-      '<div class="pillar-head-txt"><h4>' + txt(p.name) + '</h4><p>' + txt(p.sub) + '</p></div>' +
-      '<div class="pillar-meta">' +
-        (txt(p.phase) ? '<span>' + txt(p.phase) + '</span>' : '') +
-        '<button type="button" class="pillar-icon-btn" data-pillar-id="' + txt(p.id) + '" aria-label="Ver símbolo de ' + txt(p.name).replace(/"/g, '&quot;') + '" title="Ver símbolo del pilar">' +
-          '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>' +
-        '</button>' +
-      '</div>' +
-      '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>';
-
-    function toggle() {
-      const nowOpen = !card.classList.contains('open');
-      card.classList.toggle('open', nowOpen);
-      head.setAttribute('aria-expanded', nowOpen ? 'true' : 'false');
-      if (nowOpen) openPillars.add(String(p.id)); else openPillars.delete(String(p.id));
-    }
-    head.addEventListener('click', toggle);
-    head.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); toggle(); }
-    });
-    head.querySelector('.pillar-icon-btn').addEventListener('click', function (ev) {
-      ev.stopPropagation();
-      openSymbolModal(p.id);
-    });
-
-    const ideas = Array.isArray(p.ideas) ? p.ideas : [];
-    let inner = '<div class="pillar-body-inner">';
-    if (txt(p.symbol).trim()) inner += '<p class="pillar-symbol">' + txt(p.symbol) + '</p>';
-    if (ideas.length) {
-      ideas.forEach(function (idea) {
-        inner += '<div class="idea-row">' +
-          '<div class="idea-code">' + txt(idea && idea.code) + '</div>' +
-          '<div class="idea-txt">' + txt(idea && idea.txt) + '</div>' +
-          '<div class="idea-note">' + txt(idea && idea.note) + '</div>' +
-          '</div>';
-      });
-    } else {
-      inner += '<div class="empty">Este pilar todavía no tiene ideas cargadas.</div>';
-    }
-    if (txt(p.extra).trim()) inner += '<div class="note" style="margin-top:14px;">' + txt(p.extra) + '</div>';
-    inner += '</div>';
-
-    const body = el('div', 'pillar-body', inner);
-    card.appendChild(head);
-    card.appendChild(body);
-    list.appendChild(card);
-  });
 }
 
 /* Genera 2 letras a partir del nombre, para el símbolo genérico de los
@@ -1033,45 +959,6 @@ function initialsFor(name) {
   if (pick.length === 0) return txt(name).slice(0, 2).toUpperCase();
   if (pick.length === 1) return pick[0].slice(0, 2).toUpperCase();
   return (pick[0][0] + pick[1][0]).toUpperCase();
-}
-
-/* Un símbolo se asocia a un pilar por su "tag" (ej. "Pilar 3 · Cuentas
-   claras"), así el vínculo vive en el contenido y no hay que duplicar
-   el id del pilar dentro de cada símbolo. */
-function findSymbolForPillar(p) {
-  const num = txt(p && p.num).trim();
-  if (!num) return null;
-  const re = new RegExp('\\bPilar\\s+' + num + '\\b', 'i');
-  return sortDocs(state.symbols).find(function (s) { return re.test(txt(s.tag)); }) || null;
-}
-
-function openSymbolModal(pillarId) {
-  const p = state.pillars.find(function (pp) { return String(pp.id) === String(pillarId); });
-  if (!p) return;
-  setHTML('symbolModalEyebrow', 'Pilar ' + String(txt(p.num) || '').padStart(2, '0'));
-  setHTML('symbolModalTitle', p.name);
-  const sym = findSymbolForPillar(p);
-  const body = $('symbolModalBody');
-  if (!sym) {
-    body.innerHTML = '<div class="empty">Este pilar todavía no tiene un símbolo asociado.</div>';
-  } else {
-    const url = safeUrl(sym.imageUrl);
-    body.innerHTML =
-      (url
-        ? '<div class="symbol-tile-img-wrap"><img src="' + url + '" alt="' + txt(sym.name).replace(/"/g, '&quot;') + '"></div>'
-        : '<div class="symbol-tile-img-wrap"><div class="symbol-tile-placeholder">' + initialsFor(sym.name) + '</div></div>') +
-      '<p class="symbol-tile-name">' + txt(sym.name) + '</p>' +
-      '<p class="symbol-tile-desc">' + txt(sym.description) + '</p>' +
-      (url ? '' : '<span class="symbol-tile-pending">Imagen pendiente</span>');
-  }
-  const dialog = $('symbolModal');
-  if (typeof dialog.showModal === 'function') dialog.showModal();
-}
-
-function wireSymbolModal() {
-  const dialog = $('symbolModal');
-  $('symbolModalClose').addEventListener('click', function () { dialog.close(); });
-  dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
 }
 
 /* ============ ECOSISTEMA DE CUENTAS ============
@@ -2679,10 +2566,13 @@ function attachListeners() {
     }, function (err) { onFsError(col, err); }));
   }
 
-  watchCollection('pillars', 'pillars', function () { renderPillars(); });
-  /* "symbols" ya no tiene una vista propia (se eliminó la comparación de
-     los 3 símbolos) -- solo se sincroniza el dato porque openSymbolModal()
-     sigue usándolo para el símbolo individual de cada categoría. */
+  /* Las 4 categorías del banco de contenidos ya no tienen una vista
+     propia en "Banco de contenidos" (a pedido del usuario) -- se sigue
+     sincronizando "pillars" porque el conteo real de ideas en Resumen
+     (renderMeta) depende de esos datos. */
+  watchCollection('pillars', 'pillars', function () { renderMeta(); });
+  /* "symbols" no tiene ninguna vista que lo use por ahora -- se conserva
+     la sincronización sin tocar los datos, por si se vuelve a mostrar. */
   watchCollection('symbols', 'symbols');
   watchCollection('weekly', 'weekly', function () { renderComplianceChart(); renderCalendar(); });
   watchCollection('specials', 'specials', function () { renderComplianceChart(); renderCalendar(); });
@@ -2879,7 +2769,6 @@ function wireFbDialog() {
 
 function renderAllFromState() {
   renderMeta();
-  renderPillars();
   renderKpis();
   renderInstitutionKpis();
   renderChecklist();
@@ -2960,7 +2849,6 @@ async function boot() {
   renderAllFromState(); // contenido local inmediato: nunca hay pantalla en blanco
   wireStaticButtons();
   wireFbDialog();
-  wireSymbolModal();
   wireLogoModal();
   wireCalendarNav();
   wirePubModal();
