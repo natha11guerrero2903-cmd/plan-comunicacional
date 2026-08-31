@@ -154,7 +154,11 @@ async function run() {
           console.warn('  @' + handle + ' no existe o no es pública. No se escribe nada.');
           totalSinEncontrar++;
         } else {
-          accounts[i] = Object.assign({}, a, { metrics: Object.assign({}, a.metrics, metrics) });
+          // Las métricas se guardan por plataforma (metrics.x, metrics.instagram,
+          // etc.) -- nunca combinadas entre redes. Este script solo toca
+          // metrics.x; cualquier dato ya cargado de otra red se conserva.
+          const prevMetrics = (a.metrics && typeof a.metrics === 'object') ? a.metrics : {};
+          accounts[i] = Object.assign({}, a, { metrics: Object.assign({}, prevMetrics, { x: metrics }) });
           changed = true;
           totalActualizadas++;
           console.log('  Seguidores: ' + metrics.seguidores + ' · Publicaciones: ' + metrics.publicacionesHistorico + ' · Últ. mes: ' + metrics.publicacionesUltimoMes);

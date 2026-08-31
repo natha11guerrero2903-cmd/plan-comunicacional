@@ -1101,6 +1101,12 @@ function openEnteModal(segNum, code) {
     });
   }
 
+  // Las métricas se guardan y se muestran POR RED (metrics.instagram,
+  // metrics.x, etc.) -- nunca combinadas en un solo número, por la misma
+  // razón que el estado Activo/Inactivo ya se muestra por separado por
+  // plataforma (punto 14). Solo se listan las redes que el ente tiene
+  // realmente (según parseAccountSocial), para no mostrar 4 bloques
+  // vacíos en entes con una sola red.
   const METRIC_FIELDS = [
     { key: 'seguidores', label: 'Seguidores' },
     { key: 'publicacionesHistorico', label: 'Publicaciones (histórico)' },
@@ -1112,16 +1118,32 @@ function openEnteModal(segNum, code) {
     { key: 'impresiones', label: 'Impresiones' },
     { key: 'frecuenciaPublicacion', label: 'Frecuencia de publicación' }
   ];
-  const metrics = (a && typeof a.metrics === 'object' && a.metrics) || {};
-  const hasAnyMetric = METRIC_FIELDS.some(function (f) { return metrics[f.key] !== undefined && metrics[f.key] !== null && metrics[f.key] !== ''; })
-    || !!(metrics.publicacionDestacada && txt(metrics.publicacionDestacada.titulo).trim());
-  const metricRows = METRIC_FIELDS.map(function (f) {
-    const v = metrics[f.key];
-    const has = v !== undefined && v !== null && v !== '';
-    return '<div class="pub-detail-row"><span class="k">' + f.label + '</span><span class="v"' +
-      (has ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' +
-      (has ? txt(v) : 'Sin datos cargados') + '</span></div>';
-  }).join('') + destacadaRowHtml(metrics.publicacionDestacada);
+  const metricsByPlatform = (a && typeof a.metrics === 'object' && a.metrics) || {};
+  let hasAnyMetric = false;
+  let metricRows = '';
+  if (social.central) {
+    metricRows = '<div class="pub-detail-row"><span class="k">Métricas</span><span class="v" style="color:var(--gray-soft);font-weight:500;">Usa la cuenta central -- se mide a nivel de esa cuenta, no por separado</span></div>';
+  } else {
+    const platformsWithAccount = SOCIAL_PLATFORMS.filter(function (p) { return !!social[p.key]; });
+    if (!platformsWithAccount.length) {
+      metricRows = '<div class="pub-detail-row"><span class="k">Métricas</span><span class="v" style="color:var(--gray-soft);font-weight:500;">Sin redes propias que medir</span></div>';
+    } else {
+      platformsWithAccount.forEach(function (p) {
+        const pm = (metricsByPlatform[p.key] && typeof metricsByPlatform[p.key] === 'object') ? metricsByPlatform[p.key] : {};
+        const platformHasData = METRIC_FIELDS.some(function (f) { return pm[f.key] !== undefined && pm[f.key] !== null && pm[f.key] !== ''; })
+          || !!(pm.publicacionDestacada && txt(pm.publicacionDestacada.titulo).trim());
+        if (platformHasData) hasAnyMetric = true;
+        metricRows += '<p class="symbol-tag" style="margin-top:14px;">' + p.label + (platformHasData ? '' : ' (pendiente de conectar)') + '</p>';
+        metricRows += METRIC_FIELDS.map(function (f) {
+          const v = pm[f.key];
+          const has = v !== undefined && v !== null && v !== '';
+          return '<div class="pub-detail-row"><span class="k">' + f.label + '</span><span class="v"' +
+            (has ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' +
+            (has ? txt(v) : 'Sin datos cargados') + '</span></div>';
+        }).join('') + destacadaRowHtml(pm.publicacionDestacada);
+      });
+    }
+  }
 
   const director = (a && typeof a.director === 'object' && a.director) || null;
   const hasDirector = !!(director && txt(director.nombre).trim());
@@ -1145,7 +1167,7 @@ function openEnteModal(segNum, code) {
     directorHtml +
     '<p class="symbol-tag" style="margin-top:16px;">Redes sociales del ente</p>' +
     socialHtml +
-    '<p class="symbol-tag" style="margin-top:16px;">Métricas' + (hasAnyMetric ? '' : ' (pendiente de conectar)') + '</p>' +
+    '<p class="symbol-tag" style="margin-top:16px;">Métricas por red</p>' +
     metricRows +
     '<p class="pub-objective" style="font-style:italic;color:var(--gray);">' +
       (hasAnyMetric
@@ -2296,18 +2318,33 @@ function renderKpis() {
    Bien/Proceso/Atención -- esos califican una pieza contra una meta
    definida, y aquí no hay meta que calificar, solo una cifra medida (o,
    por ahora, sin medir todavía -- nunca un cero inventado). */
-function institutionKpiCardHtml(a) {
-  const metrics = (a && typeof a.metrics === 'object' && a.metrics) || {};
-  const seguidores = metrics.seguidores;
-  const likes = metrics.likes;
-  const hasSeg = seguidores !== undefined && seguidores !== null && seguidores !== '';
-  const hasLikes = likes !== undefined && likes !== null && likes !== '';
+/* Igual que en la ficha del ente: una fila real por cada red que el
+   ente tiene de verdad (nunca un número combinado entre redes). El
+   detalle completo (publicaciones, likes, publicación destacada) queda
+   en "Ver ficha completa" para no hacer la tarjeta demasiado larga. */
+function institutionKpiCardHtml(a, segNum) {
+  const social = parseAccountSocial(a);
+  const metricsByPlatform = (a && typeof a.metrics === 'object' && a.metrics) || {};
+  let rows;
+  if (social.central) {
+    rows = '<div class="kpi-row"><span class="k">Redes</span><span class="v" style="color:var(--gray-soft);font-weight:500;">Usa cuenta central</span></div>';
+  } else {
+    const platforms = SOCIAL_PLATFORMS.filter(function (p) { return !!social[p.key]; });
+    if (!platforms.length) {
+      rows = '<div class="kpi-row"><span class="k">Redes</span><span class="v" style="color:var(--gray-soft);font-weight:500;">Sin redes propias</span></div>';
+    } else {
+      rows = platforms.map(function (p) {
+        const pm = (metricsByPlatform[p.key] && typeof metricsByPlatform[p.key] === 'object') ? metricsByPlatform[p.key] : {};
+        const seg = pm.seguidores;
+        const has = seg !== undefined && seg !== null && seg !== '';
+        return '<div class="kpi-row"><span class="k">' + p.label + '</span><span class="v"' +
+          (has ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' + (has ? txt(seg) + ' seguidores' : 'Sin datos cargados') + '</span></div>';
+      }).join('');
+    }
+  }
   return '<div class="kpi-card-head">' + enteLogoHtml(a) + '<p class="piece">' + txt(a.name) + '</p></div>' +
-    '<div class="kpi-row"><span class="k">Seguidores</span><span class="v"' +
-      (hasSeg ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' + (hasSeg ? txt(seguidores) : 'Sin datos cargados') + '</span></div>' +
-    '<div class="kpi-row"><span class="k">Likes</span><span class="v"' +
-      (hasLikes ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' + (hasLikes ? txt(likes) : 'Sin datos cargados') + '</span></div>' +
-    destacadaRowHtml(metrics.publicacionDestacada, 'kpi-row');
+    rows +
+    '<button type="button" class="ente-detail-btn" data-seg="' + txt(segNum) + '" data-code="' + txt(a.code).replace(/"/g, '&quot;') + '">Ver ficha completa →</button>';
 }
 
 function renderInstitutionKpis() {
@@ -2315,14 +2352,17 @@ function renderInstitutionKpis() {
   if (!c) return;
   c.innerHTML = '';
   const accounts = sortDocs(state.accountSegments).reduce(function (acc, s) {
-    return acc.concat(Array.isArray(s.accounts) ? s.accounts : []);
+    return acc.concat((Array.isArray(s.accounts) ? s.accounts : []).map(function (a) { return { account: a, segNum: s.num }; }));
   }, []);
   if (!accounts.length) {
     c.appendChild(el('div', 'empty', 'Sin instituciones cargadas todavía.'));
     return;
   }
-  accounts.forEach(function (a) {
-    c.appendChild(el('div', 'card kpi-card', institutionKpiCardHtml(a)));
+  accounts.forEach(function (entry) {
+    const card = el('div', 'card kpi-card', institutionKpiCardHtml(entry.account, entry.segNum));
+    const btn = card.querySelector('.ente-detail-btn');
+    if (btn) btn.addEventListener('click', function () { openEnteModal(btn.dataset.seg, btn.dataset.code); });
+    c.appendChild(card);
   });
 }
 
@@ -2695,11 +2735,16 @@ document.addEventListener('keydown', function (e) {
        nombre, instagram, tiktok, x, facebook   (handles "@usuario" o URL)
      }
      accountSegments/{seg}.accounts[].metrics = {
+       instagram: { ... }, tiktok: { ... }, x: { ... }, facebook: { ... }
+     }
+     -- cada objeto de plataforma (solo se llena para las redes que el
+     ente tiene de verdad, ver parseAccountSocial) trae:
        seguidores, publicacionesHistorico, publicacionesUltimoMes, likes,
        comentarios, compartidos, alcance, impresiones, frecuenciaPublicacion,
        publicacionDestacada: { titulo, likes }   (la publicación con más
                                                    interacción y likes)
-     }
+     Las métricas nunca se combinan entre redes -- mismo principio que el
+     estado Activo/Inactivo por plataforma (punto 14).
    openEnteModal() y las tarjetas de "KPI semanal por institución"
    (institutionKpiCardHtml()) ya muestran estos datos reales en cuanto
    existan en el documento del ente; si no existen, siguen mostrando
