@@ -1,11 +1,65 @@
-# Sincronización de métricas reales (X / Twitter)
+# Métricas reales para el Centro de Control
 
-Este script llena `accountSegments[].accounts[].metrics` en Firestore con
-datos reales de X para las cuentas que ya tienen un `@handle` de X cargado
-en el dashboard. El Centro de Control y la ficha de cada ente leen ese
-mismo campo automáticamente — no hace falta tocar el código del dashboard.
+Dos formas de llenar `accountSegments[].accounts[].metrics` en Firestore
+con datos reales. El Centro de Control y la ficha de cada ente leen ese
+mismo campo automáticamente en cuanto exista — no hace falta tocar el
+código del dashboard en ninguno de los dos casos.
 
-## ⚠️ Antes de empezar: el costo real de la API de X
+- **Opción A — Carga asistida con Claude en Chrome** (sin costo, cubre
+  Instagram/X/Facebook/TikTok): tú navegas con tu propia sesión y un
+  archivo CSV, ideal para actualizar cada semana.
+- **Opción B — API oficial de X** (automática pero de pago, solo cubre
+  cuentas de X): un script que consulta X directamente.
+
+Puedes usar una, otra, o las dos a la vez (si cargas la misma cuenta por
+ambos caminos, gana la que corras al final).
+
+---
+
+## Opción A: Carga asistida con Claude en Chrome
+
+0. (Opcional) Si agregaron o quitaron cuentas desde la Consola de
+   Firebase y quieren que el CSV refleje eso, regenera la plantilla con
+   los datos reales actuales: `npm run generate-template` (usa la misma
+   credencial de Firebase del punto 2 de la Opción B). Nunca hace falta
+   correrlo la primera vez -- el CSV ya viene armado con las 29 cuentas
+   de hoy.
+1. Abre `scripts/prompt-claude-en-chrome.md` y sigue las instrucciones:
+   copias el prompt en la extensión de Claude en Chrome (con tu sesión
+   iniciada en tus redes), y te devuelve una línea de datos por cada
+   cuenta.
+2. Pasa esos datos a `scripts/plantilla-metricas.csv` -- ya viene con las
+   29 cuentas reales (código, ente, plataforma, usuario, link)
+   precargadas; solo completas las columnas de seguidores, publicaciones,
+   likes y publicación destacada.
+3. Sube el CSV a Firestore:
+
+```bash
+cd scripts
+npm install
+export GOOGLE_APPLICATION_CREDENTIALS="/ruta/a/serviceAccountKey.json"
+npm run import-metrics
+```
+
+(Necesitas la misma clave de servicio de Firebase que se explica en la
+Opción B, punto 2 -- es la misma para ambos scripts.)
+
+El importador:
+- Solo escribe los campos que de verdad tengan un valor en el CSV -- una
+  celda vacía nunca sobrescribe con un cero ni con un dato de relleno.
+- Guarda las métricas por plataforma (`metrics.instagram`, `metrics.x`,
+  etc.), nunca mezcladas entre redes.
+- Si el código de un ente no coincide con ninguno real, te avisa en la
+  terminal en vez de fallar en silencio.
+
+Repite el proceso (prompt → CSV → `npm run import-metrics`) cada vez que
+quieran refrescar los números -- no hay nada corriendo solo.
+
+---
+
+## Opción B: API oficial de X (Twitter)
+
+### ⚠️ El costo real de la API de X
 
 La API de X tiene niveles de acceso. El nivel **gratuito** solo permite
 publicar tweets — **no** permite leer seguidores ni tweets de una cuenta
@@ -14,37 +68,32 @@ nivel **Basic** de pago.
 
 Verifica el precio y los límites actuales en
 https://developer.x.com/en/portal/products antes de suscribirte — cambian
-con frecuencia y no quiero darte una cifra que ya no sea la real. Con 9
-cuentas institucionales cargadas hoy, el volumen de consultas es bajo,
+con frecuencia y no quiero darte una cifra que ya no sea la real. Con las
+cuentas institucionales cargadas hoy el volumen de consultas es bajo,
 pero igual **hay que pagar la suscripción** para que la API responda.
 
-Si el costo no tiene sentido para el equipo, la alternativa sin costo es
-cargar seguidores/likes a mano desde la Consola de Firebase (mismo lugar
-donde ya se edita todo el contenido) -- dímelo y preparo una guía corta
-para eso en su lugar.
-
-## 1. Credenciales que necesitas
+### 1. Credenciales que necesitas
 
 1. **Bearer Token de X**: entra a https://developer.x.com, crea un
    Proyecto + App (o usa uno existente), activa un plan con acceso de
    lectura, y copia el "Bearer Token" (OAuth 2.0 App-only) desde las
    llaves de la App.
-2. **Service account de Firebase** (para que este script, que corre
-   fuera del navegador, pueda escribir en Firestore):
+2. **Service account de Firebase** (para que estos scripts, que corren
+   fuera del navegador, puedan escribir en Firestore):
    - Consola de Firebase → proyecto **marcas-generales** → ⚙️
      Configuración del proyecto → pestaña **Cuentas de servicio** →
      "Generar nueva clave privada". Se descarga un archivo `.json`.
    - Guarda ese archivo como `scripts/serviceAccountKey.json` (ya está
      en `.gitignore`, nunca se sube a GitHub) o en cualquier ruta local.
 
-## 2. Instalación
+### 2. Instalación
 
 ```bash
 cd scripts
 npm install
 ```
 
-## 3. Variables de entorno
+### 3. Variables de entorno
 
 ```bash
 export X_BEARER_TOKEN="pega_aquí_tu_bearer_token"
@@ -54,7 +103,7 @@ export GOOGLE_APPLICATION_CREDENTIALS="/ruta/completa/a/serviceAccountKey.json"
 (En Windows PowerShell: `$env:X_BEARER_TOKEN="..."` y
 `$env:GOOGLE_APPLICATION_CREDENTIALS="C:\ruta\serviceAccountKey.json"`.)
 
-## 4. Ejecutar
+### 4. Ejecutar
 
 ```bash
 npm run sync-x
@@ -66,7 +115,7 @@ El script:
   cargar los handles de nuevo en ningún otro lado.
 - Consulta seguidores, cantidad de publicaciones y las últimas ~10
   publicaciones reales de cada cuenta.
-- Escribe en Firestore: seguidores, publicaciones históricas,
+- Escribe en `metrics.x`: seguidores, publicaciones históricas,
   publicaciones del último mes, likes recientes (suma de las últimas
   publicaciones consultadas, no un histórico completo -- la API de X no
   entrega "likes totales de la cuenta") y la publicación con más
@@ -74,7 +123,7 @@ El script:
 - Si una cuenta no existe o la API no la encuentra, la deja intacta --
   nunca escribe un cero ni un dato de relleno.
 
-## 5. Repetirlo periódicamente
+### 5. Repetirlo periódicamente
 
 Este script no queda corriendo solo: hay que volver a ejecutar
 `npm run sync-x` cuando quieran refrescar los números (por ejemplo, una
@@ -85,11 +134,14 @@ dejé corriendo solo todavía porque eso implica decidir dónde va a vivir
 este script de forma permanente, y esa es una decisión de infraestructura
 que les corresponde a ustedes.
 
-## Qué falta para Instagram, Facebook y TikTok
+---
+
+## Qué falta para Instagram, Facebook y TikTok de forma automática
 
 Ninguna de esas plataformas ofrece hoy una API pública y gratuita para
 leer seguidores/publicaciones de cuentas que el equipo no administra
-directamente (a diferencia de X). Las opciones reales son:
+directamente (a diferencia de X) -- por eso la Opción A (asistida, no
+automática) es la vía real para esas tres redes por ahora:
 
 - **Instagram/Facebook Graph API**: solo funciona para cuentas que la
   Gobernación administre directamente como "cuenta profesional" vinculada
@@ -98,8 +150,3 @@ directamente (a diferencia de X). Las opciones reales son:
 - **TikTok**: no tiene una API pública equivalente para terceros.
 - **Herramientas de social listening de pago** (Social Blade, Brand24,
   Meltwater, etc.): cubren varias plataformas pero tienen costo mensual.
-- **Carga manual**: alguien del equipo anota seguidores/likes una vez por
-  semana directo en Firestore. Sin costo, funciona para cualquier cuenta.
-
-Dime si quieres que preparemos alguna de estas para Instagram/Facebook/
-TikTok también.
