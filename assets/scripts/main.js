@@ -640,7 +640,7 @@ const DEFAULT_DATA = {
         { "code": "SEG-01", "name": "Comisión de Seguridad Ciudadana", "status": "candidato", "note": "IG (candidato, sin verificar): @seguridadciudadanatachira",
           "metrics": { "instagram": { "estado": "activa", "seguidores": 2424, "publicacionesHistorico": 564, "publicacionesUltimoMes": 30, "ultimaPublicacion": "2026-08-31", "likes": 429, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Anuncio oficial DPD Táchira por instrucciones de la Presidenta (E) y el Ministro Cabello", "likes": 164 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "SEG-02", "name": "Procuraduría General del Estado", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
-        { "code": "SEG-03", "name": "Instituto Autónomo de Policía del Estado Táchira", "status": "verificado", "note": "IG: @politachira | X: @policiatachira — verificado",
+        { "code": "SEG-03", "name": "Instituto Autónomo de Policía del Estado Táchira", "status": "verificado", "note": "IG: @politachira — verificado | X: @policiatachira — cuenta suspendida (verificado 2026-09-01)",
           "metrics": {
             "instagram": { "estado": "activa", "seguidores": 27907, "publicacionesHistorico": 2082, "publicacionesUltimoMes": 22, "likes": 3282, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Detención de un sujeto en San Juan de Colón tras la difusión del caso", "likes": 988 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
             "x": { "estado": "suspendida", "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
@@ -708,7 +708,7 @@ const DEFAULT_DATA = {
         { "code": "SOC-13", "name": "CORPOSALUD", "status": "verificado", "note": "IG: @corposalud_tachira (28K seg.) — verificado",
           "metrics": { "instagram": { "estado": "activa", "seguidores": 32686, "publicacionesHistorico": 6823, "publicacionesUltimoMes": 9, "ultimaPublicacion": "2026-08-31", "likes": 471, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Orientación sobre a qué servicio de salud acudir", "likes": 281 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "SOC-14", "name": "INAPCET", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
-        { "code": "SOC-15", "name": "INTAMUJER", "status": "verificado", "note": "IG: @intamujer | X: @INTAMUJERTACH — verificado",
+        { "code": "SOC-15", "name": "INTAMUJER", "status": "verificado", "note": "IG: @intamujer — la cuenta no existe (verificado 2026-09-01) | X: @INTAMUJERTACH — verificado, inactiva desde 2022",
           "metrics": {
             "instagram": { "estado": "no_existe", "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
             "x": { "estado": "inactiva", "seguidores": 22, "publicacionesHistorico": 31, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2022-04-21", "likes": 0, "muestraLikes": 5, "publicacionDestacada": { "titulo": "Anuncio del programa Reporte Bernal del 22 de abril", "likes": 0 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
@@ -730,7 +730,7 @@ const DEFAULT_DATA = {
       "id": "4", "order": 4, "num": 4, "name": "Educación y Desarrollo Humano", "phase": "Fase 4", "symbol": "",
       "accounts": [
         { "code": "EDU-01", "name": "Dirección de Talento Humano", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "EDU-02", "name": "Dirección de Educación", "status": "verificado", "note": "IG: @diredutachira (4,975 seg.) | X: @DirEduTachira — verificado",
+        { "code": "EDU-02", "name": "Dirección de Educación", "status": "verificado", "note": "IG: @diredutachira — la cuenta no existe (verificado 2026-09-01) | X: @DirEduTachira — verificado, inactiva desde 2024",
           "metrics": {
             "instagram": { "estado": "no_existe", "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
             "x": { "estado": "inactiva", "seguidores": 2737, "publicacionesHistorico": 6669, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2024-06-03", "likes": 7, "muestraLikes": 8, "publicacionDestacada": { "titulo": "Invitación a la Consulta Popular Nacional del 21 de abril de 2024", "likes": 3 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
