@@ -462,6 +462,9 @@ h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
 .social-pill.active:hover{background:#c9ecd9;}
 .social-pill.central{background:var(--paper-2);color:var(--brand-deep-2);cursor:pointer;transition:background .15s ease;}
 .social-pill.central:hover{background:#e6d9fb;}
+.social-pill.dormant{background:#fdf3e3;color:#92660a;}
+.social-pill.dormant:hover{background:#fae8c8;}
+.social-pill.broken{background:#fde8e8;color:#b91c1c;}
 
 /* Weekly pieces */
 .week-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}

@@ -5,6 +5,14 @@ con datos reales. El Centro de Control y la ficha de cada ente leen ese
 mismo campo automáticamente en cuanto exista — no hace falta tocar el
 código del dashboard en ninguno de los dos casos.
 
+**Ya hay una medición real cargada** (2026-09-01, 29 cuentas, hecha con
+Claude en Chrome): `redes-2026-09-01-medicion-real.csv` en esta misma
+carpeta. Esos números ya están embebidos como respaldo en el propio
+`main.js` (se ven en el dashboard incluso sin conexión a Firestore); si
+además quieren subirlos a Firestore, corran el paso 3 de la Opción A
+apuntando a ese archivo:
+`node import-social-metrics.js redes-2026-09-01-medicion-real.csv`.
+
 - **Opción A — Carga asistida con Claude en Chrome** (sin costo, cubre
   Instagram/X/Facebook/TikTok): tú navegas con tu propia sesión y un
   archivo CSV, ideal para actualizar cada semana.
@@ -46,7 +54,18 @@ Opción B, punto 2 -- es la misma para ambos scripts.)
 
 El importador:
 - Solo escribe los campos que de verdad tengan un valor en el CSV -- una
-  celda vacía nunca sobrescribe con un cero ni con un dato de relleno.
+  celda vacía o "no disponible" nunca sobrescribe con un cero ni con un
+  dato de relleno.
+- Detecta solo el delimitador (acepta CSV con comas o con punto y coma,
+  como el que devuelve la extensión).
+- Entiende seguidores/publicaciones abreviados ("17.1K", "31 mil") y los
+  guarda ya convertidos, marcando `estimado: true` para dejar claro que no
+  es una cifra exacta.
+- Si la columna `estado` viene con un valor (activa/inactiva/suspendida/
+  sin publicaciones/no existe), lo guarda tal cual -- es la verificación
+  real de la cuenta, no una suposición por tener un handle anotado. La
+  ficha del ente y las pastillas Activo/Inactivo de Segmentos ya usan ese
+  dato en cuanto existe.
 - Guarda las métricas por plataforma (`metrics.instagram`, `metrics.x`,
   etc.), nunca mezcladas entre redes.
 - Si el código de un ente no coincide con ninguno real, te avisa en la

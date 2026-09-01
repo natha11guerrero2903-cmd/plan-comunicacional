@@ -637,27 +637,56 @@ const DEFAULT_DATA = {
     {
       "id": "1", "order": 1, "num": 1, "name": "Seguridad y Paz", "phase": "Fase 1", "symbol": "",
       "accounts": [
-        { "code": "SEG-01", "name": "Comisión de Seguridad Ciudadana", "status": "candidato", "note": "IG (candidato, sin verificar): @seguridadciudadanatachira" },
+        { "code": "SEG-01", "name": "Comisión de Seguridad Ciudadana", "status": "candidato", "note": "IG (candidato, sin verificar): @seguridadciudadanatachira",
+          "metrics": { "instagram": { "estado": "activa", "seguidores": 2424, "publicacionesHistorico": 564, "publicacionesUltimoMes": 30, "ultimaPublicacion": "2026-08-31", "likes": 429, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Anuncio oficial DPD Táchira por instrucciones de la Presidenta (E) y el Ministro Cabello", "likes": 164 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "SEG-02", "name": "Procuraduría General del Estado", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
-        { "code": "SEG-03", "name": "Instituto Autónomo de Policía del Estado Táchira", "status": "verificado", "note": "IG: @politachira | X: @policiatachira — verificado" },
-        { "code": "SEG-04", "name": "INAPROCET (Protección Civil Táchira)", "status": "verificado", "note": "IG: @pcsancristobal | X: @PCivilTachira (17.1K seg.) — verificado" },
+        { "code": "SEG-03", "name": "Instituto Autónomo de Policía del Estado Táchira", "status": "verificado", "note": "IG: @politachira | X: @policiatachira — verificado",
+          "metrics": {
+            "instagram": { "estado": "activa", "seguidores": 27907, "publicacionesHistorico": 2082, "publicacionesUltimoMes": 22, "likes": 3282, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Detención de un sujeto en San Juan de Colón tras la difusión del caso", "likes": 988 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
+            "x": { "estado": "suspendida", "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
+          } },
+        { "code": "SEG-04", "name": "INAPROCET (Protección Civil Táchira)", "status": "verificado", "note": "IG: @pcsancristobal | X: @PCivilTachira (17.1K seg.) — verificado",
+          "metrics": {
+            "instagram": { "estado": "activa", "seguidores": 29567, "publicacionesHistorico": 2229, "publicacionesUltimoMes": 8, "ultimaPublicacion": "2026-08-28", "likes": 1499, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Reporte del sismo de magnitud 3.2 del 9 de agosto", "likes": 749 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
+            "x": { "estado": "inactiva", "estimado": true, "seguidores": 17100, "publicacionesHistorico": 45300, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2024-10-30", "likes": 0, "muestraLikes": 6, "publicacionDestacada": { "titulo": "Enlace al blog institucional sobre más de 50 mil personas evacuadas", "likes": 0 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
+          } },
         { "code": "SEG-05", "name": "Fundación de Altos Estudios Jurídicos de la Procuraduría (FAEJ)", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" }
       ]
     },
     {
       "id": "2", "order": 2, "num": 2, "name": "Economía y Desarrollo Productivo", "phase": "Fase 2", "symbol": "",
       "accounts": [
-        { "code": "ECO-01", "name": "FUNDESTA — Instituto Autónomo para el Desarrollo de la Economía Social", "status": "verificado", "note": "IG: @fundestaoficial | X: @Fundesta_inst — verificado" },
+        { "code": "ECO-01", "name": "FUNDESTA — Instituto Autónomo para el Desarrollo de la Economía Social", "status": "verificado", "note": "IG: @fundestaoficial | X: @Fundesta_inst — verificado",
+          "metrics": {
+            "instagram": { "estado": "inactiva", "seguidores": 1361, "publicacionesHistorico": 356, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2021-12-23", "likes": 178, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Estímulo a los emprendedores del Táchira", "likes": 39 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
+            "x": { "estado": "activa", "seguidores": 171, "publicacionesHistorico": 1467, "publicacionesUltimoMes": 2, "ultimaPublicacion": "2026-08-12", "likes": 5, "muestraLikes": 6, "publicacionDestacada": { "titulo": "Mensaje por el Día Internacional de la Juventud", "likes": 2 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
+          } },
         { "code": "ECO-02", "name": "IAPRET", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
-        { "code": "ECO-03", "name": "Lotería de Táchira", "status": "verificado", "note": "IG: @lotdeltachira (185K seg.) | X: @LotDelTachira — verificado" },
-        { "code": "ECO-04", "name": "I.V.T", "status": "parcial", "note": "IG (candidato, sin verificar): @ivt_tachira | Facebook: /ivtgbt — verificado" },
-        { "code": "ECO-05", "name": "CORPOTACHIRA", "status": "verificado", "note": "X: @corpotachira — verificado. Sin Instagram propio confirmado." },
-        { "code": "ECO-06", "name": "CORPOINTA", "status": "candidato", "note": "IG (candidato, sin verificar): @corpointa.gobtachira" },
-        { "code": "ECO-07", "name": "COTATUR", "status": "verificado", "note": "IG: @cotaturve (15K seg.) — verificado" },
-        { "code": "ECO-08", "name": "COIMTA", "status": "verificado", "note": "IG: @coimtaoficial (2,156 seg.) — verificado" },
+        { "code": "ECO-03", "name": "Lotería de Táchira", "status": "verificado", "note": "IG: @lotdeltachira (185K seg.) | X: @LotDelTachira — verificado",
+          "metrics": {
+            "instagram": { "estado": "inactiva", "seguidores": 186306, "publicacionesHistorico": 3050, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2026-03-04", "likes": 1642, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Arranque de la 61 edición de la Vuelta al Táchira", "likes": 741 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
+            "x": { "estado": "inactiva", "estimado": true, "seguidores": 20800, "publicacionesHistorico": 71200, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2022-02-02", "likes": 14, "muestraLikes": 5, "publicacionDestacada": { "titulo": "Recorrido del presidente Marcos Albarrán con su directiva", "likes": 5 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
+          } },
+        { "code": "ECO-04", "name": "I.V.T", "status": "parcial", "note": "IG (candidato, sin verificar): @ivt_tachira | Facebook: /ivtgbt — verificado",
+          "metrics": {
+            "instagram": { "estado": "activa", "seguidores": 11140, "publicacionesHistorico": 1021, "publicacionesUltimoMes": 11, "likes": 1050, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Canal abierto de 300 metros y activación de alcantarilla", "likes": 705 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
+            "facebook": { "estado": "sin_publicaciones", "seguidores": 22, "publicacionesUltimoMes": 0, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
+          } },
+        { "code": "ECO-05", "name": "CORPOTACHIRA", "status": "verificado", "note": "X: @corpotachira — verificado. Sin Instagram propio confirmado.",
+          "metrics": { "x": { "estado": "inactiva", "seguidores": 108, "publicacionesHistorico": 409, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2022-11-02", "likes": 3, "muestraLikes": 6, "publicacionDestacada": { "titulo": "Cuadrillas de Corpotáchira bajo lineamientos del gobernador", "likes": 2 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
+        { "code": "ECO-06", "name": "CORPOINTA", "status": "candidato", "note": "IG (candidato, sin verificar): @corpointa.gobtachira",
+          "metrics": { "instagram": { "estado": "activa", "seguidores": 2957, "publicacionesHistorico": 812, "publicacionesUltimoMes": 6, "ultimaPublicacion": "2026-08-29", "likes": 98, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Mantenimiento de la vía clave de la Alta Montaña", "likes": 23 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
+        { "code": "ECO-07", "name": "COTATUR", "status": "verificado", "note": "IG: @cotaturve (15K seg.) — verificado",
+          "metrics": { "instagram": { "estado": "activa", "seguidores": 29469, "publicacionesHistorico": 1180, "publicacionesUltimoMes": 11, "ultimaPublicacion": "2026-08-27", "likes": 11901, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Devoción al Santo Cristo de La Grita", "likes": 5659 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
+        { "code": "ECO-08", "name": "COIMTA", "status": "verificado", "note": "IG: @coimtaoficial (2,156 seg.) — verificado",
+          "metrics": { "instagram": { "estado": "activa", "seguidores": 2424, "publicacionesHistorico": 578, "publicacionesUltimoMes": 11, "ultimaPublicacion": "2026-08-29", "likes": 116, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Despliegue operativo minero en el municipio Lobatera", "likes": 36 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "ECO-09", "name": "MAFET, C.A.", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia (sitio web: mafet.net)" },
         { "code": "ECO-10", "name": "Agroinsumos del Táchira, C.A", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
-        { "code": "ECO-11", "name": "SEDEBAT", "status": "verificado", "note": "IG: @sedebat_ (6,811 seg.) | X: @Sedebat_ — verificado" }
+        { "code": "ECO-11", "name": "SEDEBAT", "status": "verificado", "note": "IG: @sedebat_ (6,811 seg.) | X: @Sedebat_ — verificado",
+          "metrics": {
+            "instagram": { "estado": "activa", "seguidores": 7057, "publicacionesHistorico": 2505, "publicacionesUltimoMes": 9, "ultimaPublicacion": "2026-08-24", "likes": 264, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Única taquilla presencial a partir del 31 de agosto", "likes": 65 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
+            "x": { "estado": "inactiva", "estimado": true, "seguidores": 4076, "publicacionesHistorico": 19900, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2025-01-01", "likes": 3, "muestraLikes": 5, "publicacionDestacada": { "titulo": "Felicitación al Superintendente Bermúdez por su certificación", "likes": 2 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
+          } }
       ]
     },
     {
@@ -676,12 +705,23 @@ const DEFAULT_DATA = {
         { "code": "SOC-10", "name": "Oficina de Atención Comunitaria y Solidaridad Social (ODACYSS)", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
         { "code": "SOC-11", "name": "Oficina Estadal de Archivo", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
         { "code": "SOC-12", "name": "Oficina de la Imprenta Social del Estado", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-13", "name": "CORPOSALUD", "status": "verificado", "note": "IG: @corposalud_tachira (28K seg.) — verificado" },
+        { "code": "SOC-13", "name": "CORPOSALUD", "status": "verificado", "note": "IG: @corposalud_tachira (28K seg.) — verificado",
+          "metrics": { "instagram": { "estado": "activa", "seguidores": 32686, "publicacionesHistorico": 6823, "publicacionesUltimoMes": 9, "ultimaPublicacion": "2026-08-31", "likes": 471, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Orientación sobre a qué servicio de salud acudir", "likes": 281 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "SOC-14", "name": "INAPCET", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
-        { "code": "SOC-15", "name": "INTAMUJER", "status": "verificado", "note": "IG: @intamujer | X: @INTAMUJERTACH — verificado" },
-        { "code": "SOC-16", "name": "INTAVI", "status": "candidato", "note": "IG (candidato, sin verificar): @intavienlinea (5,278 seg.)" },
-        { "code": "SOC-17", "name": "Fundación de la Familia Tachirense", "status": "verificado", "note": "IG/X: @famitachirense (27K seg.) — verificado" },
-        { "code": "SOC-18", "name": "FUNDES", "status": "verificado", "note": "IG: @fundes.tachira (1,624 seg.) — verificado" },
+        { "code": "SOC-15", "name": "INTAMUJER", "status": "verificado", "note": "IG: @intamujer | X: @INTAMUJERTACH — verificado",
+          "metrics": {
+            "instagram": { "estado": "no_existe", "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
+            "x": { "estado": "inactiva", "seguidores": 22, "publicacionesHistorico": 31, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2022-04-21", "likes": 0, "muestraLikes": 5, "publicacionDestacada": { "titulo": "Anuncio del programa Reporte Bernal del 22 de abril", "likes": 0 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
+          } },
+        { "code": "SOC-16", "name": "INTAVI", "status": "candidato", "note": "IG (candidato, sin verificar): @intavienlinea (5,278 seg.)",
+          "metrics": { "instagram": { "estado": "activa", "seguidores": 8085, "publicacionesHistorico": 741, "publicacionesUltimoMes": 20, "ultimaPublicacion": "2026-08-31", "likes": 268, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Visita de la ministra de Hábitat y Vivienda al Táchira", "likes": 147 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
+        { "code": "SOC-17", "name": "Fundación de la Familia Tachirense", "status": "verificado", "note": "IG/X: @famitachirense (27K seg.) — verificado",
+          "metrics": {
+            "instagram": { "estado": "activa", "seguidores": 29674, "publicacionesHistorico": 1952, "publicacionesUltimoMes": 35, "ultimaPublicacion": "2026-08-31", "likes": 4152, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Jornada 218 en el municipio Bolívar y la historia de una beneficiaria", "likes": 986 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
+            "x": { "estado": "inactiva", "seguidores": 134, "publicacionesHistorico": 3, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2022-03-27", "likes": 13, "muestraLikes": 3, "publicacionDestacada": { "titulo": "Mensaje institucional de presentación de la Fundación", "likes": 10 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
+          } },
+        { "code": "SOC-18", "name": "FUNDES", "status": "verificado", "note": "IG: @fundes.tachira (1,624 seg.) — verificado",
+          "metrics": { "instagram": { "estado": "activa", "seguidores": 2294, "publicacionesHistorico": 620, "publicacionesUltimoMes": 3, "ultimaPublicacion": "2026-08-21", "likes": 587, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Taller de chocolatería para jóvenes con discapacidad auditiva", "likes": 223 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "SOC-19", "name": "FUNDACETA", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
         { "code": "SOC-20", "name": "DESOTA, C.A. (INACTIVA)", "status": "inactiva", "note": "Empresa inactiva — sin red social" }
       ]
@@ -690,10 +730,17 @@ const DEFAULT_DATA = {
       "id": "4", "order": 4, "num": 4, "name": "Educación y Desarrollo Humano", "phase": "Fase 4", "symbol": "",
       "accounts": [
         { "code": "EDU-01", "name": "Dirección de Talento Humano", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "EDU-02", "name": "Dirección de Educación", "status": "verificado", "note": "IG: @diredutachira (4,975 seg.) | X: @DirEduTachira — verificado" },
-        { "code": "EDU-03", "name": "Dirección de Cultura del Estado Táchira", "status": "verificado", "note": "Facebook: /direcciondeculturadelestadotachira (30,605 seg.) — verificado. Sin Instagram propio confirmado." },
-        { "code": "EDU-04", "name": "INTEDUCA", "status": "candidato", "note": "IG (candidato, sin verificar): @inteduca_tachira" },
-        { "code": "EDU-05", "name": "I.D.T (Instituto del Deporte Tachirense)", "status": "verificado", "note": "IG: @idtachirense (2,956 seg.) — verificado" },
+        { "code": "EDU-02", "name": "Dirección de Educación", "status": "verificado", "note": "IG: @diredutachira (4,975 seg.) | X: @DirEduTachira — verificado",
+          "metrics": {
+            "instagram": { "estado": "no_existe", "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
+            "x": { "estado": "inactiva", "seguidores": 2737, "publicacionesHistorico": 6669, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2024-06-03", "likes": 7, "muestraLikes": 8, "publicacionDestacada": { "titulo": "Invitación a la Consulta Popular Nacional del 21 de abril de 2024", "likes": 3 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
+          } },
+        { "code": "EDU-03", "name": "Dirección de Cultura del Estado Táchira", "status": "verificado", "note": "Facebook: /direcciondeculturadelestadotachira (30,605 seg.) — verificado. Sin Instagram propio confirmado.",
+          "metrics": { "facebook": { "estado": "activa", "estimado": true, "seguidores": 31000, "ultimaPublicacion": "2026-09-01", "likes": 83, "muestraLikes": 6, "publicacionDestacada": { "titulo": "Efeméride del Museo de Ciencias de Caracas declarado Monumento Histórico", "likes": 27 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
+        { "code": "EDU-04", "name": "INTEDUCA", "status": "candidato", "note": "IG (candidato, sin verificar): @inteduca_tachira",
+          "metrics": { "instagram": { "estado": "inactiva", "seguidores": 1382, "publicacionesHistorico": 1158, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2026-03-08", "likes": 56, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Mensaje navideño del presidente de Inteduca", "likes": 15 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
+        { "code": "EDU-05", "name": "I.D.T (Instituto del Deporte Tachirense)", "status": "verificado", "note": "IG: @idtachirense (2,956 seg.) — verificado",
+          "metrics": { "instagram": { "estado": "inactiva", "seguidores": 2997, "publicacionesHistorico": 744, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2021-10-28", "likes": 391, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Sub-14 femenino de baloncesto clasifica al nacional Súper 8", "likes": 51 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "EDU-06", "name": "Fundación Escuela de Gobierno del Estado Táchira", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" }
       ]
     }
@@ -1021,7 +1068,10 @@ function parseAccountSocial(a) {
 }
 
 /* Una fila de pastillas Activo/Inactivo por plataforma, con link real en
-   las activas. Nunca marca "Activo" sin un handle real detrás (punto 14). */
+   las activas. Nunca marca "Activo" sin un handle real detrás (punto 14).
+   Cuando ya se verificó el estado real de la cuenta (metrics.<red>.estado,
+   cargado a mano o por scraping), se usa ese dato en vez de asumir que
+   "tiene un handle anotado" significa "existe y funciona". */
 function socialPillsHtml(a) {
   const info = parseAccountSocial(a);
   if (info.central) {
@@ -1029,10 +1079,16 @@ function socialPillsHtml(a) {
   }
   const anyActive = info.instagram || info.x || info.facebook || info.tiktok;
   if (!anyActive) return '<span class="social-pill">Sin presencia en redes propias</span>';
+  const metricsByPlatform = (a && typeof a.metrics === 'object' && a.metrics) || {};
   return SOCIAL_PLATFORMS.map(function (p) {
     const d = info[p.key];
-    if (d) return '<a class="social-pill active" href="' + d.url + '" target="_blank" rel="noopener noreferrer">' + p.label + '</a>';
-    return '<span class="social-pill">' + p.label + '</span>';
+    if (!d) return '<span class="social-pill">' + p.label + '</span>';
+    const pm = (metricsByPlatform[p.key] && typeof metricsByPlatform[p.key] === 'object') ? metricsByPlatform[p.key] : {};
+    if (pm.estado === 'no_existe') return '<span class="social-pill broken">' + p.label + ' (no existe)</span>';
+    if (pm.estado === 'suspendida') return '<span class="social-pill broken">' + p.label + ' (suspendida)</span>';
+    const dormant = pm.estado === 'inactiva' || pm.estado === 'sin_publicaciones';
+    return '<a class="social-pill active' + (dormant ? ' dormant' : '') + '" href="' + d.url + '" target="_blank" rel="noopener noreferrer">' + p.label +
+      (pm.estado === 'sin_publicaciones' ? ' (sin publicaciones)' : dormant ? ' (inactiva)' : '') + '</a>';
   }).join('');
 }
 
@@ -1111,6 +1167,7 @@ function openEnteModal(segNum, code) {
     { key: 'seguidores', label: 'Seguidores' },
     { key: 'publicacionesHistorico', label: 'Publicaciones (histórico)' },
     { key: 'publicacionesUltimoMes', label: 'Publicaciones último mes' },
+    { key: 'ultimaPublicacion', label: 'Última publicación' },
     { key: 'likes', label: 'Likes' },
     { key: 'comentarios', label: 'Comentarios' },
     { key: 'compartidos', label: 'Compartidos' },
@@ -1118,6 +1175,13 @@ function openEnteModal(segNum, code) {
     { key: 'impresiones', label: 'Impresiones' },
     { key: 'frecuenciaPublicacion', label: 'Frecuencia de publicación' }
   ];
+  const ESTADO_LABELS = {
+    activa: 'Activa',
+    inactiva: 'Inactiva (sin publicar recientemente)',
+    suspendida: 'Suspendida',
+    sin_publicaciones: 'Sin publicaciones',
+    no_existe: 'No existe'
+  };
   const metricsByPlatform = (a && typeof a.metrics === 'object' && a.metrics) || {};
   let hasAnyMetric = false;
   let metricRows = '';
@@ -1131,15 +1195,23 @@ function openEnteModal(segNum, code) {
       platformsWithAccount.forEach(function (p) {
         const pm = (metricsByPlatform[p.key] && typeof metricsByPlatform[p.key] === 'object') ? metricsByPlatform[p.key] : {};
         const platformHasData = METRIC_FIELDS.some(function (f) { return pm[f.key] !== undefined && pm[f.key] !== null && pm[f.key] !== ''; })
+          || !!pm.estado
           || !!(pm.publicacionDestacada && txt(pm.publicacionDestacada.titulo).trim());
         if (platformHasData) hasAnyMetric = true;
         metricRows += '<p class="symbol-tag" style="margin-top:14px;">' + p.label + (platformHasData ? '' : ' (pendiente de conectar)') + '</p>';
+        if (pm.estado) {
+          metricRows += '<div class="pub-detail-row"><span class="k">Estado verificado</span><span class="v"' +
+            ((pm.estado === 'suspendida' || pm.estado === 'no_existe') ? ' style="color:#b91c1c;font-weight:600;"' : '') +
+            '>' + (ESTADO_LABELS[pm.estado] || txt(pm.estado)) + '</span></div>';
+        }
         metricRows += METRIC_FIELDS.map(function (f) {
           const v = pm[f.key];
           const has = v !== undefined && v !== null && v !== '';
+          let display = has ? txt(v) : 'Sin datos cargados';
+          if (has && f.key === 'seguidores' && pm.estimado) display += ' (aprox.)';
+          if (has && f.key === 'likes' && pm.muestraLikes) display += ' (últimas ' + txt(pm.muestraLikes) + ' publicaciones)';
           return '<div class="pub-detail-row"><span class="k">' + f.label + '</span><span class="v"' +
-            (has ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' +
-            (has ? txt(v) : 'Sin datos cargados') + '</span></div>';
+            (has ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' + display + '</span></div>';
         }).join('') + destacadaRowHtml(pm.publicacionDestacada);
       });
     }
@@ -2337,8 +2409,12 @@ function institutionKpiCardHtml(a, segNum) {
         const pm = (metricsByPlatform[p.key] && typeof metricsByPlatform[p.key] === 'object') ? metricsByPlatform[p.key] : {};
         const seg = pm.seguidores;
         const has = seg !== undefined && seg !== null && seg !== '';
-        return '<div class="kpi-row"><span class="k">' + p.label + '</span><span class="v"' +
-          (has ? '' : ' style="color:var(--gray-soft);font-weight:500;"') + '>' + (has ? txt(seg) + ' seguidores' : 'Sin datos cargados') + '</span></div>';
+        let v;
+        if (pm.estado === 'no_existe') v = '<span class="v" style="color:#b91c1c;font-weight:600;">No existe</span>';
+        else if (pm.estado === 'suspendida') v = '<span class="v" style="color:#b91c1c;font-weight:600;">Suspendida</span>';
+        else if (has) v = '<span class="v">' + txt(seg) + (pm.estimado ? ' aprox.' : '') + ' seguidores' + (pm.estado === 'sin_publicaciones' ? ' (sin publicaciones)' : pm.estado === 'inactiva' ? ' (inactiva)' : '') + '</span>';
+        else v = '<span class="v" style="color:var(--gray-soft);font-weight:500;">Sin datos cargados</span>';
+        return '<div class="kpi-row"><span class="k">' + p.label + '</span>' + v + '</div>';
       }).join('');
     }
   }
@@ -2726,31 +2802,45 @@ document.addEventListener('keydown', function (e) {
    platformRows y reportRows son iguales para las tres marcas y quedan
    fijas en el código (no viven en Firestore).
 
-   ---- Preparación para scraping/API (puntos 37-39 de la corrección) ----
-   Nada de esto está implementado todavía -- son los campos que la UI ya
-   sabe leer en cuanto exista un mecanismo real (scraping o API) que los
-   escriba en Firestore. No se simula ninguna conexión ni se inventa
-   ningún valor mientras tanto:
-     accountSegments/{seg}.accounts[].director = {
-       nombre, instagram, tiktok, x, facebook   (handles "@usuario" o URL)
-     }
-     accountSegments/{seg}.accounts[].metrics = {
-       instagram: { ... }, tiktok: { ... }, x: { ... }, facebook: { ... }
-     }
-     -- cada objeto de plataforma (solo se llena para las redes que el
-     ente tiene de verdad, ver parseAccountSocial) trae:
-       seguidores, publicacionesHistorico, publicacionesUltimoMes, likes,
-       comentarios, compartidos, alcance, impresiones, frecuenciaPublicacion,
-       publicacionDestacada: { titulo, likes }   (la publicación con más
-                                                   interacción y likes)
-     Las métricas nunca se combinan entre redes -- mismo principio que el
-     estado Activo/Inactivo por plataforma (punto 14).
+   ---- Scraping/API (puntos 37-39 de la corrección) ----
+   accountSegments/{seg}.accounts[].director = {
+     nombre, instagram, tiktok, x, facebook   (handles "@usuario" o URL)
+   }
+   accountSegments/{seg}.accounts[].metrics = {
+     instagram: { ... }, tiktok: { ... }, x: { ... }, facebook: { ... }
+   }
+   -- cada objeto de plataforma (solo se llena para las redes que el
+   ente tiene de verdad, ver parseAccountSocial) trae:
+     estado                 'activa'|'inactiva'|'suspendida'|
+                             'sin_publicaciones'|'no_existe' -- verificación
+                             real de la cuenta, no una suposición por tener
+                             un handle anotado. Ver socialPillsHtml():
+                             'suspendida'/'no_existe' quitan el enlace
+                             clicable (cuenta rota o inexistente).
+     seguidores, publicacionesHistorico, publicacionesUltimoMes,
+     ultimaPublicacion       fecha 'YYYY-MM-DD' de la última publicación real
+     estimado                true si el número de seguidores/publicaciones
+                             venía redondeado en el origen (ej. "17.1K")
+                             en vez de una cifra exacta
+     likes, muestraLikes    likes recientes y sobre cuántas publicaciones
+                             se sumaron (nunca un histórico completo)
+     comentarios, compartidos, alcance, impresiones, frecuenciaPublicacion
+     publicacionDestacada: { titulo, likes }   (la publicación con más
+                                                 interacción y likes)
+   Las métricas nunca se combinan entre redes -- mismo principio que el
+   estado Activo/Inactivo por plataforma (punto 14).
    openEnteModal() y las tarjetas de "KPI semanal por institución"
    (institutionKpiCardHtml()) ya muestran estos datos reales en cuanto
    existan en el documento del ente; si no existen, siguen mostrando
-   "Sin datos cargados" (nunca un cero ni un estimado). No hay ninguna
-   dependencia adicional que agregar en el código para "activar" esto --
-   solo falta que el mecanismo de obtención de datos escriba ahí.
+   "Sin datos cargados" (nunca un cero ni un estimado).
+   Carga real vigente: las 29 cuentas medidas a mano con Claude en Chrome
+   el 2026-09-01 (ver scripts/redes-2026-09-01-medicion-real.csv) ya están
+   embebidas en DEFAULT_DATA como fallback -- se ven en el dashboard incluso
+   sin conexión a Firestore. Cuando haya credenciales de Firebase, correr
+   `npm run import-metrics -- ../scripts/redes-2026-09-01-medicion-real.csv`
+   desde scripts/ sube lo mismo a Firestore (gana sobre el fallback en
+   cuanto la conexión esté activa). Repetir el proceso cada vez que se
+   quiera refrescar los números.
    ================================================================ */
 const fb = { app: null, db: null, api: null, auth: null, authApi: null, user: null, live: false, unsubs: [], connecting: false };
 
