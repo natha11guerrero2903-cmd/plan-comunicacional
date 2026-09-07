@@ -816,34 +816,13 @@ const PLATFORM_ORDER = ['instagram', 'tiktok', 'facebook', 'x'];
 const PLATFORM_LABELS = { instagram: 'Instagram', tiktok: 'TikTok', facebook: 'Facebook', x: 'X' };
 /* Íconos dibujados con primitivas SVG (rect/circle/text), en el mismo
    espíritu que los logos de cada red -- el tamaño lo controla el CSS
-   del contenedor (.platform-link-icon / .platform-tab-icon), no el svg. */
+   del contenedor (.platform-link-icon / .platform-tab-icon), no el svg.
+   (Los archivos reales viven en assets/icons/, subidos por el equipo.) */
 const PLATFORM_ICONS = {
-  instagram: '<svg viewBox="0 0 24 24" aria-hidden="true">' +
-    '<defs><linearGradient id="igGrad" x1="0" y1="24" x2="24" y2="0">' +
-    '<stop offset="0" stop-color="#FEE411"/><stop offset=".35" stop-color="#FD1D1D"/>' +
-    '<stop offset=".7" stop-color="#E1306C"/><stop offset="1" stop-color="#833AB4"/>' +
-    '</linearGradient></defs>' +
-    '<rect x="1" y="1" width="22" height="22" rx="6" fill="url(#igGrad)"/>' +
-    '<circle cx="12" cy="12" r="5" fill="none" stroke="#fff" stroke-width="1.8"/>' +
-    '<circle cx="17.3" cy="6.7" r="1.15" fill="#fff"/></svg>',
-  tiktok: '<svg viewBox="0 0 24 24" aria-hidden="true">' +
-    '<rect x="1" y="1" width="22" height="22" rx="6" fill="#000"/>' +
-    '<text x="12.6" y="16.5" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#25F4EE">♪</text>' +
-    '<text x="11.4" y="15.5" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#FE2C55">♪</text>' +
-    '<text x="12" y="16" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#fff">♪</text></svg>',
-  facebook: '<svg viewBox="0 0 24 24" aria-hidden="true">' +
-    '<defs><linearGradient id="fbGrad" x1="0" y1="0" x2="0" y2="24">' +
-    '<stop offset="0" stop-color="#0FC6FF"/><stop offset="1" stop-color="#0064E0"/>' +
-    '</linearGradient></defs>' +
-    '<circle cx="12" cy="12" r="11" fill="url(#fbGrad)"/>' +
-    '<text x="12" y="17.5" text-anchor="middle" font-size="15" font-family="Georgia,serif" font-weight="700" fill="#fff">f</text></svg>',
-  /* La X real es una marca geométrica (dos barras cruzadas), no la letra
-     de una fuente -- se arma rotando dos rectángulos ±45° para que la
-     silueta sea fiel al logo en vez de depender de una tipografía. */
-  x: '<svg viewBox="0 0 24 24" aria-hidden="true">' +
-    '<circle cx="12" cy="12" r="11" fill="#000"/>' +
-    '<rect x="10.4" y="3" width="3.2" height="18" rx="1.1" fill="#fff" transform="rotate(45 12 12)"/>' +
-    '<rect x="10.4" y="3" width="3.2" height="18" rx="1.1" fill="#fff" transform="rotate(-45 12 12)"/></svg>'
+  instagram: '<img src="assets/icons/instagram.png" alt="" width="132" height="132">',
+  tiktok: '<img src="assets/icons/tiktok.png" alt="" width="129" height="132">',
+  facebook: '<img src="assets/icons/facebook.png" alt="" width="132" height="132">',
+  x: '<img src="assets/icons/x.jpg" alt="" width="132" height="122">'
 };
 const PLATFORM_FORMATS = {
   instagram: {
