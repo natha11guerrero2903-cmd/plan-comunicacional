@@ -812,6 +812,32 @@ const reportRows = [
 /* Recomendaciones de formato por plataforma (Banco de contenidos).
    Contenido fijo acordado con el equipo -- igual que platformRows/reportRows,
    no viene de Firestore. */
+const PLATFORM_ORDER = ['instagram', 'tiktok', 'facebook', 'x'];
+const PLATFORM_LABELS = { instagram: 'Instagram', tiktok: 'TikTok', facebook: 'Facebook', x: 'X' };
+/* Íconos dibujados con primitivas SVG (rect/circle/text), en el mismo
+   espíritu que los logos de cada red -- el tamaño lo controla el CSS
+   del contenedor (.platform-link-icon / .platform-tab-icon), no el svg. */
+const PLATFORM_ICONS = {
+  instagram: '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<defs><linearGradient id="igGrad" x1="0" y1="24" x2="24" y2="0">' +
+    '<stop offset="0" stop-color="#FEE411"/><stop offset=".35" stop-color="#FD1D1D"/>' +
+    '<stop offset=".7" stop-color="#E1306C"/><stop offset="1" stop-color="#833AB4"/>' +
+    '</linearGradient></defs>' +
+    '<rect x="1" y="1" width="22" height="22" rx="6" fill="url(#igGrad)"/>' +
+    '<circle cx="12" cy="12" r="5" fill="none" stroke="#fff" stroke-width="1.8"/>' +
+    '<circle cx="17.3" cy="6.7" r="1.15" fill="#fff"/></svg>',
+  tiktok: '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<rect x="1" y="1" width="22" height="22" rx="6" fill="#000"/>' +
+    '<text x="12.6" y="16.5" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#25F4EE">♪</text>' +
+    '<text x="11.4" y="15.5" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#FE2C55">♪</text>' +
+    '<text x="12" y="16" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#fff">♪</text></svg>',
+  facebook: '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<circle cx="12" cy="12" r="11" fill="#1877F2"/>' +
+    '<text x="12" y="17.5" text-anchor="middle" font-size="15" font-family="Georgia,serif" font-weight="700" fill="#fff">f</text></svg>',
+  x: '<svg viewBox="0 0 24 24" aria-hidden="true">' +
+    '<rect x="1" y="1" width="22" height="22" rx="6" fill="#000"/>' +
+    '<text x="12" y="17" text-anchor="middle" font-size="14" font-family="Arial,sans-serif" font-weight="700" fill="#fff">X</text></svg>'
+};
 const PLATFORM_FORMATS = {
   instagram: {
     tagline: 'Plataforma de posicionamiento y estética institucional.',
@@ -846,9 +872,17 @@ const PLATFORM_FORMATS = {
     ]
   },
   x: {
-    tagline: 'Todavía no hay formatos recomendados definidos para X — indícalos y se agregan aquí.',
-    cadence: '',
-    formats: []
+    tagline: 'Plataforma de vocería directa e institucional — es donde el Gobernador tiene mayor audiencia acumulada y más margen de crecimiento en uso, así que se trata como canal propio, no como réplica de lo publicado en IG/FB.',
+    cadence: '1-2 tweets/día + 1 hilo explicativo/semana',
+    formats: [
+      { name: 'Tweet de anuncio/declaración', duration: '', when: 'Comunicados oficiales, posicionamientos, primeras reacciones a hechos noticiosos', notes: 'Máximo 2-3 líneas, tono directo, sin adornos gráficos; la fuerza está en el texto y el timing (publicar cuando el tema es tendencia).' },
+      { name: 'Hilo explicativo', duration: '5-10 tweets', when: 'Desglosar una política, rendir cuentas de una gestión, responder a críticas con datos', notes: 'Primer tweet = gancho que resuma la conclusión; cada tweet siguiente aporta un dato o paso; cerrar con CTA o resumen.' },
+      { name: 'Video nativo corto', duration: '30-60 seg', when: 'Declaraciones en cámara, cortes de discursos, anuncios en video', notes: 'Subtítulos siempre (mucho consumo sin audio); subir nativo a X, no solo enlazar YouTube/IG.' },
+      { name: 'Quote tweet con comentario institucional', duration: '', when: 'Reaccionar a medios, otras instituciones o ciudadanos de forma controlada', notes: 'Útil para corregir información o sumarse a una conversación sin abrir un tema nuevo.' },
+      { name: 'Encuesta (poll)', duration: '', when: 'Sondear percepción rápida sobre un tema de gestión, generar interacción medible', notes: 'Preguntas cerradas, 2-4 opciones, resultado se puede reutilizar como contenido en un tweet posterior.' },
+      { name: 'Hilo de cobertura en vivo (live-tweeting)', duration: '', when: 'Eventos protocolares, jornadas, inauguraciones', notes: 'Tweets cortos y espaciados en tiempo real, con foto o video corto en cada uno.' },
+      { name: 'Space (audio en vivo)', duration: '', when: 'Rendición de cuentas conversacional, entrevistas con voceros institucionales', notes: 'Mejor con invitados de otras instituciones (refuerza la lógica de vocería descentralizada del LOST).' }
+    ]
   }
 };
 
@@ -1702,43 +1736,83 @@ function renderContentSummaries() {
   });
 }
 
-let activePlatform = 'instagram';
-
-function renderPlatformFormats(platform) {
-  const data = PLATFORM_FORMATS[platform];
-  if (!data) return;
-  activePlatform = platform;
-
-  document.querySelectorAll('.platform-tab').forEach(function (btn) {
-    const on = btn.dataset.platform === platform;
-    btn.classList.toggle('active', on);
-    btn.setAttribute('aria-selected', on ? 'true' : 'false');
-  });
-
-  setHTML('platformTagline', data.tagline);
-  setHTML('platformCadence', data.cadence ? 'Cadencia sugerida: ' + data.cadence : '');
-
-  const list = $('platformFormatsList');
-  if (!list) return;
-  list.innerHTML = '';
-  if (!data.formats.length) {
-    list.appendChild(el('div', 'empty', 'Sin formatos cargados todavía para esta plataforma.'));
-    return;
-  }
-  data.formats.forEach(function (f) {
-    list.appendChild(el('div', 'card format-card',
-      '<p class="format-name">' + txt(f.name) + '</p>' +
-      (txt(f.duration).trim() ? '<span class="format-duration">' + txt(f.duration) + '</span>' : '') +
-      '<p class="format-row"><b>Cuándo usarlo</b>' + txt(f.when) + '</p>' +
-      '<p class="format-row"><b>Notas de producción</b>' + txt(f.notes) + '</p>'));
+/* Los 4 accesos de Banco de contenidos abren una sub-página propia
+   (#platformDetail) en vez de mostrar la cuadrícula en el mismo panel --
+   reutiliza el mismo mecanismo de .panel/.panel.active que el resto de
+   la navegación (ver goToSection), pero sin pasar por el sidebar. */
+function renderPlatformLinks() {
+  const wrap = $('platformLinks');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  PLATFORM_ORDER.forEach(function (p) {
+    const btn = el('button', 'platform-link',
+      '<span class="platform-link-icon">' + PLATFORM_ICONS[p] + '</span>' +
+      '<span class="platform-link-label">' + PLATFORM_LABELS[p] + '</span>' +
+      '<span class="platform-link-arrow" aria-hidden="true">→</span>');
+    btn.type = 'button';
+    btn.addEventListener('click', function () { openPlatformDetail(p); });
+    wrap.appendChild(btn);
   });
 }
 
-function wirePlatformTabs() {
-  document.querySelectorAll('.platform-tab').forEach(function (btn) {
-    btn.addEventListener('click', function () { renderPlatformFormats(btn.dataset.platform); });
+function renderPlatformDetailTabs(active) {
+  const wrap = $('platformDetailTabs');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  PLATFORM_ORDER.forEach(function (p) {
+    const on = p === active;
+    const btn = el('button', 'platform-tab' + (on ? ' active' : ''),
+      '<span class="platform-tab-icon">' + PLATFORM_ICONS[p] + '</span>' + PLATFORM_LABELS[p]);
+    btn.type = 'button';
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    btn.addEventListener('click', function () { openPlatformDetail(p); });
+    wrap.appendChild(btn);
   });
-  renderPlatformFormats(activePlatform);
+}
+
+function openPlatformDetail(platform) {
+  const data = PLATFORM_FORMATS[platform];
+  if (!data) return;
+
+  document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+  const panel = $('platformDetail');
+  if (panel) panel.classList.add('active');
+
+  setHTML('platformDetailTitle', PLATFORM_LABELS[platform]);
+  setHTML('platformDetailTagline', data.tagline);
+  setHTML('platformDetailCadence', data.cadence ? 'Cadencia sugerida: ' + data.cadence : '');
+  renderPlatformDetailTabs(platform);
+
+  const list = $('platformDetailList');
+  if (list) {
+    list.innerHTML = '';
+    if (!data.formats.length) {
+      list.appendChild(el('div', 'empty', 'Sin formatos cargados todavía para esta plataforma.'));
+    } else {
+      data.formats.forEach(function (f) {
+        list.appendChild(el('div', 'card format-card',
+          '<p class="format-name">' + txt(f.name) + '</p>' +
+          (txt(f.duration).trim() ? '<span class="format-duration">' + txt(f.duration) + '</span>' : '') +
+          '<p class="format-row"><b>Cuándo usarlo</b>' + txt(f.when) + '</p>' +
+          '<p class="format-row"><b>Notas de producción</b>' + txt(f.notes) + '</p>'));
+      });
+    }
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function closePlatformDetail() {
+  document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+  const pilares = $('pilares');
+  if (pilares) pilares.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function wirePlatformDetail() {
+  renderPlatformLinks();
+  const back = $('platformBackBtn');
+  if (back) back.addEventListener('click', closePlatformDetail);
 }
 
 function renderWeekly() {
@@ -3296,7 +3370,7 @@ async function boot() {
   renderStaticTables();
   renderAllFromState(); // contenido local inmediato: nunca hay pantalla en blanco
   wireStaticButtons();
-  wirePlatformTabs();
+  wirePlatformDetail();
   wireFbDialog();
   wireLogoModal();
   wireCalendarNav();

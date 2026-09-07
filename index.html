@@ -179,63 +179,32 @@
       </div>
 
       <div class="section-title first-title"><h3>Recomendaciones de formato por plataforma</h3></div>
-      <p class="chart-sub" style="margin:-8px 0 14px;">Elige una plataforma para ver los formatos recomendados: cuándo usarlos y las notas de producción de cada uno.</p>
+      <p class="chart-sub" style="margin:-8px 0 14px;">Abre una plataforma para ver su guía de formatos: cuándo usarlos y las notas de producción de cada uno.</p>
 
-      <div class="platform-tabs" id="platformTabs" role="tablist">
-        <button type="button" class="platform-tab active" data-platform="instagram" role="tab" aria-selected="true">
-          <span class="platform-tab-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="20" height="20">
-              <defs>
-                <linearGradient id="igGrad" x1="0" y1="24" x2="24" y2="0">
-                  <stop offset="0" stop-color="#FEE411"/>
-                  <stop offset=".35" stop-color="#FD1D1D"/>
-                  <stop offset=".7" stop-color="#E1306C"/>
-                  <stop offset="1" stop-color="#833AB4"/>
-                </linearGradient>
-              </defs>
-              <rect x="1" y="1" width="22" height="22" rx="6" fill="url(#igGrad)"/>
-              <circle cx="12" cy="12" r="5" fill="none" stroke="#fff" stroke-width="1.8"/>
-              <circle cx="17.3" cy="6.7" r="1.15" fill="#fff"/>
-            </svg>
-          </span>Instagram
-        </button>
-        <button type="button" class="platform-tab" data-platform="tiktok" role="tab" aria-selected="false">
-          <span class="platform-tab-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="20" height="20">
-              <rect x="1" y="1" width="22" height="22" rx="6" fill="#000"/>
-              <text x="12.6" y="16.5" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#25F4EE">♪</text>
-              <text x="11.4" y="15.5" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#FE2C55">♪</text>
-              <text x="12" y="16" text-anchor="middle" font-size="13" font-family="Arial,sans-serif" fill="#fff">♪</text>
-            </svg>
-          </span>TikTok
-        </button>
-        <button type="button" class="platform-tab" data-platform="facebook" role="tab" aria-selected="false">
-          <span class="platform-tab-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="20" height="20">
-              <circle cx="12" cy="12" r="11" fill="#1877F2"/>
-              <text x="12" y="17.5" text-anchor="middle" font-size="15" font-family="Georgia,serif" font-weight="700" fill="#fff">f</text>
-            </svg>
-          </span>Facebook
-        </button>
-        <button type="button" class="platform-tab" data-platform="x" role="tab" aria-selected="false">
-          <span class="platform-tab-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" width="20" height="20">
-              <rect x="1" y="1" width="22" height="22" rx="6" fill="#000"/>
-              <text x="12" y="17" text-anchor="middle" font-size="14" font-family="Arial,sans-serif" font-weight="700" fill="#fff">X</text>
-            </svg>
-          </span>X
-        </button>
-      </div>
+      <div class="platform-links" id="platformLinks"></div>
 
-      <div class="platform-panel">
-        <div class="platform-panel-head">
-          <p class="platform-tagline" id="platformTagline"></p>
-          <span class="platform-cadence" id="platformCadence"></span>
+      <div class="section-title"><h3>Resúmenes de gestión</h3><span class="num" id="summariesCount">0 vinculados</span></div>
+      <p class="chart-sub" style="margin:-8px 0 14px;">Resúmenes semanales, mensuales, trimestrales y semestrales de la gestión. Se redactan aquí y después se vinculan a una publicación del calendario.</p>
+      <div class="grid grid-2" id="summariesList"></div>
+    </section>
+
+    <!-- ============ 02B FORMATOS POR PLATAFORMA (sub-página de Banco de contenidos) ============ -->
+    <section class="panel" id="platformDetail">
+      <button type="button" class="back-link" id="platformBackBtn">← Volver a Banco de contenidos</button>
+
+      <div class="topline">
+        <div>
+          <h2 id="platformDetailTitle">—</h2>
+          <p class="sub" id="platformDetailTagline"></p>
         </div>
-        <div class="grid grid-2" id="platformFormatsList"></div>
+        <span class="platform-cadence" id="platformDetailCadence"></span>
       </div>
 
-      <div class="note" style="margin:18px 0 26px;">
+      <div class="platform-tabs" id="platformDetailTabs" role="tablist"></div>
+
+      <div class="grid grid-2" id="platformDetailList"></div>
+
+      <div class="note" style="margin:18px 0 0;">
         <b>Antes de aprobar una propuesta, revisa:</b>
         <ul style="margin:8px 0 0;padding-left:18px;">
           <li>¿Activa un mensaje clave de la estrategia de comunicación digital vigente?</li>
@@ -244,10 +213,6 @@
           <li>¿El formato elegido es el que mejor sirve al objetivo, o se está usando por costumbre (ej. todo en post estático)?</li>
         </ul>
       </div>
-
-      <div class="section-title"><h3>Resúmenes de gestión</h3><span class="num" id="summariesCount">0 vinculados</span></div>
-      <p class="chart-sub" style="margin:-8px 0 14px;">Resúmenes semanales, mensuales, trimestrales y semestrales de la gestión. Se redactan aquí y después se vinculan a una publicación del calendario.</p>
-      <div class="grid grid-2" id="summariesList"></div>
     </section>
 
     <!-- ============ 03 SEGMENTOS DE LA GESTIÓN ============ -->
