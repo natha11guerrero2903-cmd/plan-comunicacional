@@ -165,6 +165,61 @@ que les corresponde a ustedes.
 
 ---
 
+## Radar de coyuntura (Centro de Control)
+
+`scripts/monitor-coyuntura.js` llena la colección `coyuntura` con
+menciones reales en medios, usando la búsqueda de **Google Noticias**
+(pública, sin necesidad de cuenta ni de ninguna API de pago).
+
+### 1. Instalación y credenciales
+
+Usa la misma instalación y la misma clave de servicio de Firebase que el
+resto de los scripts (ver Opción B más arriba, punto 2).
+
+### 2. Ejecutar
+
+```bash
+cd scripts
+npm install
+export GOOGLE_APPLICATION_CREDENTIALS="/ruta/a/serviceAccountKey.json"
+npm run monitor-coyuntura
+```
+
+El script:
+- Busca, por cada tema del array `TOPICS` (al inicio del archivo --
+  edítalo para agregar o quitar temas), las noticias reales de los
+  últimos 7 días.
+- Guarda en Firestore cuántas encontró de verdad y hasta 8 artículos
+  reales (título, medio, fecha, link) para que el Radar de coyuntura
+  muestre de dónde sale cada número -- nunca un total inventado ni un
+  artículo de ejemplo. Si no encuentra nada, guarda `menciones: 0` (no
+  omite el tema).
+- **Nunca calcula sentimiento.** No hay ningún análisis de sentimiento
+  real conectado -- si ya clasificaste un tema a mano en Firestore
+  (positivo/negativo/neutro), el script conserva esa clasificación tal
+  cual; los temas nuevos quedan "Sin clasificar" hasta que alguien del
+  equipo los revise y lo cargue.
+
+### 3. Repetirlo periódicamente
+
+Igual que `sync-x`, este script no queda corriendo solo -- hay que
+volver a ejecutar `npm run monitor-coyuntura` cuando quieran refrescar el
+radar (por ejemplo, una vez por semana, o después de un hecho noticioso
+puntual). Si más adelante quieres automatizarlo, es la misma decisión de
+infraestructura que la de `sync-x` (dónde vive el servidor que lo corre
+solo) -- avísame cuando la tengan resuelta.
+
+### Qué NO cubre esta vía
+
+Google Noticias indexa medios digitales, no todas las redes sociales
+(comentarios en Instagram/X/Facebook de terceros, grupos de WhatsApp,
+etc.) -- para eso sí hace falta una herramienta de pago de social
+listening (Brand24, Meltwater, mencionadas más abajo). Esta vía cubre la
+parte de prensa/medios digitales, que es real y gratuita, pero no es
+"todo lo que se dice" sobre un tema.
+
+---
+
 ## Directorio de fuentes de monitoreo ("Matrices de opinión")
 
 El directorio de medios de "Matrices de opinión → Directorio de fuentes"

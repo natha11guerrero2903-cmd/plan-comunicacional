@@ -2454,8 +2454,10 @@ function renderControlStats() {
 }
 
 /* Radar de coyuntura: temas reales en monitoreo. Colección "coyuntura"
-   nueva, vacía a propósito -- se carga desde Firestore cuando exista un
-   monitoreo real de medios/redes por tema. No se inventan temas. */
+   se llena con scripts/monitor-coyuntura.js (Google News, ver README) --
+   nunca se inventan temas ni menciones. "sentimiento" nunca lo pone el
+   script solo (no hay análisis de sentimiento real conectado): queda sin
+   clasificar hasta que alguien del equipo lo revise a mano. */
 function renderCoyuntura() {
   const c = $('coyunturaGrid');
   if (!c) return;
@@ -2468,10 +2470,20 @@ function renderCoyuntura() {
   items.forEach(function (t) {
     const sentimiento = txt(t.sentimiento);
     const badge = /positiv/i.test(sentimiento) ? 'v' : /negativ/i.test(sentimiento) ? 'x' : 's';
+    const articulos = Array.isArray(t.articulos) ? t.articulos.slice(0, 3) : [];
+    const articulosHtml = articulos.length
+      ? '<div class="coyuntura-articulos">' + articulos.map(function (a) {
+          return a.url
+            ? '<a href="' + txt(a.url) + '" target="_blank" rel="noopener noreferrer">' + txt(a.titulo) + '</a>'
+            : '<span>' + txt(a.titulo) + '</span>';
+        }).join('') + '</div>'
+      : '';
     c.appendChild(el('div', 'coyuntura-tile',
       '<div><p class="coyuntura-tema">' + txt(t.tema) + '</p>' +
-      '<p class="coyuntura-menciones">Menciones: <b>' + txt(t.menciones) + '</b></p></div>' +
-      '<span class="acct-badge ' + badge + '">' + (sentimiento || 'Sin dato') + '</span>'));
+      '<p class="coyuntura-menciones">Menciones: <b>' + txt(t.menciones) + '</b>' +
+        (t.actualizado ? ' · actualizado ' + txt(t.actualizado) : '') + '</p>' +
+      articulosHtml + '</div>' +
+      '<span class="acct-badge ' + badge + '">' + (sentimiento || 'Sin clasificar') + '</span>'));
   });
 }
 
@@ -3231,9 +3243,14 @@ document.addEventListener('keydown', function (e) {
      projects/{id}         (Proyectos en desarrollo del Centro de
                             Control; {nombre, estado, ...} -- empieza
                             vacía)
-     coyuntura/{id}        (Radar de coyuntura; {tema, menciones,
-                            sentimiento} -- empieza vacía, requiere
-                            monitoreo real de medios/redes)
+     coyuntura/{id}        (Radar de coyuntura; se llena con
+                            scripts/monitor-coyuntura.js, ver README.
+                            {tema, menciones, articulos: [{titulo, fuente,
+                            fecha, url}], fuente: 'google-news-rss',
+                            actualizado, sentimiento} -- "sentimiento" no
+                            lo pone nunca el script, solo lo conserva si
+                            ya estaba cargado a mano; no hay análisis de
+                            sentimiento real conectado.)
    platformRows y reportRows son iguales para las tres marcas y quedan
    fijas en el código (no viven en Firestore).
 
