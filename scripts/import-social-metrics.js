@@ -165,6 +165,9 @@ async function run() {
     const likes = parseNumberField(r.likes_recientes);
     if (likes.value !== undefined) fields.likes = likes.value;
 
+    const comentarios = parseNumberField(r.comentarios_recientes);
+    if (comentarios.value !== undefined) fields.comentarios = comentarios.value;
+
     const muestra = parseNumberField(r.publicaciones_muestra);
     if (muestra.value !== undefined) fields.muestraLikes = muestra.value;
 
@@ -197,6 +200,23 @@ async function run() {
     const account = seg.accounts[loc.idx];
     const prevMetrics = (account.metrics && typeof account.metrics === 'object') ? account.metrics : {};
     const prevPlatform = (prevMetrics[platformKey] && typeof prevMetrics[platformKey] === 'object') ? prevMetrics[platformKey] : {};
+
+    // Antes de sobrescribir, guarda el seguidores/fecha de la medición
+    // ANTERIOR real (si había una) -- es lo único que permite calcular
+    // "Nuevos seguidores" como una diferencia real entre dos mediciones,
+    // en vez de inventar una variación. Solo se guarda si la medición
+    // anterior es de una fecha distinta a la de hoy (evita pisarse a sí
+    // mismo si el mismo CSV se importa dos veces).
+    if (prevPlatform.seguidores !== undefined && prevPlatform.actualizado && prevPlatform.actualizado !== cleanFields.actualizado) {
+      cleanFields.seguidoresAnterior = prevPlatform.seguidores;
+      cleanFields.seguidoresAnteriorFecha = prevPlatform.actualizado;
+    } else if (prevPlatform.seguidoresAnterior !== undefined) {
+      // Ya importado hoy antes -- conserva la comparación real que ya
+      // existía en vez de perderla.
+      cleanFields.seguidoresAnterior = prevPlatform.seguidoresAnterior;
+      cleanFields.seguidoresAnteriorFecha = prevPlatform.seguidoresAnteriorFecha;
+    }
+
     seg.accounts[loc.idx] = Object.assign({}, account, {
       metrics: Object.assign({}, prevMetrics, {
         [platformKey]: Object.assign({}, prevPlatform, cleanFields)

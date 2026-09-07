@@ -41,11 +41,20 @@ Táchira). Para cada una, abre el link y anota:
 6. **Fecha de la última publicación** (formato AAAA-MM-DD).
 7. **Likes recientes**: suma los "me gusta" de las últimas 5-10
    publicaciones que veas (no hace falta scrollear todo el historial).
-8. **Publicaciones que revisaste para el punto anterior**: cuántas
-   publicaciones sumaste (ej. 10, 6, 5).
-9. **Publicación con más interacción**: de esas mismas últimas
-   publicaciones, cuál tiene más likes + comentarios/compartidos juntos.
-   Anota un resumen corto de qué trata (una frase) y su cantidad de likes.
+8. **Comentarios recientes**: suma los comentarios de esas MISMAS
+   publicaciones (el mismo lote que usaste para el punto anterior) --
+   esto es lo que permite calcular el engagement real en el dashboard.
+9. **Publicaciones que revisaste para los dos puntos anteriores**:
+   cuántas publicaciones sumaste (ej. 10, 6, 5).
+10. **Publicación con más interacción**: de esas mismas últimas
+    publicaciones, cuál tiene más likes + comentarios/compartidos juntos.
+    Anota un resumen corto de qué trata (una frase) y su cantidad de likes.
+
+No busques "alcance" ni "impresiones": ninguna red social las muestra en
+un perfil público (ni a ti ni a nadie que no administre la cuenta), así
+que ni lo intentes ni pongas un cálculo tuyo -- eso se queda sin dato en
+el dashboard hasta que alguien con acceso de administrador a la cuenta
+conecte la API oficial.
 
 Si un dato no está visible o no aplica (por ejemplo, la cuenta es
 privada, no carga, no existe, o está suspendida), escribe "no disponible"
@@ -56,13 +65,13 @@ con este formato exacto (para poder pegarlo directo en un CSV), separando
 los campos con punto y coma `;`:
 
 ```
-codigo;ente;plataforma;usuario;url;estado;seguidores;seguidores_exacto;publicaciones_historico;publicaciones_ultimo_mes;ultima_publicacion;likes_recientes;publicaciones_muestra;publicacion_destacada_titulo;publicacion_destacada_likes;fecha_medicion
+codigo;ente;plataforma;usuario;url;estado;seguidores;seguidores_exacto;publicaciones_historico;publicaciones_ultimo_mes;ultima_publicacion;likes_recientes;comentarios_recientes;publicaciones_muestra;publicacion_destacada_titulo;publicacion_destacada_likes;fecha_medicion
 ```
 
 Ejemplo de una línea de resultado real:
 
 ```
-SEG-01;Comisión de Seguridad Ciudadana;Instagram;@seguridadciudadanatachira;https://instagram.com/seguridadciudadanatachira;activa;2600;si;580;12;2026-09-06;510;10;Operativo de seguridad en el centro;180;2026-09-07
+SEG-01;Comisión de Seguridad Ciudadana;Instagram;@seguridadciudadanatachira;https://instagram.com/seguridadciudadanatachira;activa;2600;si;580;12;2026-09-06;510;87;10;Operativo de seguridad en el centro;180;2026-09-07
 ```
 
 (la fecha de `fecha_medicion` es la de HOY, cuando hagas la revisión)
@@ -71,7 +80,8 @@ Aquí está la tabla de cuentas a revisar:
 
 | Código | Ente | Plataforma | Usuario | Link |
 |---|---|---|---|---|
-| SEG-01 | Comisión de Seguridad Ciudadana | Instagram | @seguridadciudadanatachira | https://instagram.com/seguridadciudadanatachira |
+| GOB-01 | Gobernación del Estado Táchira (cuenta central) | Instagram | @gobernaciondeltachira | https://instagram.com/gobernaciondeltachira |
+| GOB-01 | Gobernación del Estado Táchira (cuenta central) | X | @gobernaciondeltachira | https://x.com/gobernaciondeltachira |
 | SEG-03 | Instituto Autónomo de Policía del Estado Táchira | Instagram | @politachira | https://instagram.com/politachira |
 | SEG-03 | Instituto Autónomo de Policía del Estado Táchira | X | @policiatachira | https://x.com/policiatachira |
 | SEG-04 | INAPROCET (Protección Civil Táchira) | Instagram | @pcsancristobal | https://instagram.com/pcsancristobal |
@@ -95,11 +105,14 @@ Aquí está la tabla de cuentas a revisar:
 | SOC-17 | Fundación de la Familia Tachirense | Instagram | @famitachirense | https://instagram.com/famitachirense |
 | SOC-17 | Fundación de la Familia Tachirense | X | @famitachirense | https://x.com/famitachirense |
 | SOC-18 | FUNDES | Instagram | @fundes.tachira | https://instagram.com/fundes.tachira |
-| EDU-02 | Dirección de Educación | Instagram | @diredutachira | https://instagram.com/diredutachira |
-| EDU-02 | Dirección de Educación | X | @DirEduTachira | https://x.com/DirEduTachira |
-| EDU-03 | Dirección de Cultura del Estado Táchira | Facebook | /direcciondeculturadelestadotachira | https://facebook.com/direcciondeculturadelestadotachira |
 | EDU-04 | INTEDUCA | Instagram | @inteduca_tachira | https://instagram.com/inteduca_tachira |
 | EDU-05 | I.D.T (Instituto del Deporte Tachirense) | Instagram | @idtachirense | https://instagram.com/idtachirense |
+
+(Comisión de Seguridad Ciudadana, Procuraduría, Dirección de Educación y
+Dirección de Cultura ya no se listan aquí porque no son entes
+descentralizados -- se quitaron de Segmentos de la gestión. GOB-01 es
+nuevo: la cuenta central de la Gobernación nunca se había medido por
+separado, ahora que tiene su propia fila en Segmentos.)
 
 ## (fin del prompt para pegar)
 
@@ -110,7 +123,7 @@ Aquí está la tabla de cuentas a revisar:
 1. Copia las líneas que te devuelva Claude (una por cuenta, separadas por `;`).
 2. Pégalas en un archivo de texto, con esta primera línea de cabecera:
    ```
-   codigo;ente;plataforma;usuario;url;estado;seguidores;seguidores_exacto;publicaciones_historico;publicaciones_ultimo_mes;ultima_publicacion;likes_recientes;publicaciones_muestra;publicacion_destacada_titulo;publicacion_destacada_likes;fecha_medicion
+   codigo;ente;plataforma;usuario;url;estado;seguidores;seguidores_exacto;publicaciones_historico;publicaciones_ultimo_mes;ultima_publicacion;likes_recientes;comentarios_recientes;publicaciones_muestra;publicacion_destacada_titulo;publicacion_destacada_likes;fecha_medicion
    ```
    y guárdalo como `.csv` (o mándamelo directo a mí, como hiciste la vez
    pasada, y yo lo cargo al dashboard).
@@ -124,16 +137,21 @@ npm run import-metrics -- ruta/al/archivo.csv
 ```
 
 Esto sube todo de una vez a Firestore y el dashboard lo muestra
-automáticamente (en la ficha de cada ente, en las pastillas Activo/Inactivo
-de Segmentos de la gestión, y en las tarjetas de "KPI semanal por
-institución").
+automáticamente: en la ficha de cada ente, en las pastillas Activo/Inactivo
+de Segmentos de la gestión, en las tarjetas de "KPI semanal por
+institución", y en Centro de Control -- "Top contenidos" (la publicación
+más comentada/gustada de cada cuenta) y el Engagement del panel de
+estadísticas se recalculan solos con este mismo CSV. "Nuevos seguidores"
+en "Rendimiento reciente" empieza a mostrar un número real a partir de la
+SEGUNDA vez que importes el mismo ente (el importador guarda la medición
+anterior para poder restar).
 
 ---
 
 ## Lo que este prompt NO puede darte
 
 Esta vía sirve solo para **métricas de redes sociales que ya existen**
-(las 29 cuentas de la tabla). No sirve para llenar estas otras partes del
+(las cuentas de la tabla). No sirve para llenar estas otras partes del
 Centro de Control, que hoy están vacías a propósito porque no son datos
 que se puedan leer navegando perfiles públicos:
 
@@ -142,10 +160,9 @@ que se puedan leer navegando perfiles públicos:
   fase) -- alguien del equipo tiene que cargarlos, no se "scrapean".
 - **Radar de coyuntura**: requiere monitoreo real de medios/menciones,
   no solo revisar las cuentas propias.
-- **Rendimiento de la semana (alcance/engagement agregado)**: una vez que
-  tengamos dos o más mediciones en el tiempo (por ejemplo, esta y la del
-  2026-09-01) puedo calcular la variación real semana a semana -- dímelo
-  cuando tengas el nuevo CSV y lo agrego.
+- **Alcance e impresiones**: ninguna red los muestra en un perfil
+  público -- solo se pueden leer con acceso de administrador a la cuenta
+  vía la API oficial de Meta/X, que hoy nadie tiene conectado.
 
 Si quieres, cuando me pases el nuevo archivo también reviso si hay
 Instagram/X que se recuperaron (por ejemplo si @intamujer o @diredutachira

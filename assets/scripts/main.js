@@ -2312,6 +2312,114 @@ function renderReportsAvailable() {
    del calendario y segmentos. Campañas y proyectos son conteos reales
    de colecciones nuevas (empiezan vacías). Alcance y engagement quedan
    honestamente sin dato: no hay scraping/API conectado todavía. */
+/* Rendimiento real a partir de metrics.<red> de cada cuenta -- nunca
+   estima ni promedia sobre cuentas sin datos.
+   - engagement: suma de likes + comentarios de la muestra más reciente de
+     cada cuenta con esos campos cargados (puede estar incompleto si
+     todavía no se cargaron comentarios para todas las cuentas).
+   - nuevosSeguidores: suma de (seguidores - seguidoresAnterior) solo en
+     las cuentas donde el importador ya guardó una medición anterior real
+     (ver import-social-metrics.js) -- 0 mediciones comparables = null,
+     nunca se muestra un 0 que en realidad es "no medido todavía".
+   - alcance/impresiones: quedan siempre null. Instagram/X/Facebook no
+     muestran esas cifras en un perfil público -- solo se pueden leer con
+     acceso de administrador a la cuenta (API oficial de Meta/X), que hoy
+     nadie tiene conectado. */
+function computeControlPerformance() {
+  let engagement = 0, engagementCuentas = 0;
+  let nuevosSeguidores = 0, comparablesCuentas = 0;
+  allEnteMetrics().forEach(function (pm) {
+    const likes = Number(pm.likes);
+    if (Number.isFinite(likes)) {
+      engagement += likes + (Number.isFinite(Number(pm.comentarios)) ? Number(pm.comentarios) : 0);
+      engagementCuentas++;
+    }
+    if (Number.isFinite(Number(pm.seguidores)) && Number.isFinite(Number(pm.seguidoresAnterior))) {
+      nuevosSeguidores += Number(pm.seguidores) - Number(pm.seguidoresAnterior);
+      comparablesCuentas++;
+    }
+  });
+  return {
+    engagement: engagementCuentas ? engagement : null,
+    engagementCuentas: engagementCuentas,
+    nuevosSeguidores: comparablesCuentas ? nuevosSeguidores : null,
+    comparablesCuentas: comparablesCuentas
+  };
+}
+
+/* Todas las cuentas-plataforma reales de accountSegments, planas, para
+   que computeControlPerformance()/computeTopContents() no dupliquen el
+   recorrido de segmentos -> cuentas -> plataformas. */
+function allEnteMetrics() {
+  const out = [];
+  sortDocs(state.accountSegments).forEach(function (s) {
+    (Array.isArray(s.accounts) ? s.accounts : []).forEach(function (a) {
+      const m = (a && typeof a.metrics === 'object' && a.metrics) || {};
+      SOCIAL_PLATFORMS.forEach(function (p) {
+        const pm = m[p.key];
+        if (pm && typeof pm === 'object') out.push(Object.assign({ ente: a, platform: p }, pm));
+      });
+    });
+  });
+  return out;
+}
+
+function renderControlPerformance() {
+  const perf = computeControlPerformance();
+  setHTML('perfAlcance', '—');
+  setHTML('perfImpresiones', '—');
+  setHTML('perfEngagement', perf.engagement === null ? '—' : txt(perf.engagement));
+  setHTML('perfNuevosSeguidores', perf.nuevosSeguidores === null ? '—' : (perf.nuevosSeguidores > 0 ? '+' : '') + txt(perf.nuevosSeguidores));
+  const note = $('controlPerformanceNote');
+  if (!note) return;
+  const parts = [];
+  parts.push(perf.engagement === null
+    ? 'Engagement: sin cuentas con likes/comentarios cargados todavía.'
+    : 'Engagement: suma real de likes + comentarios de la muestra más reciente de ' + perf.engagementCuentas + ' cuenta(s)-red.');
+  parts.push(perf.nuevosSeguidores === null
+    ? 'Nuevos seguidores: hace falta al menos dos mediciones de la misma cuenta para calcular una variación real -- todavía no hay ninguna comparación disponible.'
+    : 'Nuevos seguidores: variación real entre la medición anterior y la actual en ' + perf.comparablesCuentas + ' cuenta(s)-red.');
+  parts.push('Alcance e impresiones no están disponibles: esas cifras no se muestran en un perfil público, solo con acceso de administrador a la cuenta (API oficial de Meta/X), que hoy no está conectado.');
+  note.textContent = parts.join(' ');
+}
+
+/* Top contenidos real: junta publicacionDestacada de cada cuenta-red ya
+   medida y ordena por likes + comentarios. Es la publicación más
+   comentada/gustada de la MUESTRA más reciente de cada cuenta (no
+   necesariamente publicada esta semana calendario) -- se rotula así,
+   nunca como "de esta semana" sin serlo. */
+function computeTopContents(limit) {
+  const rows = allEnteMetrics()
+    .filter(function (pm) { return pm.publicacionDestacada && txt(pm.publicacionDestacada.titulo).trim(); })
+    .map(function (pm) {
+      const likes = Number(pm.publicacionDestacada.likes);
+      const interacciones = (Number.isFinite(likes) ? likes : 0);
+      return { ente: pm.ente, platform: pm.platform, titulo: txt(pm.publicacionDestacada.titulo), likes: Number.isFinite(likes) ? likes : null, interacciones: interacciones };
+    });
+  rows.sort(function (a, b) { return b.interacciones - a.interacciones; });
+  return rows.slice(0, limit || 5);
+}
+
+function renderTopContents() {
+  const c = $('topContentsList');
+  if (!c) return;
+  const rows = computeTopContents(5);
+  if (!rows.length) {
+    c.innerHTML = '<div class="empty">Sin publicaciones con métricas registradas todavía: requiere datos de interacción por publicación, que hoy no vienen de ninguna fuente conectada.</div>';
+    return;
+  }
+  c.innerHTML = rows.map(function (r) {
+    return '<div class="control-item">' +
+      enteLogoHtml(r.ente) +
+      '<div class="control-item-body">' +
+        '<p class="control-item-title">' + r.titulo + '</p>' +
+        '<span class="control-item-tag">' + txt(r.ente.name) + ' · ' + r.platform.label + '</span>' +
+      '</div>' +
+      '<span class="acct-badge v">' + (r.likes === null ? 'Sin likes' : r.likes + ' likes') + '</span>' +
+    '</div>';
+  }).join('');
+}
+
 function renderControlStats() {
   const c = $('controlStatGrid');
   if (!c) return;
@@ -2329,6 +2437,7 @@ function renderControlStats() {
   const scheduled = thisWeek.length - done;
   const upcomingEvents = occurrences.filter(function (o) { return o.kind === 'especial' && o.date > todayIso; }).length;
   const alerts = computeControlAlerts();
+  const perf = computeControlPerformance();
 
   [
     { num: String(scheduled), lbl: 'Publicaciones programadas (semana)' },
@@ -2337,7 +2446,7 @@ function renderControlStats() {
     { num: String(state.campaigns.length), lbl: 'Campañas activas' },
     { num: String(state.projects.length), lbl: 'Proyectos en desarrollo' },
     { num: '—', lbl: 'Alcance acumulado (sin datos)' },
-    { num: '—', lbl: 'Engagement (sin datos)' },
+    { num: perf.engagement === null ? '—' : String(perf.engagement), lbl: perf.engagement === null ? 'Engagement (sin datos)' : 'Engagement (likes + comentarios)' },
     { num: String(alerts.length), lbl: 'Alertas pendientes' }
   ].forEach(function (st) {
     c.appendChild(el('div', 'card stat-card', '<div class="num">' + st.num + '</div><div class="lbl">' + st.lbl + '</div>'));
@@ -3148,11 +3257,26 @@ document.addEventListener('keydown', function (e) {
      estimado                true si el número de seguidores/publicaciones
                              venía redondeado en el origen (ej. "17.1K")
                              en vez de una cifra exacta
-     likes, muestraLikes    likes recientes y sobre cuántas publicaciones
-                             se sumaron (nunca un histórico completo)
-     comentarios, compartidos, alcance, impresiones, frecuenciaPublicacion
+     likes, comentarios,     de la misma muestra de publicaciones recientes
+     muestraLikes            (likes+comentarios alimentan Engagement real
+                             en Centro de Control, ver computeControlPerformance())
+     seguidoresAnterior,     el valor de "seguidores"/"actualizado" que
+     seguidoresAnteriorFecha tenía la medición ANTERIOR, antes de que
+                             import-social-metrics.js los sobrescribiera --
+                             permite calcular "Nuevos seguidores" real
+                             (diferencia entre dos mediciones reales, nunca
+                             una estimación). Aparece solo desde la segunda
+                             vez que se importa una cuenta.
+     compartidos, alcance, impresiones, frecuenciaPublicacion
+                             (alcance/impresiones nunca se llenan por esta
+                             vía -- ninguna red los muestra en un perfil
+                             público; solo con acceso de administrador a
+                             la cuenta vía API oficial)
      publicacionDestacada: { titulo, likes }   (la publicación con más
-                                                 interacción y likes)
+                                                 interacción y likes de la
+                                                 muestra -- alimenta "Top
+                                                 contenidos" en Centro de
+                                                 Control, ver computeTopContents())
    Las métricas nunca se combinan entre redes -- mismo principio que el
    estado Activo/Inactivo por plataforma (punto 14).
    openEnteModal() y las tarjetas de "KPI semanal por institución"
@@ -3222,7 +3346,7 @@ function attachListeners() {
     renderTodayPriorities();
     renderUpcoming7Days();
     renderControlAlerts();
-    renderControlStats();
+    renderControlStats(); renderControlPerformance(); renderTopContents();
     scheduleFirstPaintDone();
   }, function (err) { onFsError('meta', err); }));
 
@@ -3231,7 +3355,7 @@ function attachListeners() {
     state.perception = Object.assign({}, DEFAULT_DATA.perception, docOr({}, snap.data()));
     renderPerception();
     renderControlAlerts();
-    renderControlStats();
+    renderControlStats(); renderControlPerformance(); renderTopContents();
     scheduleFirstPaintDone();
   }, function (err) { onFsError('perception', err); }));
 
@@ -3254,24 +3378,24 @@ function attachListeners() {
   /* "symbols" no tiene ninguna vista que lo use por ahora -- se conserva
      la sincronización sin tocar los datos, por si se vuelve a mostrar. */
   watchCollection('symbols', 'symbols');
-  watchCollection('weekly', 'weekly', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); });
-  watchCollection('specials', 'specials', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); });
+  watchCollection('weekly', 'weekly', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); renderControlPerformance(); renderTopContents(); });
+  watchCollection('specials', 'specials', function () { renderComplianceChart(); renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); renderControlPerformance(); renderTopContents(); });
   watchCollection('phases', 'phases', function () { renderMilestones(); });
-  watchCollection('publications', 'publications', function () { renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); });
+  watchCollection('publications', 'publications', function () { renderCalendar(); renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); renderControlPerformance(); renderTopContents(); });
   watchCollection('kpiWeekly', 'kpiWeekly', function () { renderKpis(); });
   watchCollection('kpiSpecial', 'kpiSpecial', function () { renderKpis(); });
   watchCollection('checklist', 'checklist', function () { renderChecklist(); });
-  watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); renderInstitutionKpis(); renderControlAlerts(); renderControlStats(); });
+  watchCollection('accountSegments', 'accountSegments', function () { renderAccountSegments(); renderInstitutionKpis(); renderControlAlerts(); renderControlStats(); renderControlPerformance(); renderTopContents(); });
   watchCollection('newsSources', 'newsSources', function () { renderNews(); });
   watchCollection('newsItems', 'newsItems', function () { renderOpinionNews(); });
   watchCollection('contentSummaries', 'contentSummaries', function () { renderContentSummaries(); renderReportsAvailable(); });
-  watchCollection('campaigns', 'campaigns', function () { renderControlStats(); });
-  watchCollection('projects', 'projects', function () { renderControlStats(); });
+  watchCollection('campaigns', 'campaigns', function () { renderControlStats(); renderControlPerformance(); renderTopContents(); });
+  watchCollection('projects', 'projects', function () { renderControlStats(); renderControlPerformance(); renderTopContents(); });
   watchCollection('coyuntura', 'coyuntura', function () { renderCoyuntura(); });
   watchCollection('contentProposals', 'contentProposals', function () {
     renderProposalsQueue();
     renderComplianceChart(); renderCalendar(); renderSegmentDiagnostics();
-    renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats();
+    renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats(); renderControlPerformance(); renderTopContents();
   });
 }
 
@@ -3474,7 +3598,7 @@ function renderAllFromState() {
   renderTodayPriorities();
   renderUpcoming7Days();
   renderControlAlerts();
-  renderControlStats();
+  renderControlStats(); renderControlPerformance(); renderTopContents();
   renderCoyuntura();
   renderReportsAvailable();
 }

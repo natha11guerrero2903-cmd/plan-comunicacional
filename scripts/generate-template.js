@@ -68,29 +68,30 @@ function extractSocial(account) {
 
 function csvEscape(v) {
   const s = String(v == null ? '' : v);
-  if (/["\n,]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  if (/["\n;]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
   return s;
 }
 
 async function run() {
   const snap = await db.collection(BRAND_SLUG).doc('plan').collection('accountSegments').get();
-  const header = ['segmento', 'segmento_nombre', 'codigo', 'ente', 'plataforma', 'usuario', 'link',
-    'seguidores', 'publicaciones_historico', 'publicaciones_ultimo_mes', 'likes_recientes',
-    'publicacion_destacada_titulo', 'publicacion_destacada_likes', 'fecha_carga'];
+  const header = ['codigo', 'ente', 'plataforma', 'usuario', 'url', 'estado', 'seguidores',
+    'seguidores_exacto', 'publicaciones_historico', 'publicaciones_ultimo_mes', 'ultima_publicacion',
+    'likes_recientes', 'comentarios_recientes', 'publicaciones_muestra',
+    'publicacion_destacada_titulo', 'publicacion_destacada_likes', 'fecha_medicion'];
   const rows = [header];
 
   snap.docs.forEach(function (doc) {
     const seg = doc.data();
     (Array.isArray(seg.accounts) ? seg.accounts : []).forEach(function (a) {
       extractSocial(a).forEach(function (s) {
-        rows.push([seg.num, seg.name, a.code, a.name, s.platform, s.usuario, s.link, '', '', '', '', '', '', '']);
+        rows.push([a.code, a.name, s.platform, s.usuario, s.link, '', '', '', '', '', '', '', '', '', '', '', '']);
       });
     });
   });
 
-  const csv = rows.map(function (r) { return r.map(csvEscape).join(','); }).join('\n') + '\n';
+  const csv = rows.map(function (r) { return r.map(csvEscape).join(';'); }).join('\n') + '\n';
   fs.writeFileSync(OUT_PATH, csv, 'utf8');
-  console.log('Generado ' + OUT_PATH + ' con ' + (rows.length - 1) + ' cuentas reales.');
+  console.log('Generado ' + OUT_PATH + ' con ' + (rows.length - 1) + ' cuentas reales (delimitador ";").');
   process.exit(0);
 }
 

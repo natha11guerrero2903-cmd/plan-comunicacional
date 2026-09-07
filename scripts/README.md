@@ -66,6 +66,16 @@ El importador:
   real de la cuenta, no una suposición por tener un handle anotado. La
   ficha del ente y las pastillas Activo/Inactivo de Segmentos ya usan ese
   dato en cuanto existe.
+- Antes de sobrescribir seguidores, guarda el valor de la medición
+  ANTERIOR (`seguidoresAnterior`) -- desde la segunda vez que importes la
+  misma cuenta, Centro de Control ya puede mostrar "Nuevos seguidores"
+  como una resta real entre dos mediciones, no un estimado.
+- Con `comentarios_recientes` (además de `likes_recientes`) calcula un
+  Engagement real (suma de likes + comentarios) que ya se ve en el panel
+  de estadísticas y en "Rendimiento reciente" de Centro de Control.
+- `publicacion_destacada_titulo`/`_likes` de cada cuenta alimentan "Top
+  contenidos" en Centro de Control -- se ordenan solas por interacción,
+  sin que haya que tocar nada más.
 - Guarda las métricas por plataforma (`metrics.instagram`, `metrics.x`,
   etc.), nunca mezcladas entre redes.
 - Si el código de un ente no coincide con ninguno real, te avisa en la
