@@ -730,6 +730,60 @@ const DEFAULT_DATA = {
     { "id": "1", "order": 1, "scope": "regional", "name": "La Nación (Táchira)", "description": "Diario regional de San Cristóbal — la referencia impresa y digital del estado.", "url": "https://www.lanacion.com.ve" },
     { "id": "2", "order": 2, "scope": "regional", "name": "Diario Los Andes", "description": "Cobertura de toda la región andina venezolana: Táchira, Mérida y Trujillo.", "url": "https://www.diariolosandes.com.ve" },
     { "id": "3", "order": 3, "scope": "regional", "name": "Google Noticias · Táchira", "description": "Agregador en vivo: reúne en un solo lugar lo último publicado sobre el estado por cualquier medio.", "url": "https://news.google.com/search?q=T%C3%A1chira&hl=es-419&gl=VE" },
+    /* Directorio de medios digitales de Táchira en Instagram -- levantado
+       a mano por el equipo (51 cuentas, ordenadas por alcance). Cada uno
+       enlaza directo al perfil real de Instagram, no a un sitio web. */
+    { "id": "14", "order": 4, "scope": "regional", "name": "Táchira Noticias (@tachiranoticias1)", "description": "Portal de noticias generalista. 755K seguidores en Instagram.", "url": "https://www.instagram.com/tachiranoticias1/" },
+    { "id": "15", "order": 5, "scope": "regional", "name": "Diario La Nación - Venezuela (@lanacionweb)", "description": "Diario tradicional con edición digital (Editorial Torbes). 565K seguidores en Instagram.", "url": "https://www.instagram.com/lanacionweb/" },
+    { "id": "16", "order": 6, "scope": "regional", "name": "Táchira Noticias (cuenta alterna) (@tachiranoticiastuvoz)", "description": "Portal de noticias generalista (respaldo de @tachiranoticias1). 358K seguidores en Instagram.", "url": "https://www.instagram.com/tachiranoticiastuvoz/" },
+    { "id": "17", "order": 7, "scope": "regional", "name": "Noticias Tachirenses (@noticiastachirenses)", "description": "Portal de noticias / periodismo hiperlocal (red CNT Táchira). 356K seguidores en Instagram.", "url": "https://www.instagram.com/noticiastachirenses/" },
+    { "id": "18", "order": 8, "scope": "regional", "name": "Táchira News (@tachiranews.oficial)", "description": "Portal de noticias generalista. 349K seguidores en Instagram. Handle activo real de 'Táchira News'; @tachiranews (sin sufijo) está inactivo.", "url": "https://www.instagram.com/tachiranews.oficial/" },
+    { "id": "19", "order": 9, "scope": "regional", "name": "Diario del Pueblo (@diariodlpueblo)", "description": "Diario digital / portal de noticias generalista. 328K seguidores en Instagram.", "url": "https://www.instagram.com/diariodlpueblo/" },
+    { "id": "20", "order": 10, "scope": "regional", "name": "Tachira Punto Noticias (@tachira.noticias)", "description": "Portal de noticias generalista. 317K seguidores en Instagram.", "url": "https://www.instagram.com/tachira.noticias/" },
+    { "id": "21", "order": 11, "scope": "regional", "name": "Tachira24hrs | Red de Noticias | Servicio Público | Deportes (@tachira24hrs)", "description": "Portal de noticias generalista / agregador. 253K seguidores en Instagram.", "url": "https://www.instagram.com/tachira24hrs/" },
+    { "id": "22", "order": 12, "scope": "regional", "name": "Reporte La Grita (@reportelagrita)", "description": "Medio municipal (La Grita / municipio Jáuregui). 205K seguidores en Instagram.", "url": "https://www.instagram.com/reportelagrita/" },
+    { "id": "23", "order": 13, "scope": "regional", "name": "Yo Reporto a La Nación (@yoreportoalanacion)", "description": "Cuenta comunitaria/alterna de Diario La Nación. 174K seguidores en Instagram.", "url": "https://www.instagram.com/yoreportoalanacion/" },
+    { "id": "24", "order": 14, "scope": "regional", "name": "Conexión Táchira - Noticias Táchira (@conexiontachira)", "description": "Portal de noticias / red hiperlocal (red CNT Táchira). 142K seguidores en Instagram.", "url": "https://www.instagram.com/conexiontachira/" },
+    { "id": "25", "order": 15, "scope": "regional", "name": "Reporte.Táchira | Noticias de Táchira y Venezuela (@reporte.tachira)", "description": "Portal de noticias generalista (red CNT Táchira). 109K seguidores en Instagram.", "url": "https://www.instagram.com/reporte.tachira/" },
+    { "id": "26", "order": 16, "scope": "regional", "name": "La Red Táchira (@laredtachira)", "description": "Portal de noticias generalista. 93.9K seguidores en Instagram.", "url": "https://www.instagram.com/laredtachira/" },
+    { "id": "27", "order": 17, "scope": "regional", "name": "Tachiranoticia (@tachiranoticia)", "description": "Portal de noticias / servicios públicos y denuncias. 74K seguidores en Instagram.", "url": "https://www.instagram.com/tachiranoticia/" },
+    { "id": "28", "order": 18, "scope": "regional", "name": "Tachira Punto Noticias (cuenta de respaldo) (@tachira.noticias1)", "description": "Portal de noticias generalista (respaldo). 67.7K seguidores en Instagram.", "url": "https://www.instagram.com/tachira.noticias1/" },
+    { "id": "29", "order": 19, "scope": "regional", "name": "Táchira noticias (@tachiranoticias_)", "description": "Portal de noticias / comunidad (San Cristóbal). 65.9K seguidores en Instagram.", "url": "https://www.instagram.com/tachiranoticias_/" },
+    { "id": "30", "order": 20, "scope": "regional", "name": "San Cristóbal | Noticias | Eventos y Comunidad (@noti.sancristobal)", "description": "Medio municipal (San Cristóbal). 54.7K seguidores en Instagram.", "url": "https://www.instagram.com/noti.sancristobal/" },
+    { "id": "31", "order": 21, "scope": "regional", "name": "Fogón Informativo Táchira (@fogoninformativo)", "description": "Portal de noticias generalista. 49K seguidores en Instagram.", "url": "https://www.instagram.com/fogoninformativo/" },
+    { "id": "32", "order": 22, "scope": "regional", "name": "Notitachira (@ntnotitachira)", "description": "Portal de noticias generalista. 45K seguidores en Instagram.", "url": "https://www.instagram.com/ntnotitachira/" },
+    { "id": "33", "order": 23, "scope": "regional", "name": "Megavision (@megavision.ve)", "description": "Medio institucional / televisora regional tachirense. 39.7K seguidores en Instagram. Cuenta de un canal de TV, no medio nativo digital.", "url": "https://www.instagram.com/megavision.ve/" },
+    { "id": "34", "order": 24, "scope": "regional", "name": "La Red de Noticias del Táchira (@laredsancristobal)", "description": "Medio municipal (San Cristóbal). 34.4K seguidores en Instagram.", "url": "https://www.instagram.com/laredsancristobal/" },
+    { "id": "35", "order": 25, "scope": "regional", "name": "Centro de Noticias Táchira (@centrodenoticiastachira)", "description": "Portal de noticias / cabecera de red hiperlocal (red CNT Táchira). 31.4K seguidores en Instagram.", "url": "https://www.instagram.com/centrodenoticiastachira/" },
+    { "id": "36", "order": 26, "scope": "regional", "name": "Ntnotitachira (cuenta alterna) (@nt_notitachira)", "description": "Portal de noticias (respaldo de @ntnotitachira). 21.6K seguidores en Instagram.", "url": "https://www.instagram.com/nt_notitachira/" },
+    { "id": "37", "order": 27, "scope": "regional", "name": "LaGritaNoticias (@lagritanoticias)", "description": "Medio municipal (La Grita). 20K seguidores en Instagram.", "url": "https://www.instagram.com/lagritanoticias/" },
+    { "id": "38", "order": 28, "scope": "regional", "name": "Sucesos Táchira (@sucesostachira)", "description": "Medio de sucesos / seguridad (policiales, judiciales). 15.6K seguidores en Instagram.", "url": "https://www.instagram.com/sucesostachira/" },
+    { "id": "39", "order": 29, "scope": "regional", "name": "Noticias de Táchira y la zona norte (@tachiranorte)", "description": "Medio regional (zona norte del estado). 14.4K seguidores en Instagram.", "url": "https://www.instagram.com/tachiranorte/" },
+    { "id": "40", "order": 30, "scope": "regional", "name": "La Red Táchira (cuenta alterna) (@laredtachira1)", "description": "Portal de noticias (respaldo de @laredtachira). 12.8K seguidores en Instagram.", "url": "https://www.instagram.com/laredtachira1/" },
+    { "id": "41", "order": 31, "scope": "regional", "name": "La Voz del Táchira | Portal de Noticias (@lavozdeltachira)", "description": "Portal de noticias generalista. 10.7K seguidores en Instagram.", "url": "https://www.instagram.com/lavozdeltachira/" },
+    { "id": "42", "order": 32, "scope": "regional", "name": "Tachira prensa 2.0 (@tachira_prensa2.0)", "description": "Canal cultural / medio digital regional. 10.1K seguidores en Instagram.", "url": "https://www.instagram.com/tachira_prensa2.0/" },
+    { "id": "43", "order": 33, "scope": "regional", "name": "Noticias del Táchira, Venezuela, Colombia y el mundo (@infotachira24)", "description": "Portal de noticias generalista. 7.4K seguidores en Instagram.", "url": "https://www.instagram.com/infotachira24/" },
+    { "id": "44", "order": 34, "scope": "regional", "name": "Portinformacionestachira (@portinformacionestachira)", "description": "Canal informativo generalista. 6.1K seguidores en Instagram.", "url": "https://www.instagram.com/portinformacionestachira/" },
+    { "id": "45", "order": 35, "scope": "regional", "name": "Tachira 24 Horas (@tachira24horas)", "description": "Portal de noticias / info empresarial y social (zona fronteriza). 5.9K seguidores en Instagram.", "url": "https://www.instagram.com/tachira24horas/" },
+    { "id": "46", "order": 36, "scope": "regional", "name": "Tachira Informa (@tachira_news)", "description": "Portal de noticias generalista. 4.5K seguidores en Instagram.", "url": "https://www.instagram.com/tachira_news/" },
+    { "id": "47", "order": 37, "scope": "regional", "name": "La Voz del Táchira | Noticias (@lavozdeltachira_ve)", "description": "Portal de noticias (cuenta alterna). 2.5K seguidores en Instagram.", "url": "https://www.instagram.com/lavozdeltachira_ve/" },
+    { "id": "48", "order": 38, "scope": "regional", "name": "La Prensa Táchira (@laprensatachira)", "description": "Medio digital independiente (cuenta alterna). 2.5K seguidores en Instagram.", "url": "https://www.instagram.com/laprensatachira/" },
+    { "id": "49", "order": 39, "scope": "regional", "name": "Rubio Noticias al Día 2019 (@rubionoticiasaldia)", "description": "Medio municipal (Rubio). 2.2K seguidores en Instagram.", "url": "https://www.instagram.com/rubionoticiasaldia/" },
+    { "id": "50", "order": 40, "scope": "regional", "name": "Informa Táchira (@informa_tachira)", "description": "Portal de noticias generalista. 2.2K seguidores en Instagram.", "url": "https://www.instagram.com/informa_tachira/" },
+    { "id": "51", "order": 41, "scope": "regional", "name": "Noticias del Táchira (@diariotachira)", "description": "Portal de noticias generalista. 1.8K seguidores en Instagram.", "url": "https://www.instagram.com/diariotachira/" },
+    { "id": "52", "order": 42, "scope": "regional", "name": "Cordero Táchira Venezuela (@corderoenfotos)", "description": "Medio comunitario / fotográfico (Cordero). 808 seguidores en Instagram. Cuenta pequeña; enfocada en fotografía comunitaria más que en noticias puras.", "url": "https://www.instagram.com/corderoenfotos/" },
+    { "id": "53", "order": 43, "scope": "regional", "name": "Noticias, política, farándula, memes, Táchira (@lamugroteca2.0)", "description": "Medio de farándula / entretenimiento y humor. 712 seguidores en Instagram. Cuenta pequeña pero activa.", "url": "https://www.instagram.com/lamugroteca2.0/" },
+    { "id": "54", "order": 44, "scope": "regional", "name": "Tachira al Día (@tachira_aldia)", "description": "Portal de noticias generalista. 560 seguidores en Instagram. Cuenta pequeña, solo 5 publicaciones.", "url": "https://www.instagram.com/tachira_aldia/" },
+    { "id": "55", "order": 45, "scope": "regional", "name": "Lagritanoticiastachira (@lagritanoticiastachira)", "description": "Medio municipal (La Grita). 547 seguidores en Instagram. Cuenta pequeña.", "url": "https://www.instagram.com/lagritanoticiastachira/" },
+    { "id": "56", "order": 46, "scope": "regional", "name": "Táchira 24_7 (@tachira24_7)", "description": "Portal de noticias generalista. 513 seguidores en Instagram. Cuenta pequeña.", "url": "https://www.instagram.com/tachira24_7/" },
+    { "id": "57", "order": 47, "scope": "regional", "name": "Rubionoticias (@rubionoticias)", "description": "Medio municipal (Rubio). 429 seguidores en Instagram. Cuenta pequeña.", "url": "https://www.instagram.com/rubionoticias/" },
+    { "id": "58", "order": 48, "scope": "regional", "name": "San Cristóbal Noticias (@sancris_noticias)", "description": "Medio municipal (San Cristóbal). 280 seguidores en Instagram. Cuenta pequeña.", "url": "https://www.instagram.com/sancris_noticias/" },
+    { "id": "59", "order": 49, "scope": "regional", "name": "Noticias Capacho Nuevo (@politica_capachonuevo)", "description": "Medio municipal (Capacho). 263 seguidores en Instagram. Cuenta pequeña.", "url": "https://www.instagram.com/politica_capachonuevo/" },
+    { "id": "60", "order": 50, "scope": "regional", "name": "Prensa 171 Táchira (@emergencias171tachira)", "description": "Medio de emergencias / sucesos. 198 seguidores en Instagram. Cuenta pequeña.", "url": "https://www.instagram.com/emergencias171tachira/" },
+    { "id": "61", "order": 51, "scope": "regional", "name": "La voz del agro Táchira (@lavozdelagrotachira)", "description": "Medio institucional/radio - segmento agro. 141 seguidores en Instagram. Extensión de un programa de radio (Mastermix 91.5 FM).", "url": "https://www.instagram.com/lavozdelagrotachira/" },
+    { "id": "62", "order": 52, "scope": "regional", "name": "NotiTachira (@notit.achira)", "description": "Portal de noticias generalista. 123 seguidores en Instagram. Cuenta pequeña.", "url": "https://www.instagram.com/notit.achira/" },
+    { "id": "63", "order": 53, "scope": "regional", "name": "Perla del Torbes (@taribanoticias1)", "description": "Medio municipal (Táriba). 114 seguidores en Instagram. Cuenta pequeña.", "url": "https://www.instagram.com/taribanoticias1/" },
+    { "id": "64", "order": 54, "scope": "regional", "name": "Táchira Hoy (@tachira.hoy)", "description": "Portal de noticias generalista. 111 seguidores en Instagram. Cuenta pequeña.", "url": "https://www.instagram.com/tachira.hoy/" },
     { "id": "4", "order": 1, "scope": "nacional", "name": "El Nacional", "description": "Uno de los diarios nacionales de mayor circulación digital.", "url": "https://www.elnacional.com" },
     { "id": "5", "order": 2, "scope": "nacional", "name": "El Universal", "description": "Diario nacional de referencia, fundado en 1909.", "url": "https://www.eluniversal.com" },
     { "id": "6", "order": 3, "scope": "nacional", "name": "Efecto Cocuyo", "description": "Medio digital independiente especializado en verificación y datos.", "url": "https://efectococuyo.com" },
@@ -789,6 +843,69 @@ const reportRows = [
   ['Mensual (por fase)','KPIs de especiales + crecimiento de seguidores','Director Estratégico — informe ejecutivo de 1 página'],
   ['Cierre del plan (día 72)','Resumen de los 4 pilares + recomendación para la siguiente fase','Equipo estratégico completo']
 ];
+
+/* Recomendaciones de formato por plataforma (Banco de contenidos).
+   Contenido fijo acordado con el equipo -- igual que platformRows/reportRows,
+   no viene de Firestore. */
+const PLATFORM_ORDER = ['instagram', 'tiktok', 'facebook', 'x'];
+const PLATFORM_LABELS = { instagram: 'Instagram', tiktok: 'TikTok', facebook: 'Facebook', x: 'X' };
+/* Íconos dibujados con primitivas SVG (rect/circle/text), en el mismo
+   espíritu que los logos de cada red -- el tamaño lo controla el CSS
+   del contenedor (.platform-link-icon / .platform-tab-icon), no el svg.
+   (Los archivos reales viven en assets/icons/, subidos por el equipo.) */
+const PLATFORM_ICONS = {
+  instagram: '<img src="assets/icons/instagram.png" alt="" width="132" height="132">',
+  tiktok: '<img src="assets/icons/tiktok.png" alt="" width="129" height="132">',
+  facebook: '<img src="assets/icons/facebook.png" alt="" width="132" height="132">',
+  x: '<img src="assets/icons/x.jpg" alt="" width="132" height="122">'
+};
+const PLATFORM_FORMATS = {
+  instagram: {
+    tagline: 'Plataforma de posicionamiento y estética institucional.',
+    cadence: '4-5 piezas / semana',
+    formats: [
+      { name: 'Reel narrativo', duration: '15-30 seg', when: 'Anuncios, inauguraciones, avances de obra', notes: 'Cortes rápidos, texto en pantalla, música de tendencia moderada (no debe competir con la narrativa institucional).' },
+      { name: 'Carrusel informativo', duration: '5-8 slides', when: 'Cifras de gestión, explicación de un programa, "antes/después"', notes: 'Slide 1 = gancho visual fuerte; última slide = CTA claro.' },
+      { name: 'Post estático + copy largo', duration: '', when: 'Reconocimientos, comunicados formales, citas del Gobernador', notes: 'Diseño alineado a manual de marca (negro/dorado si es Gobernación, azul marino si es FUNDESTA).' },
+      { name: 'Stories', duration: 'serie de 3-5', when: 'Cobertura en vivo de eventos, detrás de cámaras', notes: 'Usar stickers de encuesta/pregunta para generar interacción medible.' },
+      { name: 'Guías guardables', duration: '', when: 'Contenido de servicio (trámites, requisitos, rutas de atención)', notes: 'Pensado para que el usuario lo guarde y regrese a consultarlo.' }
+    ]
+  },
+  tiktok: {
+    tagline: 'Plataforma de alcance y cercanía humana.',
+    cadence: '2-3 videos / semana',
+    formats: [
+      { name: 'Día en la vida / detrás de cámaras', duration: '', when: 'Humanizar la gestión, mostrar equipos técnicos trabajando', notes: 'Tono informal, cámara al hombro, sin sobreproducir.' },
+      { name: 'Explicativo rápido ("te explico")', duration: '60 seg', when: 'Programas o políticas que la gente no entiende bien (ej. ZEEFT, PVC)', notes: 'Un solo presentador, lenguaje sencillo, subtítulos siempre.' },
+      { name: 'Testimonial ciudadano corto', duration: '10-15 seg c/u', when: 'Impacto directo de un programa social', notes: 'Preguntas breves, respuestas de 10-15 seg, varios testimonios en un mismo video.' },
+      { name: 'Reacción a cifras/logros', duration: '', when: 'Resultados de gestión mensual o trimestral', notes: 'Gráficos simples animados, tono de "esto es lo que se logró".' },
+      { name: 'Trend adaptado institucionalmente', duration: '', when: 'Solo cuando el trend permite mensaje claro sin restarle seriedad a la institución', notes: 'Usar con moderación — filtrar por coherencia de posicionamiento antes de aprobar.' }
+    ]
+  },
+  facebook: {
+    tagline: 'Plataforma de profundidad y comunidad.',
+    cadence: '3-4 publicaciones / semana',
+    formats: [
+      { name: 'Post + artículo/nota de prensa enlazada', duration: '', when: 'Anuncios formales, rendición de cuentas', notes: 'Copy de 3-5 líneas que resuma lo esencial, enlace a nota completa.' },
+      { name: 'Álbum fotográfico de evento', duration: '8-12 fotos', when: 'Cobertura extensa de actos protocolares o jornadas', notes: 'Fotos curadas, pie de foto con contexto.' },
+      { name: 'Video en vivo (Facebook Live)', duration: '', when: 'Eventos de alto interés público, inauguraciones grandes', notes: 'Anunciar con antelación en Stories/IG para direccionar audiencia.' },
+      { name: 'Post de comunidad / agradecimiento', duration: '', when: 'Cierre de jornadas, agradecimiento a equipos o beneficiarios', notes: 'Tono cercano, etiquetar instituciones y personas involucradas cuando aplique.' }
+    ]
+  },
+  x: {
+    tagline: 'Plataforma de vocería directa e institucional — es donde el Gobernador tiene mayor audiencia acumulada y más margen de crecimiento en uso, así que se trata como canal propio, no como réplica de lo publicado en IG/FB.',
+    cadence: '1-2 tweets/día + 1 hilo explicativo/semana',
+    formats: [
+      { name: 'Tweet de anuncio/declaración', duration: '', when: 'Comunicados oficiales, posicionamientos, primeras reacciones a hechos noticiosos', notes: 'Máximo 2-3 líneas, tono directo, sin adornos gráficos; la fuerza está en el texto y el timing (publicar cuando el tema es tendencia).' },
+      { name: 'Hilo explicativo', duration: '5-10 tweets', when: 'Desglosar una política, rendir cuentas de una gestión, responder a críticas con datos', notes: 'Primer tweet = gancho que resuma la conclusión; cada tweet siguiente aporta un dato o paso; cerrar con CTA o resumen.' },
+      { name: 'Video nativo corto', duration: '30-60 seg', when: 'Declaraciones en cámara, cortes de discursos, anuncios en video', notes: 'Subtítulos siempre (mucho consumo sin audio); subir nativo a X, no solo enlazar YouTube/IG.' },
+      { name: 'Quote tweet con comentario institucional', duration: '', when: 'Reaccionar a medios, otras instituciones o ciudadanos de forma controlada', notes: 'Útil para corregir información o sumarse a una conversación sin abrir un tema nuevo.' },
+      { name: 'Encuesta (poll)', duration: '', when: 'Sondear percepción rápida sobre un tema de gestión, generar interacción medible', notes: 'Preguntas cerradas, 2-4 opciones, resultado se puede reutilizar como contenido en un tweet posterior.' },
+      { name: 'Hilo de cobertura en vivo (live-tweeting)', duration: '', when: 'Eventos protocolares, jornadas, inauguraciones', notes: 'Tweets cortos y espaciados en tiempo real, con foto o video corto en cada uno.' },
+      { name: 'Space (audio en vivo)', duration: '', when: 'Rendición de cuentas conversacional, entrevistas con voceros institucionales', notes: 'Mejor con invitados de otras instituciones (refuerza la lógica de vocería descentralizada del LOST).' }
+    ]
+  }
+};
 
 /* ============ 2 · UTILIDADES ============ */
 const $ = function (id) { return document.getElementById(id); };
@@ -922,6 +1039,15 @@ function daysUntil(dateStr) {
   return Math.round((end.getTime() - today.getTime()) / 86400000);
 }
 
+/* Lunes siguiente a "from" -- si "from" ya es lunes, salta al de la
+   semana entrante (nunca devuelve el mismo día). */
+function nextMonday(from) {
+  const d = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const add = ((8 - d.getDay()) % 7) || 7;
+  d.setDate(d.getDate() + add);
+  return d;
+}
+
 /* Independiente del resto de renderMeta() para poder refrescarse solo
    (ver boot()): así el recuento de días sigue correcto aunque la
    pestaña quede abierta de un día para otro, sin re-renderizar todo. */
@@ -943,6 +1069,9 @@ function updateDateDisplay() {
     else countdown = 'Plan finalizado';
   }
   setHTML('brandCountdown', countdown);
+
+  const monday = nextMonday(today);
+  setHTML('updateNextDate', fmtDay(monday) + ' ' + monday.getFullYear());
 }
 
 /* ============ 4 · RENDER ============ */
@@ -1640,6 +1769,85 @@ function renderContentSummaries() {
       '</p>' +
       '<p style="margin:8px 0 0;font-size:11.5px;color:var(--gray);font-style:italic;">' + txt(it.note) + '</p>'));
   });
+}
+
+/* Los 4 accesos de Banco de contenidos abren una sub-página propia
+   (#platformDetail) en vez de mostrar la cuadrícula en el mismo panel --
+   reutiliza el mismo mecanismo de .panel/.panel.active que el resto de
+   la navegación (ver goToSection), pero sin pasar por el sidebar. */
+function renderPlatformLinks() {
+  const wrap = $('platformLinks');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  PLATFORM_ORDER.forEach(function (p) {
+    const btn = el('button', 'platform-link',
+      '<span class="platform-link-icon">' + PLATFORM_ICONS[p] + '</span>' +
+      '<span class="platform-link-label">' + PLATFORM_LABELS[p] + '</span>' +
+      '<span class="platform-link-arrow" aria-hidden="true">→</span>');
+    btn.type = 'button';
+    btn.addEventListener('click', function () { openPlatformDetail(p); });
+    wrap.appendChild(btn);
+  });
+}
+
+function renderPlatformDetailTabs(active) {
+  const wrap = $('platformDetailTabs');
+  if (!wrap) return;
+  wrap.innerHTML = '';
+  PLATFORM_ORDER.forEach(function (p) {
+    const on = p === active;
+    const btn = el('button', 'platform-tab' + (on ? ' active' : ''),
+      '<span class="platform-tab-icon">' + PLATFORM_ICONS[p] + '</span>' + PLATFORM_LABELS[p]);
+    btn.type = 'button';
+    btn.setAttribute('role', 'tab');
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    btn.addEventListener('click', function () { openPlatformDetail(p); });
+    wrap.appendChild(btn);
+  });
+}
+
+function openPlatformDetail(platform) {
+  const data = PLATFORM_FORMATS[platform];
+  if (!data) return;
+
+  document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+  const panel = $('platformDetail');
+  if (panel) panel.classList.add('active');
+
+  setHTML('platformDetailTitle', PLATFORM_LABELS[platform]);
+  setHTML('platformDetailTagline', data.tagline);
+  setHTML('platformDetailCadence', data.cadence ? 'Cadencia sugerida: ' + data.cadence : '');
+  renderPlatformDetailTabs(platform);
+
+  const list = $('platformDetailList');
+  if (list) {
+    list.innerHTML = '';
+    if (!data.formats.length) {
+      list.appendChild(el('div', 'empty', 'Sin formatos cargados todavía para esta plataforma.'));
+    } else {
+      data.formats.forEach(function (f) {
+        list.appendChild(el('div', 'card format-card',
+          '<p class="format-name">' + txt(f.name) + '</p>' +
+          (txt(f.duration).trim() ? '<span class="format-duration">' + txt(f.duration) + '</span>' : '') +
+          '<p class="format-row"><b>Cuándo usarlo</b>' + txt(f.when) + '</p>' +
+          '<p class="format-row"><b>Notas de producción</b>' + txt(f.notes) + '</p>'));
+      });
+    }
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function closePlatformDetail() {
+  document.querySelectorAll('.panel').forEach(function (p) { p.classList.remove('active'); });
+  const pilares = $('pilares');
+  if (pilares) pilares.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function wirePlatformDetail() {
+  renderPlatformLinks();
+  const back = $('platformBackBtn');
+  if (back) back.addEventListener('click', closePlatformDetail);
 }
 
 function renderWeekly() {
@@ -3197,6 +3405,7 @@ async function boot() {
   renderStaticTables();
   renderAllFromState(); // contenido local inmediato: nunca hay pantalla en blanco
   wireStaticButtons();
+  wirePlatformDetail();
   wireFbDialog();
   wireLogoModal();
   wireCalendarNav();

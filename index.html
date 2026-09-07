@@ -78,13 +78,19 @@
           <h2>Centro de Control</h2>
           <p class="sub" id="heroSub"></p>
         </div>
-        <div class="chips">
-          <span class="chip"><span class="dot"></span>72 días</span>
-          <span class="chip"><span class="dot"></span>4 categorías</span>
-          <span class="chip"><span class="dot"></span>5 piezas / semana</span>
-          <span class="chip"><span class="dot"></span>3 plataformas</span>
-          <span class="chip"><span class="dot"></span><span id="chipResumenEntes">0 entes</span></span>
-          <span class="chip"><span class="dot"></span><span id="chipResumenVerificadas">0 verificadas</span></span>
+        <div class="topline-right">
+          <div class="update-badge">
+            <p class="update-badge-main">Se actualiza semanalmente después de revisión de todos los medios de comunicación y las cuentas de contenido de gestión.</p>
+            <span class="update-badge-next">Próxima actualización: <b id="updateNextDate">—</b></span>
+          </div>
+          <div class="chips">
+            <span class="chip"><span class="dot"></span>72 días</span>
+            <span class="chip"><span class="dot"></span>4 categorías</span>
+            <span class="chip"><span class="dot"></span>5 piezas / semana</span>
+            <span class="chip"><span class="dot"></span>3 plataformas</span>
+            <span class="chip"><span class="dot"></span><span id="chipResumenEntes">0 entes</span></span>
+            <span class="chip"><span class="dot"></span><span id="chipResumenVerificadas">0 verificadas</span></span>
+          </div>
         </div>
       </div>
 
@@ -178,9 +184,41 @@
         </div>
       </div>
 
-      <div class="section-title first-title"><h3>Resúmenes de gestión</h3><span class="num" id="summariesCount">0 vinculados</span></div>
+      <div class="section-title first-title"><h3>Recomendaciones de formato por plataforma</h3></div>
+      <p class="chart-sub" style="margin:-8px 0 14px;">Abre una plataforma para ver su guía de formatos: cuándo usarlos y las notas de producción de cada uno.</p>
+
+      <div class="platform-links" id="platformLinks"></div>
+
+      <div class="section-title"><h3>Resúmenes de gestión</h3><span class="num" id="summariesCount">0 vinculados</span></div>
       <p class="chart-sub" style="margin:-8px 0 14px;">Resúmenes semanales, mensuales, trimestrales y semestrales de la gestión. Se redactan aquí y después se vinculan a una publicación del calendario.</p>
       <div class="grid grid-2" id="summariesList"></div>
+    </section>
+
+    <!-- ============ 02B FORMATOS POR PLATAFORMA (sub-página de Banco de contenidos) ============ -->
+    <section class="panel" id="platformDetail">
+      <button type="button" class="back-link" id="platformBackBtn">← Volver a Banco de contenidos</button>
+
+      <div class="topline">
+        <div>
+          <h2 id="platformDetailTitle">—</h2>
+          <p class="sub" id="platformDetailTagline"></p>
+        </div>
+        <span class="platform-cadence" id="platformDetailCadence"></span>
+      </div>
+
+      <div class="platform-tabs" id="platformDetailTabs" role="tablist"></div>
+
+      <div class="grid grid-2" id="platformDetailList"></div>
+
+      <div class="note" style="margin:18px 0 0;">
+        <b>Antes de aprobar una propuesta, revisa:</b>
+        <ul style="margin:8px 0 0;padding-left:18px;">
+          <li>¿Activa un mensaje clave de la estrategia de comunicación digital vigente?</li>
+          <li>¿Es coherente con el posicionamiento de la marca Gestión (no se mezcla con marca Personal ni Territorio sin justificación)?</li>
+          <li>¿Tiene relevancia territorial ZEEFT o valor para algún microsegmento identificado?</li>
+          <li>¿El formato elegido es el que mejor sirve al objetivo, o se está usando por costumbre (ej. todo en post estático)?</li>
+        </ul>
+      </div>
     </section>
 
     <!-- ============ 03 SEGMENTOS DE LA GESTIÓN ============ -->
