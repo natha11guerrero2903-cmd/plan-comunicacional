@@ -299,88 +299,19 @@ const DEFAULT_DATA = {
       "imageUrl": ""
     }
   ],
-  "weekly": [
-    {
-      "id": "miercoles",
-      "order": 1,
-      "day": "Miércoles",
-      "title": "Obra de la semana",
-      "format": "Reel 45-60 s · 9:16",
-      "objective": "Mostrar una obra terminada con antes/después y ficha de datos en pantalla.",
-      "time": "7:30 p.m."
-    },
-    {
-      "id": "jueves",
-      "order": 2,
-      "day": "Jueves",
-      "title": "¿Cómo va?",
-      "format": "Carrusel · 5-6 láminas",
-      "objective": "Estado de avance de lo que está en ejecución, con porcentaje y fecha comprometida.",
-      "time": "12:30 p.m."
-    },
-    {
-      "id": "viernes",
-      "order": 3,
-      "day": "Viernes",
-      "title": "Resuelto",
-      "format": "Reel 30-40 s · 9:16",
-      "objective": "Cerrar en público un reporte ciudadano: mensaje, cuadrilla y resultado.",
-      "time": "7:00 p.m."
-    },
-    {
-      "id": "sabado",
-      "order": 4,
-      "day": "Sábado",
-      "title": "La cuadrilla",
-      "format": "Reel documental · 60-75 s",
-      "objective": "Poner cara y oficio al equipo que ejecuta, en su ruta real de trabajo.",
-      "time": "11:00 a.m."
-    },
-    {
-      "id": "domingo",
-      "order": 5,
-      "day": "Domingo",
-      "title": "Cuentas de la semana",
-      "format": "Carrusel 4 láminas + Stories",
-      "objective": "Cerrar con tres cifras verificables de la semana y la fuente de cada una.",
-      "time": "6:00 p.m."
-    }
-  ],
-  "specials": [
-    {
-      "id": "1",
-      "order": 1,
-      "title": "Lo que cambió en tu calle",
-      "phase": "Fase 1 · 12 sep 2026",
-      "format": "Reel documental · 90 s",
-      "theme": "Recorrido de una misma calle grabado con dron y a pie: el material de archivo del deterioro contra la toma actual, en el mismo orden de planos.",
-      "hook": "Primeros 3 segundos: la toma de archivo del bache y el corte seco a la calle asfaltada, sin locución.",
-      "development": "Tres vecinos cuentan qué hacían antes para poder pasar por ahí. Entre testimonio y testimonio, rótulos con fecha de inicio, fecha de entrega y monto ejecutado.",
-      "cta": "«¿Cuál es la calle que falta en tu sector? Escríbela en los comentarios» — se responde con el cronograma real."
-    },
-    {
-      "id": "2",
-      "order": 2,
-      "title": "Un día con la cuadrilla",
-      "phase": "Fase 2 · 3 oct 2026",
-      "format": "Mini-documental · 2-3 min",
-      "theme": "Jornada completa de una cuadrilla de servicios desde las 5 a.m.: el galpón, la ruta, la avería y el cierre del turno.",
-      "hook": "El despertador de un operador a las 4:30 a.m. y su casco sobre la mesa.",
-      "development": "Se sigue una sola avería de principio a fin, con el tiempo transcurrido en pantalla. Sin música épica: sonido ambiente y las voces del equipo.",
-      "cta": "«Así se atiende un reporte. El tuyo entra por aquí» — enlace al canal de reportes fijado en el perfil."
-    },
-    {
-      "id": "3",
-      "order": 3,
-      "title": "Cuentas en la mano",
-      "phase": "Fase 4 · 2 nov 2026",
-      "format": "Reel de rendición · 90 s",
-      "theme": "Balance de los 72 días grabado en las obras entregadas y no en oficina: cada cifra se dice parado en el lugar que la produjo.",
-      "hook": "«Hace 72 días dijimos que íbamos a entregar esto. Esto fue lo que pasó.»",
-      "development": "Tres bloques: lo entregado, lo que sigue en ejecución con nueva fecha, y lo que no se logró. Cada bloque con su cifra y su fuente en pantalla.",
-      "cta": "«El detalle completo, parroquia por parroquia, en el informe fijado» — carrusel de soporte publicado el mismo día."
-    }
-  ],
+  /* El equipo pidió quitar la cadencia semanal fija de piezas sobre obras
+     y cuadrilla (Obra de la semana, ¿Cómo va?, Resuelto, La cuadrilla,
+     Cuentas de la semana) porque esas iniciativas no se están ejecutando
+     ni encaminando en la realidad -- publicar contenido sobre ellas sería
+     mostrar algo que no está pasando. Se deja vacío a propósito: el
+     calendario ahora solo muestra los resúmenes de gestión reales
+     (semanal/quincenal/mensual, ver buildScheduleOccurrences) hasta que
+     el equipo defina una nueva cadencia de piezas semanales real. */
+  "weekly": [],
+  /* Mismo motivo: las 3 piezas especiales (calle, cuadrilla, rendición de
+     72 días) estaban construidas sobre el mismo relato de obras que no
+     se está cumpliendo. Vacío a propósito -- no se inventan reemplazos. */
+  "specials": [],
   "phases": [
     {
       "id": "1",
@@ -491,6 +422,11 @@ const DEFAULT_DATA = {
       "status": null
     }
   ],
+  /* Se quitó el grupo "Producción semanal y especiales" completo (9 ítems
+     sobre las cinco piezas de lunes/martes, versión TikTok, especial de
+     fase, etc.) y los 3 ítems de "Calendario y coordinación" sobre obras
+     y cuadrilla -- verificaban justo la cadencia de piezas que se retiró
+     del calendario por no estar encaminada en la realidad. */
   "checklist": [
     {
       "id": "grupo1",
@@ -532,67 +468,12 @@ const DEFAULT_DATA = {
       ]
     },
     {
-      "id": "grupo2",
-      "order": 2,
-      "title": "Producción semanal y especiales",
-      "items": [
-        {
-          "text": "¿Las cinco piezas de la semana quedaron grabadas en el bloque de lunes y martes?",
-          "checked": false
-        },
-        {
-          "text": "¿Cada pieza tiene subtítulos quemados y se entiende sin audio?",
-          "checked": false
-        },
-        {
-          "text": "¿El antes/después usa el mismo encuadre y la misma altura de cámara?",
-          "checked": false
-        },
-        {
-          "text": "¿El rótulo de datos respeta la plantilla y no tapa rostros ni carteles?",
-          "checked": false
-        },
-        {
-          "text": "¿La versión de TikTok se recortó y reeditó, en vez de reciclar la de Instagram?",
-          "checked": false
-        },
-        {
-          "text": "¿El especial de la fase tiene fecha de grabación y de publicación confirmadas?",
-          "checked": false
-        },
-        {
-          "text": "¿Hay al menos una pieza de reserva grabada por si se cae la agenda de terreno?",
-          "checked": false
-        },
-        {
-          "text": "¿El copy evita mensajes de campaña electoral, siglas de partido o llamados al voto, incluso siendo contenido de gestión?",
-          "checked": false
-        },
-        {
-          "text": "¿La música de fondo está libre de derechos de autor?",
-          "checked": false
-        }
-      ]
-    },
-    {
       "id": "grupo3",
-      "order": 3,
+      "order": 2,
       "title": "Calendario y coordinación",
       "items": [
         {
-          "text": "¿El cronograma de obras del mes está cruzado con la grilla de publicación?",
-          "checked": false
-        },
-        {
-          "text": "¿Se avisó a la cuadrilla y al enlace de la parroquia con 48 horas de anticipación?",
-          "checked": false
-        },
-        {
           "text": "¿Los reportes ciudadanos de la semana están clasificados y con responsable asignado?",
-          "checked": false
-        },
-        {
-          "text": "¿El informe del lunes salió con los KPIs de las cinco piezas y las menciones detectadas?",
           "checked": false
         },
         {
@@ -603,7 +484,7 @@ const DEFAULT_DATA = {
     },
     {
       "id": "grupo4",
-      "order": 4,
+      "order": 3,
       "title": "Verificación de cuentas del ecosistema",
       "items": [
         {
@@ -797,10 +678,11 @@ const DEFAULT_DATA = {
   ],
   "newsItems": [],
   "contentSummaries": [
-    { "id": "1", "order": 1, "type": "Resumen semanal", "title": "", "note": "Se propone para los lunes. Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
-    { "id": "2", "order": 2, "type": "Resumen mensual", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
-    { "id": "3", "order": 3, "type": "Resumen trimestral", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
-    { "id": "4", "order": 4, "type": "Resumen semestral", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false }
+    { "id": "1", "order": 1, "type": "Resumen semanal", "title": "", "note": "Ya aparece automáticamente en el Calendario de gestión cada lunes (resumen de la semana anterior). Falta redactar el contenido real de cada semana.", "linked": false },
+    { "id": "2", "order": 2, "type": "Resumen quincenal", "title": "", "note": "Ya aparece automáticamente en el Calendario de gestión el día 1 y el 16 de cada mes (o el día hábil siguiente). Falta redactar el contenido real de cada quincena.", "linked": false },
+    { "id": "3", "order": 3, "type": "Resumen mensual", "title": "", "note": "Ya aparece automáticamente en el Calendario de gestión el primer día hábil de cada mes. Falta redactar el contenido real de cada mes.", "linked": false },
+    { "id": "4", "order": 4, "type": "Resumen trimestral", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false },
+    { "id": "5", "order": 5, "type": "Resumen semestral", "title": "", "note": "Aún no redactado — cuando se escriba, se vincula a una publicación del calendario.", "linked": false }
   ],
   /* Percepción ciudadana sobre la gestión: estructura preparada a propósito
      sin metodología ni cifras inventadas. positiva/negativa/neutra quedan
@@ -1988,6 +1870,16 @@ function publicationStatus(id) {
 }
 
 /* Genera cada casilla real del calendario dentro del período del plan. */
+/* Sábado/domingo -> el lunes siguiente. Sin calendario de feriados (no
+   hay una fuente real de feriados del Táchira conectada todavía) -- solo
+   evita caer en fin de semana, que es la parte segura de "día hábil". */
+function nextBusinessDay(d) {
+  const wd = d.getDay();
+  if (wd === 6) return addDays(d, 2);
+  if (wd === 0) return addDays(d, 1);
+  return d;
+}
+
 function buildScheduleOccurrences() {
   const start = parseISO(state.meta && state.meta.periodStart);
   const end = parseISO(state.meta && state.meta.periodEnd);
@@ -2012,11 +1904,38 @@ function buildScheduleOccurrences() {
       const id = iso + '_resumen-semanal';
       out.push({
         id: id, date: iso, weekday: wd, kind: 'resumen', segment: null,
-        title: 'Resumen semanal de gestión (propuesta)', format: 'Carrusel o video corto',
-        objective: 'Cierre de la semana: lo más relevante de los 4 segmentos en una sola pieza.',
+        title: 'Resumen semanal de gestión (semana anterior)', format: 'Carrusel o video corto',
+        objective: 'Cierre de la semana anterior: lo más relevante de los 4 segmentos en una sola pieza.',
         time: '', status: publicationStatus(id)
       });
     }
+
+    // Primer día hábil del mes -> resumen del mes que acaba de cerrar.
+    const firstBizDay = nextBusinessDay(new Date(d.getFullYear(), d.getMonth(), 1));
+    if (isoOf(firstBizDay) === iso) {
+      const id = iso + '_resumen-mensual';
+      out.push({
+        id: id, date: iso, weekday: wd, kind: 'resumen', segment: null,
+        title: 'Resumen mensual de gestión (mes anterior)', format: 'Carrusel o video corto',
+        objective: 'Balance del mes que cerró: avance real por segmento y cifras verificables.',
+        time: '', status: publicationStatus(id)
+      });
+    }
+
+    // Días 1 y 16 (primer día hábil desde ahí) -> resumen de la quincena
+    // que acaba de cerrar (1-15 y 16-fin de mes).
+    [1, 16].forEach(function (dom) {
+      const target = nextBusinessDay(new Date(d.getFullYear(), d.getMonth(), dom));
+      if (isoOf(target) === iso) {
+        const id = iso + '_resumen-quincenal-' + dom;
+        out.push({
+          id: id, date: iso, weekday: wd, kind: 'resumen', segment: null,
+          title: 'Resumen quincenal de gestión (quincena anterior)', format: 'Carrusel o video corto',
+          objective: 'Cierre de la quincena que terminó: avance real por segmento y cifras verificables.',
+          time: '', status: publicationStatus(id)
+        });
+      }
+    });
 
     const w = weeklyByDay[wd];
     if (w) {
