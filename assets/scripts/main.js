@@ -1004,6 +1004,15 @@ function daysUntil(dateStr) {
   return Math.round((end.getTime() - today.getTime()) / 86400000);
 }
 
+/* Lunes siguiente a "from" -- si "from" ya es lunes, salta al de la
+   semana entrante (nunca devuelve el mismo día). */
+function nextMonday(from) {
+  const d = new Date(from.getFullYear(), from.getMonth(), from.getDate());
+  const add = ((8 - d.getDay()) % 7) || 7;
+  d.setDate(d.getDate() + add);
+  return d;
+}
+
 /* Independiente del resto de renderMeta() para poder refrescarse solo
    (ver boot()): así el recuento de días sigue correcto aunque la
    pestaña quede abierta de un día para otro, sin re-renderizar todo. */
@@ -1025,6 +1034,9 @@ function updateDateDisplay() {
     else countdown = 'Plan finalizado';
   }
   setHTML('brandCountdown', countdown);
+
+  const monday = nextMonday(today);
+  setHTML('updateNextDate', fmtDay(monday) + ' ' + monday.getFullYear());
 }
 
 /* ============ 4 · RENDER ============ */
