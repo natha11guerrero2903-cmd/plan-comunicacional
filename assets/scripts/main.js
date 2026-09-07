@@ -636,10 +636,8 @@ const DEFAULT_DATA = {
   "accountSegments": [
     {
       "id": "1", "order": 1, "num": 1, "name": "Seguridad y Paz", "phase": "Fase 1", "symbol": "",
+      "extra": "Según el organigrama estructural de la Gobernación (nivel de descentralización), la Comisión de Seguridad Ciudadana y la Procuraduría General del Estado son dependencias directas del Despacho del Gobernador, no entes descentralizados -- se dejaron de listar aquí el 2026-09-07.",
       "accounts": [
-        { "code": "SEG-01", "name": "Comisión de Seguridad Ciudadana", "status": "candidato", "note": "IG (candidato, sin verificar): @seguridadciudadanatachira",
-          "metrics": { "instagram": { "estado": "activa", "seguidores": 2424, "publicacionesHistorico": 564, "publicacionesUltimoMes": 30, "ultimaPublicacion": "2026-08-31", "likes": 429, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Anuncio oficial DPD Táchira por instrucciones de la Presidenta (E) y el Ministro Cabello", "likes": 164 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
-        { "code": "SEG-02", "name": "Procuraduría General del Estado", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
         { "code": "SEG-03", "name": "Instituto Autónomo de Policía del Estado Táchira", "status": "verificado", "note": "IG: @politachira — verificado | X: @policiatachira — cuenta suspendida (verificado 2026-09-01)",
           "metrics": {
             "instagram": { "estado": "activa", "seguidores": 27907, "publicacionesHistorico": 2082, "publicacionesUltimoMes": 22, "likes": 3282, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Detención de un sujeto en San Juan de Colón tras la difusión del caso", "likes": 988 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
@@ -691,20 +689,10 @@ const DEFAULT_DATA = {
     },
     {
       "id": "3", "order": 3, "num": 3, "name": "Gestión Social y Servicios", "phase": "Fase 3", "symbol": "",
-      "extra": "Incluye 12 oficinas y direcciones internas de la Gobernación que se comunican únicamente a través de @gobernaciondeltachira (no requieren cuenta propia) y 1 empresa inactiva (DESOTA, C.A.).",
+      "extra": "Las 12 oficinas y direcciones internas de la Gobernación que se comunican únicamente a través de @gobernaciondeltachira (Secretaría General de Gobierno, Consejos, Gabinetes Sectoriales, y las direcciones de Despacho, Comunicación, Política y Participación Ciudadana, DISI, Cooperación/Protocolo/RR.II., ODACYSS, Archivo e Imprenta Social) dejaron de listarse una por una el 2026-09-07 -- según el organigrama estructural, ninguna es un ente descentralizado. Su cobertura queda representada por la cuenta central de la Gobernación, junto con la del Gobernador, listadas primero abajo. Incluye además 1 empresa inactiva (DESOTA, C.A.).",
       "accounts": [
-        { "code": "SOC-01", "name": "Secretaría General de Gobierno", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-02", "name": "Consejo Estadal de Planificación y Coordinación de Políticas Públicas", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-03", "name": "Consejo de Gobierno del Estado", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-04", "name": "Gabinetes Sectoriales", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-05", "name": "Dirección de la Secretaría del Despacho del Gobernador", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-06", "name": "Dirección de Comunicación e Información", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-07", "name": "Dirección de Política y Participación Ciudadana", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-08", "name": "Dirección de Sistemas e Informática (DISI)", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-09", "name": "Dirección de Cooperación, Protocolo y Relaciones Institucionales", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-10", "name": "Oficina de Atención Comunitaria y Solidaridad Social (ODACYSS)", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-11", "name": "Oficina Estadal de Archivo", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "SOC-12", "name": "Oficina de la Imprenta Social del Estado", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
+        { "code": "GOB-01", "name": "Gobernación del Estado Táchira (cuenta institucional central)", "status": "verificado", "note": "IG/X: @gobernaciondeltachira — cuenta central de la Gobernación, usada también por sus 12 oficinas y direcciones internas — verificado" },
+        { "code": "GOB-02", "name": "Freddy Bernal (Gobernador del Estado Táchira)", "status": "candidato", "note": "Cuenta pendiente de confirmar -- indícanos el @usuario real de Instagram/X/Facebook del Gobernador para poder darle seguimiento (todavía no se ha verificado ningún handle)." },
         { "code": "SOC-13", "name": "CORPOSALUD", "status": "verificado", "note": "IG: @corposalud_tachira (28K seg.) — verificado",
           "metrics": { "instagram": { "estado": "activa", "seguidores": 32686, "publicacionesHistorico": 6823, "publicacionesUltimoMes": 9, "ultimaPublicacion": "2026-08-31", "likes": 471, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Orientación sobre a qué servicio de salud acudir", "likes": 281 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "SOC-14", "name": "INAPCET", "status": "sin_cuenta", "note": "No se encontró cuenta oficial propia" },
@@ -728,15 +716,8 @@ const DEFAULT_DATA = {
     },
     {
       "id": "4", "order": 4, "num": 4, "name": "Educación y Desarrollo Humano", "phase": "Fase 4", "symbol": "",
+      "extra": "Según el organigrama estructural de la Gobernación (nivel de descentralización), la Dirección de Talento Humano, la Dirección de Educación y la Dirección de Cultura del Estado Táchira son dependencias directas de la Gobernación, no entes descentralizados -- se dejaron de listar aquí el 2026-09-07 (las dos últimas tenían cuentas reales medidas: @DirEduTachira en X y el Facebook de Cultura, ambas quedan registradas en el historial del proyecto).",
       "accounts": [
-        { "code": "EDU-01", "name": "Dirección de Talento Humano", "status": "interno", "note": "Oficina/dirección interna — usa @gobernaciondeltachira" },
-        { "code": "EDU-02", "name": "Dirección de Educación", "status": "verificado", "note": "IG: @diredutachira — la cuenta no existe (verificado 2026-09-01) | X: @DirEduTachira — verificado, inactiva desde 2024",
-          "metrics": {
-            "instagram": { "estado": "no_existe", "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" },
-            "x": { "estado": "inactiva", "seguidores": 2737, "publicacionesHistorico": 6669, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2024-06-03", "likes": 7, "muestraLikes": 8, "publicacionDestacada": { "titulo": "Invitación a la Consulta Popular Nacional del 21 de abril de 2024", "likes": 3 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" }
-          } },
-        { "code": "EDU-03", "name": "Dirección de Cultura del Estado Táchira", "status": "verificado", "note": "Facebook: /direcciondeculturadelestadotachira (30,605 seg.) — verificado. Sin Instagram propio confirmado.",
-          "metrics": { "facebook": { "estado": "activa", "estimado": true, "seguidores": 31000, "ultimaPublicacion": "2026-09-01", "likes": 83, "muestraLikes": 6, "publicacionDestacada": { "titulo": "Efeméride del Museo de Ciencias de Caracas declarado Monumento Histórico", "likes": 27 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "EDU-04", "name": "INTEDUCA", "status": "candidato", "note": "IG (candidato, sin verificar): @inteduca_tachira",
           "metrics": { "instagram": { "estado": "inactiva", "seguidores": 1382, "publicacionesHistorico": 1158, "publicacionesUltimoMes": 0, "ultimaPublicacion": "2026-03-08", "likes": 56, "muestraLikes": 10, "publicacionDestacada": { "titulo": "Mensaje navideño del presidente de Inteduca", "likes": 15 }, "fuente": "manual/claude-en-chrome", "actualizado": "2026-09-01" } } },
         { "code": "EDU-05", "name": "I.D.T (Instituto del Deporte Tachirense)", "status": "verificado", "note": "IG: @idtachirense (2,956 seg.) — verificado",
@@ -1108,6 +1089,8 @@ function hasActiveSocial(a) {
 function inferEnteType(a) {
   if (a && a.status === 'interno') return 'Dependencia de la Gobernación';
   const n = txt(a && a.name);
+  if (/^Gobernaci[oó]n del Estado/i.test(n)) return 'Cuenta institucional central';
+  if (/Gobernador/i.test(n)) return 'Máxima autoridad del Ejecutivo estadal';
   if (/^(Direcci[oó]n|Oficina|Secretar[ií]a|Consejo|Gabinete)/i.test(n)) return 'Dependencia de la Gobernación';
   if (/Comisi[oó]n/i.test(n)) return 'Comisión / coordinación especial';
   if (/Instituto Aut[oó]nomo|Corporaci[oó]n|Fundaci[oó]n|Servicio Desconcentrado|C\.A\./i.test(n)) return 'Ente descentralizado';
