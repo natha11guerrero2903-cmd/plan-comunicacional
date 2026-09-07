@@ -50,6 +50,13 @@ const FIREBASE_PROJECT = 'MARCAS GENERALES';
 // TODO 3/4: contraseña de acceso a este dashboard (independiente de las otras marcas)
 const DASHBOARD_PASSWORD = 'gestion80-2026';
 
+/* Segunda contraseña, independiente de la del acceso general: desbloquea
+   el "modo administrador" (aprobar/rechazar propuestas de contenido).
+   No es un sistema de usuarios real -- es un segundo candado, igual de
+   simple que DASHBOARD_PASSWORD, para separar "puede proponer" de "puede
+   aprobar". Cámbiala aquí cuando haga falta. */
+const ADMIN_PASSWORD = 'gestion80-admin';
+
 /* ---------------------------------------------------------------------
    Pega aquí el firebaseConfig del proyecto "MARCAS GENERALES" para dejar
    la conexión fija en el archivo. Si lo dejas vacío, el dashboard funciona
@@ -1005,6 +1012,11 @@ const state = {
   campaigns: clone(DEFAULT_DATA.campaigns),
   projects: clone(DEFAULT_DATA.projects),
   coyuntura: clone(DEFAULT_DATA.coyuntura),
+  /* Propuestas de contenido hechas desde Banco de contenidos (ver sección
+     "Propuestas de contenido" más abajo). Nunca vienen de DEFAULT_DATA --
+     no existen propuestas "de ejemplo", solo las que alguien cree de
+     verdad desde el dashboard. */
+  contentProposals: [],
   /* Las publicaciones del calendario no vienen de DEFAULT_DATA: se
      generan en vivo a partir de weekly/specials (ver
      buildScheduleOccurrences). Aquí solo vive el ESTADO de cada una
@@ -1826,11 +1838,14 @@ function openPlatformDetail(platform) {
       list.appendChild(el('div', 'empty', 'Sin formatos cargados todavía para esta plataforma.'));
     } else {
       data.formats.forEach(function (f) {
-        list.appendChild(el('div', 'card format-card',
+        const card = el('div', 'card format-card',
           '<p class="format-name">' + txt(f.name) + '</p>' +
           (txt(f.duration).trim() ? '<span class="format-duration">' + txt(f.duration) + '</span>' : '') +
           '<p class="format-row"><b>Cuándo usarlo</b>' + txt(f.when) + '</p>' +
-          '<p class="format-row"><b>Notas de producción</b>' + txt(f.notes) + '</p>'));
+          '<p class="format-row"><b>Notas de producción</b>' + txt(f.notes) + '</p>' +
+          '<button type="button" class="propose-btn">+ Proponer contenido</button>');
+        card.querySelector('.propose-btn').addEventListener('click', function () { openProposalForm(platform, f.name); });
+        list.appendChild(card);
       });
     }
   }
@@ -1848,6 +1863,178 @@ function wirePlatformDetail() {
   renderPlatformLinks();
   const back = $('platformBackBtn');
   if (back) back.addEventListener('click', closePlatformDetail);
+}
+
+/* ============ PROPUESTAS DE CONTENIDO ============
+   Cualquiera con la contraseña general puede proponer una pieza desde un
+   formato concreto de Banco de contenidos. Queda "pendiente" hasta que
+   alguien en modo administrador la aprueba o la rechaza -- solo al
+   aprobarla se convierte en una ocurrencia real del Calendario de gestión
+   (ver buildScheduleOccurrences). Nunca se inventa una propuesta de
+   ejemplo: la cola empieza vacía y solo crece con las que cree el equipo. */
+let proposalContext = null; // { platform, formatName }
+
+function proposalSegmentOptionsHtml() {
+  const segs = sortDocs(state.accountSegments);
+  let html = '<label class="proposal-seg-opt proposal-seg-all">' +
+    '<input type="checkbox" name="proposalSeg" value="all">Todas las cuentas de la Gobernación</label>';
+  segs.forEach(function (s) {
+    html += '<label class="proposal-seg-opt">' +
+      '<input type="checkbox" name="proposalSeg" value="' + txt(s.num) + '">' + txt(s.name) + '</label>';
+  });
+  return html;
+}
+
+function wireProposalSegmentExclusivity(container) {
+  const boxes = container.querySelectorAll('input[name="proposalSeg"]');
+  boxes.forEach(function (box) {
+    box.addEventListener('change', function () {
+      if (box.value === 'all') {
+        if (box.checked) boxes.forEach(function (b) { if (b.value !== 'all') b.checked = false; });
+      } else if (box.checked) {
+        boxes.forEach(function (b) { if (b.value === 'all') b.checked = false; });
+      }
+    });
+  });
+}
+
+function openProposalForm(platform, formatName) {
+  proposalContext = { platform: platform, formatName: formatName };
+  setHTML('proposalModalTitle', 'Proponer contenido');
+  setHTML('proposalModalSubtitle', PLATFORM_LABELS[platform] + ' · ' + txt(formatName));
+
+  const segWrap = $('proposalSegments');
+  if (segWrap) {
+    segWrap.innerHTML = proposalSegmentOptionsHtml();
+    wireProposalSegmentExclusivity(segWrap);
+  }
+  const desc = $('proposalDescription'); if (desc) desc.value = '';
+  const date = $('proposalDate'); if (date) date.value = '';
+  const by = $('proposalBy'); if (by) by.value = '';
+  const msg = $('proposalMsg'); if (msg) { msg.textContent = ''; msg.className = 'fb-msg'; }
+
+  const dialog = $('proposalModal');
+  if (dialog && typeof dialog.showModal === 'function') dialog.showModal();
+}
+
+function closeProposalModal() {
+  const dialog = $('proposalModal');
+  if (dialog) dialog.close();
+}
+
+function submitProposal(e) {
+  e.preventDefault();
+  if (!proposalContext) return;
+  const msg = $('proposalMsg');
+  const setMsg = function (text, kind) { if (msg) { msg.textContent = text; msg.className = 'fb-msg' + (kind ? ' ' + kind : ''); } };
+
+  if (!fb.live) { setMsg('Conecta primero con Firestore (ver el estado en la barra lateral) antes de enviar una propuesta -- necesita quedar guardada para que el equipo la revise.', 'err'); return; }
+
+  const description = txt($('proposalDescription') && $('proposalDescription').value).trim();
+  const proposedDate = txt($('proposalDate') && $('proposalDate').value).trim();
+  const proposedBy = txt($('proposalBy') && $('proposalBy').value).trim();
+  const segments = Array.prototype.slice.call(document.querySelectorAll('input[name="proposalSeg"]:checked')).map(function (b) { return b.value; });
+
+  if (!description) { setMsg('Describe la idea de contenido antes de enviar.', 'err'); return; }
+  if (!proposedDate || !parseISO(proposedDate)) { setMsg('Elige una fecha propuesta válida.', 'err'); return; }
+  if (!segments.length) { setMsg('Marca al menos un segmento (o "Todas las cuentas").', 'err'); return; }
+
+  const proposal = {
+    platform: proposalContext.platform,
+    format: proposalContext.formatName,
+    description: description,
+    proposedDate: proposedDate,
+    segments: segments,
+    proposedBy: proposedBy,
+    status: 'pendiente',
+    createdAt: new Date().toISOString()
+  };
+
+  setMsg('Enviando propuesta…', 'ok');
+  fb.api.addDoc(fb.api.collection(fb.db, BRAND_SLUG, 'plan', 'contentProposals'), proposal)
+    .then(function () {
+      toast('Propuesta enviada. Queda pendiente de aprobación.');
+      closeProposalModal();
+    })
+    .catch(function (err) { setMsg('No se pudo guardar la propuesta: ' + (err && err.code ? err.code : 'error'), 'err'); });
+}
+
+function proposalSegmentLabel(proposal) {
+  const segments = Array.isArray(proposal.segments) ? proposal.segments : [];
+  if (segments.indexOf('all') !== -1) return 'Todas las cuentas de la Gobernación';
+  const names = segments.map(function (num) {
+    const s = state.accountSegments.find(function (seg) { return String(seg.num) === String(num); });
+    return s ? txt(s.name) : null;
+  }).filter(Boolean);
+  return names.length ? names.join(', ') : 'Sin segmento';
+}
+
+function proposalStatusBadgeClass(status) {
+  if (status === 'aprobada') return 'v';
+  if (status === 'rechazada') return 's';
+  return 'p';
+}
+function proposalStatusLabel(status) {
+  if (status === 'aprobada') return 'Aprobada';
+  if (status === 'rechazada') return 'Rechazada';
+  return 'Pendiente';
+}
+
+function renderProposalsQueue() {
+  const list = $('proposalsQueueList');
+  if (!list) return;
+  const items = state.contentProposals.slice().sort(function (a, b) {
+    return String(b.createdAt).localeCompare(String(a.createdAt));
+  });
+  const pendingCount = items.filter(function (p) { return p.status === 'pendiente'; }).length;
+  setHTML('proposalsPendingCount', pendingCount + (pendingCount === 1 ? ' pendiente' : ' pendientes'));
+
+  list.innerHTML = '';
+  if (!items.length) {
+    list.appendChild(el('div', 'empty', 'Sin propuestas todavía. Se crean desde un formato en cualquiera de las 4 plataformas de arriba.'));
+    return;
+  }
+  const admin = isAdminUnlocked();
+  items.forEach(function (p) {
+    const d = parseISO(p.proposedDate);
+    const card = el('div', 'card proposal-card',
+      '<div class="proposal-card-top">' +
+        '<p class="format-name">' + PLATFORM_LABELS[p.platform] + ' · ' + txt(p.format) + '</p>' +
+        '<span class="acct-badge ' + proposalStatusBadgeClass(p.status) + '">' + proposalStatusLabel(p.status) + '</span>' +
+      '</div>' +
+      '<p class="format-row">' + txt(p.description) + '</p>' +
+      '<p class="format-row"><b>Fecha propuesta</b>' + (d ? fmtDay(d) + ' de ' + d.getFullYear() : txt(p.proposedDate)) + '</p>' +
+      '<p class="format-row"><b>Segmento</b>' + proposalSegmentLabel(p) + '</p>' +
+      (txt(p.proposedBy).trim() ? '<p class="format-row"><b>Propuesto por</b>' + txt(p.proposedBy) + '</p>' : ''));
+
+    if (admin && p.status === 'pendiente') {
+      const actions = el('div', 'proposal-actions',
+        '<button type="button" class="status-btn g active">Aprobar</button>' +
+        '<button type="button" class="status-btn r active">Rechazar</button>');
+      const btns = actions.querySelectorAll('button');
+      btns[0].addEventListener('click', function () { reviewProposal(p.id, 'aprobada'); });
+      btns[1].addEventListener('click', function () { reviewProposal(p.id, 'rechazada'); });
+      card.appendChild(actions);
+    }
+    list.appendChild(card);
+  });
+}
+
+function reviewProposal(id, status) {
+  if (!isAdminUnlocked()) { toast('Activa el modo administrador para aprobar o rechazar propuestas.'); return; }
+  if (!fb.live) { toast('Conecta con Firestore para aprobar o rechazar propuestas.'); return; }
+  fb.api.setDoc(fb.api.doc(fb.db, BRAND_SLUG, 'plan', 'contentProposals', txt(id)), { status: status, reviewedAt: new Date().toISOString() }, { merge: true })
+    .then(function () { toast(status === 'aprobada' ? 'Propuesta aprobada: ya aparece en el Calendario de gestión.' : 'Propuesta rechazada.'); })
+    .catch(function (err) { toast('No se pudo guardar: ' + (err && err.code ? err.code : 'error')); });
+}
+
+function wireProposalForm() {
+  const dialog = $('proposalModal');
+  const form = $('proposalForm');
+  if (!dialog || !form) return;
+  $('proposalModalCloseBtn').addEventListener('click', closeProposalModal);
+  dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+  form.addEventListener('submit', submitProposal);
 }
 
 function renderWeekly() {
@@ -2035,11 +2222,37 @@ function buildScheduleOccurrences() {
       });
     }
   }
+
+  /* Propuestas de contenido ya aprobadas -- se agregan como una ocurrencia
+     real por cada segmento que hayan marcado (o por los 4 segmentos, si
+     se propuso para "todas las cuentas de la Gobernación"). */
+  const allSegmentNums = state.accountSegments.map(function (s) { return String(s.num); });
+  state.contentProposals.forEach(function (p) {
+    if (p.status !== 'aprobada') return;
+    const iso = txt(p.proposedDate);
+    if (iso < isoOf(start) || iso > isoOf(end)) return;
+    const segNums = Array.isArray(p.segments) && p.segments.indexOf('all') !== -1
+      ? allSegmentNums
+      : (Array.isArray(p.segments) ? p.segments.filter(function (n) { return allSegmentNums.indexOf(String(n)) !== -1; }) : []);
+    segNums.forEach(function (segNum) {
+      const id = iso + '_propuesta-' + txt(p.id) + '-' + segNum;
+      out.push({
+        id: id, date: iso, weekday: WEEKDAY_KEYS[(parseISO(iso) || new Date()).getDay()], kind: 'propuesta', segment: segNum,
+        title: txt(p.format) + ' (' + PLATFORM_LABELS[p.platform] + ')', format: PLATFORM_LABELS[p.platform] + ' · ' + txt(p.format),
+        objective: txt(p.description), time: '',
+        status: publicationStatus(id)
+      });
+    });
+  });
+
   return out;
 }
 
 function kindLabel(kind) {
-  return kind === 'semanal' ? 'Pieza semanal' : kind === 'especial' ? 'Publicación especial' : 'Resumen de gestión';
+  if (kind === 'semanal') return 'Pieza semanal';
+  if (kind === 'especial') return 'Publicación especial';
+  if (kind === 'propuesta') return 'Propuesta aprobada';
+  return 'Resumen de gestión';
 }
 
 /* ============ CENTRO DE CONTROL ============
@@ -3133,6 +3346,11 @@ function attachListeners() {
   watchCollection('campaigns', 'campaigns', function () { renderControlStats(); });
   watchCollection('projects', 'projects', function () { renderControlStats(); });
   watchCollection('coyuntura', 'coyuntura', function () { renderCoyuntura(); });
+  watchCollection('contentProposals', 'contentProposals', function () {
+    renderProposalsQueue();
+    renderComplianceChart(); renderCalendar(); renderSegmentDiagnostics();
+    renderTodayPriorities(); renderUpcoming7Days(); renderControlAlerts(); renderControlStats();
+  });
 }
 
 let firstPaintPending = 0;
@@ -3362,6 +3580,62 @@ function unlockGate() {
   document.documentElement.classList.add('gate-unlocked');
 }
 
+/* ---- Modo administrador (segundo candado, solo para aprobar propuestas) ---- */
+function isAdminUnlocked() { return safeStorage.get(LS_PREFIX + 'admin_unlocked_v1') === true; }
+function unlockAdmin() {
+  safeStorage.set(LS_PREFIX + 'admin_unlocked_v1', true);
+  document.documentElement.classList.add('admin-unlocked');
+  updateAdminBadge();
+  renderProposalsQueue();
+}
+function lockAdmin() {
+  safeStorage.remove(LS_PREFIX + 'admin_unlocked_v1');
+  document.documentElement.classList.remove('admin-unlocked');
+  updateAdminBadge();
+  renderProposalsQueue();
+}
+function updateAdminBadge() {
+  const btn = $('adminModeBtn');
+  if (!btn) return;
+  const on = isAdminUnlocked();
+  btn.classList.toggle('active', on);
+  setHTML('adminModeBtnLabel', on ? 'Modo administrador activo' : 'Modo administrador');
+}
+function wireAdminGate() {
+  if (isAdminUnlocked()) document.documentElement.classList.add('admin-unlocked');
+  updateAdminBadge();
+
+  const btn = $('adminModeBtn');
+  const dialog = $('adminModal');
+  const form = $('adminUnlockForm');
+  const input = $('adminPasswordInput');
+  const err = $('adminUnlockError');
+  if (!btn || !dialog || !form || !input) return;
+
+  btn.addEventListener('click', function () {
+    if (isAdminUnlocked()) { lockAdmin(); toast('Modo administrador desactivado.'); return; }
+    if (err) err.textContent = '';
+    input.value = '';
+    if (typeof dialog.showModal === 'function') dialog.showModal();
+    input.focus();
+  });
+  $('adminModalCloseBtn').addEventListener('click', function () { dialog.close(); });
+  dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (input.value === ADMIN_PASSWORD) {
+      if (err) err.textContent = '';
+      dialog.close();
+      unlockAdmin();
+      toast('Modo administrador activado: ya puedes aprobar o rechazar propuestas.');
+    } else {
+      if (err) err.textContent = 'Contraseña de administrador incorrecta.';
+      input.value = '';
+      input.focus();
+    }
+  });
+}
+
 async function attemptFirebaseConnect() {
   const cfg = effectiveFbConfig();
   if (cfg) {
@@ -3406,6 +3680,9 @@ async function boot() {
   renderAllFromState(); // contenido local inmediato: nunca hay pantalla en blanco
   wireStaticButtons();
   wirePlatformDetail();
+  wireProposalForm();
+  wireAdminGate();
+  renderProposalsQueue();
   wireFbDialog();
   wireLogoModal();
   wireCalendarNav();
