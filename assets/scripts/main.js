@@ -809,6 +809,49 @@ const reportRows = [
   ['Cierre del plan (día 72)','Resumen de los 4 pilares + recomendación para la siguiente fase','Equipo estratégico completo']
 ];
 
+/* Recomendaciones de formato por plataforma (Banco de contenidos).
+   Contenido fijo acordado con el equipo -- igual que platformRows/reportRows,
+   no viene de Firestore. */
+const PLATFORM_FORMATS = {
+  instagram: {
+    tagline: 'Plataforma de posicionamiento y estética institucional.',
+    cadence: '4-5 piezas / semana',
+    formats: [
+      { name: 'Reel narrativo', duration: '15-30 seg', when: 'Anuncios, inauguraciones, avances de obra', notes: 'Cortes rápidos, texto en pantalla, música de tendencia moderada (no debe competir con la narrativa institucional).' },
+      { name: 'Carrusel informativo', duration: '5-8 slides', when: 'Cifras de gestión, explicación de un programa, "antes/después"', notes: 'Slide 1 = gancho visual fuerte; última slide = CTA claro.' },
+      { name: 'Post estático + copy largo', duration: '', when: 'Reconocimientos, comunicados formales, citas del Gobernador', notes: 'Diseño alineado a manual de marca (negro/dorado si es Gobernación, azul marino si es FUNDESTA).' },
+      { name: 'Stories', duration: 'serie de 3-5', when: 'Cobertura en vivo de eventos, detrás de cámaras', notes: 'Usar stickers de encuesta/pregunta para generar interacción medible.' },
+      { name: 'Guías guardables', duration: '', when: 'Contenido de servicio (trámites, requisitos, rutas de atención)', notes: 'Pensado para que el usuario lo guarde y regrese a consultarlo.' }
+    ]
+  },
+  tiktok: {
+    tagline: 'Plataforma de alcance y cercanía humana.',
+    cadence: '2-3 videos / semana',
+    formats: [
+      { name: 'Día en la vida / detrás de cámaras', duration: '', when: 'Humanizar la gestión, mostrar equipos técnicos trabajando', notes: 'Tono informal, cámara al hombro, sin sobreproducir.' },
+      { name: 'Explicativo rápido ("te explico")', duration: '60 seg', when: 'Programas o políticas que la gente no entiende bien (ej. ZEEFT, PVC)', notes: 'Un solo presentador, lenguaje sencillo, subtítulos siempre.' },
+      { name: 'Testimonial ciudadano corto', duration: '10-15 seg c/u', when: 'Impacto directo de un programa social', notes: 'Preguntas breves, respuestas de 10-15 seg, varios testimonios en un mismo video.' },
+      { name: 'Reacción a cifras/logros', duration: '', when: 'Resultados de gestión mensual o trimestral', notes: 'Gráficos simples animados, tono de "esto es lo que se logró".' },
+      { name: 'Trend adaptado institucionalmente', duration: '', when: 'Solo cuando el trend permite mensaje claro sin restarle seriedad a la institución', notes: 'Usar con moderación — filtrar por coherencia de posicionamiento antes de aprobar.' }
+    ]
+  },
+  facebook: {
+    tagline: 'Plataforma de profundidad y comunidad.',
+    cadence: '3-4 publicaciones / semana',
+    formats: [
+      { name: 'Post + artículo/nota de prensa enlazada', duration: '', when: 'Anuncios formales, rendición de cuentas', notes: 'Copy de 3-5 líneas que resuma lo esencial, enlace a nota completa.' },
+      { name: 'Álbum fotográfico de evento', duration: '8-12 fotos', when: 'Cobertura extensa de actos protocolares o jornadas', notes: 'Fotos curadas, pie de foto con contexto.' },
+      { name: 'Video en vivo (Facebook Live)', duration: '', when: 'Eventos de alto interés público, inauguraciones grandes', notes: 'Anunciar con antelación en Stories/IG para direccionar audiencia.' },
+      { name: 'Post de comunidad / agradecimiento', duration: '', when: 'Cierre de jornadas, agradecimiento a equipos o beneficiarios', notes: 'Tono cercano, etiquetar instituciones y personas involucradas cuando aplique.' }
+    ]
+  },
+  x: {
+    tagline: 'Todavía no hay formatos recomendados definidos para X — indícalos y se agregan aquí.',
+    cadence: '',
+    formats: []
+  }
+};
+
 /* ============ 2 · UTILIDADES ============ */
 const $ = function (id) { return document.getElementById(id); };
 
@@ -1657,6 +1700,45 @@ function renderContentSummaries() {
       '</p>' +
       '<p style="margin:8px 0 0;font-size:11.5px;color:var(--gray);font-style:italic;">' + txt(it.note) + '</p>'));
   });
+}
+
+let activePlatform = 'instagram';
+
+function renderPlatformFormats(platform) {
+  const data = PLATFORM_FORMATS[platform];
+  if (!data) return;
+  activePlatform = platform;
+
+  document.querySelectorAll('.platform-tab').forEach(function (btn) {
+    const on = btn.dataset.platform === platform;
+    btn.classList.toggle('active', on);
+    btn.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+
+  setHTML('platformTagline', data.tagline);
+  setHTML('platformCadence', data.cadence ? 'Cadencia sugerida: ' + data.cadence : '');
+
+  const list = $('platformFormatsList');
+  if (!list) return;
+  list.innerHTML = '';
+  if (!data.formats.length) {
+    list.appendChild(el('div', 'empty', 'Sin formatos cargados todavía para esta plataforma.'));
+    return;
+  }
+  data.formats.forEach(function (f) {
+    list.appendChild(el('div', 'card format-card',
+      '<p class="format-name">' + txt(f.name) + '</p>' +
+      (txt(f.duration).trim() ? '<span class="format-duration">' + txt(f.duration) + '</span>' : '') +
+      '<p class="format-row"><b>Cuándo usarlo</b>' + txt(f.when) + '</p>' +
+      '<p class="format-row"><b>Notas de producción</b>' + txt(f.notes) + '</p>'));
+  });
+}
+
+function wirePlatformTabs() {
+  document.querySelectorAll('.platform-tab').forEach(function (btn) {
+    btn.addEventListener('click', function () { renderPlatformFormats(btn.dataset.platform); });
+  });
+  renderPlatformFormats(activePlatform);
 }
 
 function renderWeekly() {
@@ -3214,6 +3296,7 @@ async function boot() {
   renderStaticTables();
   renderAllFromState(); // contenido local inmediato: nunca hay pantalla en blanco
   wireStaticButtons();
+  wirePlatformTabs();
   wireFbDialog();
   wireLogoModal();
   wireCalendarNav();
