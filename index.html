@@ -100,6 +100,17 @@
       <div class="section-title first-title"><h3>Centro de control operativo</h3></div>
       <div class="grid grid-4" id="controlStatGrid"></div>
 
+      <div class="grid grid-2">
+        <div class="chart-card control-widget">
+          <div class="cp-list-head"><h4>Campañas activas</h4><button type="button" class="btn-ghost btn-sm" id="addCampaignBtn">+ Agregar campaña</button></div>
+          <div id="campaignsList"></div>
+        </div>
+        <div class="chart-card control-widget">
+          <div class="cp-list-head"><h4>Proyectos en desarrollo</h4><button type="button" class="btn-ghost btn-sm" id="addProjectBtn">+ Agregar proyecto</button></div>
+          <div id="projectsList"></div>
+        </div>
+      </div>
+
       <div class="grid grid-3">
         <div class="chart-card control-widget">
           <h4>Prioridades de hoy</h4>
@@ -512,6 +523,36 @@
     <div class="fb-actions">
       <button type="submit" class="print-btn">Enviar propuesta</button>
       <button type="button" class="btn-ghost" id="proposalModalCloseBtn">Cancelar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Modal "Agregar campaña / proyecto" -->
+<dialog class="fb-dialog" id="campaignProjectModal">
+  <div class="fb-head">
+    <h3 id="campaignProjectModalTitle">Agregar</h3>
+    <p id="campaignProjectModalSubtitle"></p>
+  </div>
+  <form class="fb-body" id="campaignProjectForm">
+    <label for="cpNombre">Nombre</label>
+    <input type="text" id="cpNombre" placeholder="Ej. Jornada de vacunación 2026" required>
+
+    <label for="cpEstado" style="margin-top:14px;">Estado</label>
+    <select id="cpEstado" required></select>
+
+    <label for="cpDescripcion" style="margin-top:14px;">Descripción (opcional)</label>
+    <textarea id="cpDescripcion" rows="3" placeholder="En qué consiste, alcance, municipios..."></textarea>
+
+    <label for="cpFechaInicio" style="margin-top:14px;">Fecha de inicio (opcional)</label>
+    <input type="date" id="cpFechaInicio">
+
+    <label for="cpResponsable" style="margin-top:14px;">Responsable (opcional)</label>
+    <input type="text" id="cpResponsable" placeholder="Ente o persona a cargo">
+
+    <p class="fb-msg" id="campaignProjectMsg"></p>
+    <div class="fb-actions">
+      <button type="submit" class="print-btn" id="campaignProjectSubmitBtn">Guardar</button>
+      <button type="button" class="btn-ghost" id="campaignProjectModalCloseBtn">Cancelar</button>
     </div>
   </form>
 </dialog>

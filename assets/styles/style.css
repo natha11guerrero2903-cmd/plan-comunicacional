@@ -1061,6 +1061,22 @@ footer.doc-foot b{color:var(--brand-bright);}
   padding:9px 16px;border-radius:100px;cursor:pointer;
 }
 .btn-ghost:hover{border-color:var(--gray-soft);color:var(--black);}
+.btn-ghost.btn-sm{padding:5px 12px;font-size:11px;}
+.cp-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.cp-list-head h4{margin:0;}
+.cp-item{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:10px;
+  padding:9px 0;border-top:1px solid var(--border);
+}
+.cp-item:first-child{border-top:none;padding-top:0;}
+.cp-item-name{margin:0;font-size:12.5px;font-weight:600;color:var(--black);}
+.cp-item-meta{margin:3px 0 0;font-size:11px;color:var(--gray);}
+.cp-item-desc{margin:4px 0 0;font-size:11px;color:var(--gray-soft);}
+.cp-item-del{
+  background:none;border:none;color:var(--gray-soft);cursor:pointer;
+  font-size:11px;font-family:'IBM Plex Mono',monospace;flex-shrink:0;
+}
+.cp-item-del:hover{color:#b91c1c;}
 
 /* Modal "Ver símbolo del pilar" */
 .symbol-modal, .pub-modal{

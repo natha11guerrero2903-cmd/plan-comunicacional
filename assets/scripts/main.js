@@ -2487,6 +2487,120 @@ function renderCoyuntura() {
   });
 }
 
+/* ============ CAMPAÑAS Y PROYECTOS (Centro de Control) ============
+   Formulario simple para que el equipo cargue directamente el estado
+   real de campañas y proyectos -- no existe ninguna fuente externa de
+   la que "scrapear" esto (es información interna de gestión), así que
+   la única forma honesta de tenerla es que alguien la escriba. Mismo
+   patrón de escritura que "Proponer contenido": abierto a cualquiera con
+   la contraseña general del equipo, sin necesidad de modo administrador
+   (no es una propuesta que alguien más deba aprobar, es un hecho real que
+   el equipo ya decidió). */
+const CAMPAIGN_ESTADOS = ['Activa', 'En pausa', 'Finalizada'];
+const PROJECT_ESTADOS = ['En planificación', 'En ejecución', 'Finalizado', 'Detenido'];
+let campaignProjectContext = null; // 'campaigns' | 'projects'
+
+function openCampaignProjectForm(kind) {
+  campaignProjectContext = kind;
+  const isCampaign = kind === 'campaigns';
+  setHTML('campaignProjectModalTitle', isCampaign ? 'Agregar campaña' : 'Agregar proyecto');
+  setHTML('campaignProjectModalSubtitle', isCampaign ? 'Aparece en "Campañas activas" del Centro de Control.' : 'Aparece en "Proyectos en desarrollo" del Centro de Control.');
+
+  const estadoSel = $('cpEstado');
+  if (estadoSel) {
+    const opts = isCampaign ? CAMPAIGN_ESTADOS : PROJECT_ESTADOS;
+    estadoSel.innerHTML = opts.map(function (o) { return '<option value="' + o + '">' + o + '</option>'; }).join('');
+  }
+  ['cpNombre', 'cpDescripcion', 'cpFechaInicio', 'cpResponsable'].forEach(function (id) { const f = $(id); if (f) f.value = ''; });
+  const msg = $('campaignProjectMsg'); if (msg) { msg.textContent = ''; msg.className = 'fb-msg'; }
+
+  const dialog = $('campaignProjectModal');
+  if (dialog && typeof dialog.showModal === 'function') dialog.showModal();
+}
+
+function closeCampaignProjectModal() {
+  const dialog = $('campaignProjectModal');
+  if (dialog) dialog.close();
+}
+
+function submitCampaignProject(e) {
+  e.preventDefault();
+  if (!campaignProjectContext) return;
+  const msg = $('campaignProjectMsg');
+  const setMsg = function (text, kind) { if (msg) { msg.textContent = text; msg.className = 'fb-msg' + (kind ? ' ' + kind : ''); } };
+
+  if (!fb.live) { setMsg('Conecta primero con Firestore (ver el estado en la barra lateral) antes de guardar -- necesita quedar guardado ahí para que todo el equipo lo vea.', 'err'); return; }
+
+  const nombre = txt($('cpNombre') && $('cpNombre').value).trim();
+  const estado = txt($('cpEstado') && $('cpEstado').value).trim();
+  const descripcion = txt($('cpDescripcion') && $('cpDescripcion').value).trim();
+  const fechaInicio = txt($('cpFechaInicio') && $('cpFechaInicio').value).trim();
+  const responsable = txt($('cpResponsable') && $('cpResponsable').value).trim();
+
+  if (!nombre) { setMsg('Escribe un nombre antes de guardar.', 'err'); return; }
+  if (!estado) { setMsg('Elige un estado.', 'err'); return; }
+
+  const doc = { nombre: nombre, estado: estado, createdAt: new Date().toISOString() };
+  if (descripcion) doc.descripcion = descripcion;
+  if (fechaInicio) doc.fechaInicio = fechaInicio;
+  if (responsable) doc.responsable = responsable;
+
+  setMsg('Guardando…', 'ok');
+  fb.api.addDoc(fb.api.collection(fb.db, BRAND_SLUG, 'plan', campaignProjectContext), doc)
+    .then(function () {
+      toast((campaignProjectContext === 'campaigns' ? 'Campaña' : 'Proyecto') + ' guardado.');
+      closeCampaignProjectModal();
+    })
+    .catch(function (err) { setMsg('No se pudo guardar: ' + (err && err.code ? err.code : 'error'), 'err'); });
+}
+
+function deleteCampaignProject(kind, id) {
+  if (!fb.live) { toast('Conecta con Firestore para eliminar.'); return; }
+  if (!window.confirm('¿Eliminar este ' + (kind === 'campaigns' ? 'campaña' : 'proyecto') + '? Esta acción no se puede deshacer.')) return;
+  fb.api.deleteDoc(fb.api.doc(fb.db, BRAND_SLUG, 'plan', kind, txt(id)))
+    .then(function () { toast('Eliminado.'); })
+    .catch(function (err) { toast('No se pudo eliminar: ' + (err && err.code ? err.code : 'error')); });
+}
+
+function campaignProjectItemHtml(kind, item) {
+  return '<div class="cp-item">' +
+    '<div><p class="cp-item-name">' + txt(item.nombre) + '</p>' +
+    '<p class="cp-item-meta">' + txt(item.estado) +
+      (item.fechaInicio ? ' · desde ' + txt(item.fechaInicio) : '') +
+      (item.responsable ? ' · ' + txt(item.responsable) : '') + '</p>' +
+    (txt(item.descripcion).trim() ? '<p class="cp-item-desc">' + txt(item.descripcion) + '</p>' : '') + '</div>' +
+    '<button type="button" class="cp-item-del" data-kind="' + kind + '" data-id="' + txt(item.id) + '">Eliminar</button>' +
+  '</div>';
+}
+
+function renderCampaignsProjects() {
+  [['campaigns', 'campaignsList', 'Sin campañas cargadas todavía.'], ['projects', 'projectsList', 'Sin proyectos cargados todavía.']].forEach(function (cfg) {
+    const kind = cfg[0], elId = cfg[1], emptyMsg = cfg[2];
+    const c = $(elId);
+    if (!c) return;
+    const items = sortDocs(state[kind]);
+    c.innerHTML = items.length
+      ? items.map(function (it) { return campaignProjectItemHtml(kind, it); }).join('')
+      : '<div class="empty">' + emptyMsg + '</div>';
+    c.querySelectorAll('.cp-item-del').forEach(function (btn) {
+      btn.addEventListener('click', function () { deleteCampaignProject(btn.dataset.kind, btn.dataset.id); });
+    });
+  });
+}
+
+function wireCampaignProjectForm() {
+  const dialog = $('campaignProjectModal');
+  const form = $('campaignProjectForm');
+  if (!dialog || !form) return;
+  $('campaignProjectModalCloseBtn').addEventListener('click', closeCampaignProjectModal);
+  dialog.addEventListener('click', function (e) { if (e.target === dialog) dialog.close(); });
+  form.addEventListener('submit', submitCampaignProject);
+  const addCampaignBtn = $('addCampaignBtn');
+  if (addCampaignBtn) addCampaignBtn.addEventListener('click', function () { openCampaignProjectForm('campaigns'); });
+  const addProjectBtn = $('addProjectBtn');
+  if (addProjectBtn) addProjectBtn.addEventListener('click', function () { openCampaignProjectForm('projects'); });
+}
+
 /* ---- Gráfico: piezas planificadas por segmento y mes (Resumen) ---- */
 /* Lista de meses del período del plan, con el mes real de hoy marcado
    -- se reutiliza en la tabla de "Piezas planificadas por segmento y
@@ -3238,11 +3352,18 @@ document.addEventListener('keydown', function (e) {
                             quedan en null hasta que exista una
                             metodología real de medición -- no se
                             inventan cifras de percepción ciudadana)
-     campaigns/{id}        (Campañas activas del Centro de Control;
-                            {nombre, estado, ...} -- empieza vacía)
+     campaigns/{id}        (Campañas activas del Centro de Control; se
+                            cargan con el formulario "+ Agregar campaña"
+                            -- {nombre, estado: 'Activa'|'En pausa'|
+                            'Finalizada', descripcion?, fechaInicio?,
+                            responsable?, createdAt} -- empieza vacía,
+                            no existe ninguna fuente externa de la que
+                            "scrapear" esto, es información interna)
      projects/{id}         (Proyectos en desarrollo del Centro de
-                            Control; {nombre, estado, ...} -- empieza
-                            vacía)
+                            Control; mismo formulario -- {nombre,
+                            estado: 'En planificación'|'En ejecución'|
+                            'Finalizado'|'Detenido', descripcion?,
+                            fechaInicio?, responsable?, createdAt})
      coyuntura/{id}        (Radar de coyuntura; se llena con
                             scripts/monitor-coyuntura.js, ver README.
                             {tema, menciones, articulos: [{titulo, fuente,
@@ -3406,8 +3527,8 @@ function attachListeners() {
   watchCollection('newsSources', 'newsSources', function () { renderNews(); });
   watchCollection('newsItems', 'newsItems', function () { renderOpinionNews(); });
   watchCollection('contentSummaries', 'contentSummaries', function () { renderContentSummaries(); renderReportsAvailable(); });
-  watchCollection('campaigns', 'campaigns', function () { renderControlStats(); renderControlPerformance(); renderTopContents(); });
-  watchCollection('projects', 'projects', function () { renderControlStats(); renderControlPerformance(); renderTopContents(); });
+  watchCollection('campaigns', 'campaigns', function () { renderControlStats(); renderControlPerformance(); renderTopContents(); renderCampaignsProjects(); });
+  watchCollection('projects', 'projects', function () { renderControlStats(); renderControlPerformance(); renderTopContents(); renderCampaignsProjects(); });
   watchCollection('coyuntura', 'coyuntura', function () { renderCoyuntura(); });
   watchCollection('contentProposals', 'contentProposals', function () {
     renderProposalsQueue();
@@ -3616,6 +3737,7 @@ function renderAllFromState() {
   renderUpcoming7Days();
   renderControlAlerts();
   renderControlStats(); renderControlPerformance(); renderTopContents();
+  renderCampaignsProjects();
   renderCoyuntura();
   renderReportsAvailable();
 }
@@ -3744,6 +3866,7 @@ async function boot() {
   wireStaticButtons();
   wirePlatformDetail();
   wireProposalForm();
+  wireCampaignProjectForm();
   wireAdminGate();
   renderProposalsQueue();
   wireFbDialog();
