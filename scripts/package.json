@@ -7,7 +7,8 @@
   "scripts": {
     "sync-x": "node sync-x-metrics.js",
     "import-metrics": "node import-social-metrics.js",
-    "generate-template": "node generate-template.js"
+    "generate-template": "node generate-template.js",
+    "seed-news-sources": "node seed-news-sources.js"
   },
   "dependencies": {
     "firebase-admin": "^12.7.0"

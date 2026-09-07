@@ -155,6 +155,33 @@ que les corresponde a ustedes.
 
 ---
 
+## Directorio de fuentes de monitoreo ("Matrices de opinión")
+
+El directorio de medios de "Matrices de opinión → Directorio de fuentes"
+vive en dos lugares a la vez: el código (`assets/scripts/main.js`,
+`DEFAULT_DATA.newsSources` -- el respaldo local) y Firestore (colección
+`newsSources`, lo que de verdad se muestra en el sitio en cuanto hay
+conexión). Actualizar el código NO actualiza Firestore solo -- son dos
+copias independientes.
+
+Si cambiaste ese directorio en el código (por ejemplo, para ampliar la
+lista de medios de una región) y el sitio desplegado sigue mostrando los
+datos viejos, es porque Firestore todavía tiene la versión anterior. Para
+igualarlo:
+
+```bash
+cd scripts
+npm install
+export GOOGLE_APPLICATION_CREDENTIALS="/ruta/a/serviceAccountKey.json"
+npm run seed-news-sources
+```
+
+Este script solo escribe en la colección `newsSources` -- a diferencia del
+botón "Cargar contenido inicial" del diálogo de Firebase (que sobrescribe
+TODO el plan con la plantilla por defecto y borraría checklist, KPIs y
+métricas reales ya cargadas), este es seguro de correr las veces que haga
+falta.
+
 ## Qué falta para Instagram, Facebook y TikTok de forma automática
 
 Ninguna de esas plataformas ofrece hoy una API pública y gratuita para
