@@ -58,6 +58,9 @@
       <button type="button" class="conn" id="connBadge" title="Estado de la conexión con Firebase Firestore">
         <span class="led"></span><span id="connTxt">Modo local</span>
       </button>
+      <button type="button" class="conn admin-toggle" id="adminModeBtn" title="Aprobar o rechazar propuestas de contenido" style="margin-top:8px;">
+        <span class="led"></span><span id="adminModeBtnLabel">Modo administrador</span>
+      </button>
       <div style="margin-top:12px;">
         <b>Documento de trabajo interno · Confidencial</b><br>
         Para evaluación del equipo estratégico
@@ -188,6 +191,10 @@
       <p class="chart-sub" style="margin:-8px 0 14px;">Abre una plataforma para ver su guía de formatos: cuándo usarlos y las notas de producción de cada uno.</p>
 
       <div class="platform-links" id="platformLinks"></div>
+
+      <div class="section-title"><h3>Propuestas de contenido</h3><span class="num" id="proposalsPendingCount">0 pendientes</span></div>
+      <p class="chart-sub" style="margin:-8px 0 14px;">Se proponen desde un formato concreto de cada plataforma (botón "+ Proponer contenido"). Una vez aprobadas en modo administrador, entran solas al Calendario de gestión, en el segmento y fecha que se marcó.</p>
+      <div class="grid grid-2" id="proposalsQueueList"></div>
 
       <div class="section-title"><h3>Resúmenes de gestión</h3><span class="num" id="summariesCount">0 vinculados</span></div>
       <p class="chart-sub" style="margin:-8px 0 14px;">Resúmenes semanales, mensuales, trimestrales y semestrales de la gestión. Se redactan aquí y después se vinculan a una publicación del calendario.</p>
@@ -480,6 +487,50 @@
     <h4 id="enteModalTitle"></h4>
   </div>
   <div class="sm-body" id="enteModalBody"></div>
+</dialog>
+
+<!-- Modal "Proponer contenido" -->
+<dialog class="fb-dialog" id="proposalModal">
+  <div class="fb-head">
+    <h3 id="proposalModalTitle">Proponer contenido</h3>
+    <p id="proposalModalSubtitle"></p>
+  </div>
+  <form class="fb-body" id="proposalForm">
+    <label for="proposalDescription">Descripción de la idea</label>
+    <textarea id="proposalDescription" rows="3" placeholder="Ej. Reel sobre el sistema de agua potable, mostrando antes/después de la obra en tal sector..." required></textarea>
+
+    <label for="proposalDate" style="margin-top:14px;">Fecha propuesta de publicación</label>
+    <input type="date" id="proposalDate" required>
+
+    <label style="margin-top:14px;">Segmento / cuenta a la que aplica</label>
+    <div class="proposal-seg-list" id="proposalSegments"></div>
+
+    <label for="proposalBy" style="margin-top:14px;">Propuesto por (opcional)</label>
+    <input type="text" id="proposalBy" placeholder="Nombre o institución">
+
+    <p class="fb-msg" id="proposalMsg"></p>
+    <div class="fb-actions">
+      <button type="submit" class="print-btn">Enviar propuesta</button>
+      <button type="button" class="btn-ghost" id="proposalModalCloseBtn">Cancelar</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- Modal "Modo administrador" -->
+<dialog class="fb-dialog" id="adminModal">
+  <div class="fb-head">
+    <h3>Modo administrador</h3>
+    <p>Contraseña independiente de la del dashboard: habilita aprobar o rechazar propuestas de contenido en Banco de contenidos.</p>
+  </div>
+  <form class="fb-body" id="adminUnlockForm">
+    <label for="adminPasswordInput">Contraseña de administrador</label>
+    <input type="password" id="adminPasswordInput" autocomplete="current-password" required>
+    <p class="fb-msg err" id="adminUnlockError"></p>
+    <div class="fb-actions">
+      <button type="submit" class="print-btn">Activar</button>
+      <button type="button" class="btn-ghost" id="adminModalCloseBtn">Cancelar</button>
+    </div>
+  </form>
 </dialog>
 <script src="assets/scripts/main.js"></script>
 </body>

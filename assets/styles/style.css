@@ -273,6 +273,22 @@ h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
 .format-row{margin:0 0 8px;font-size:12.5px;line-height:1.5;color:var(--black);}
 .format-row:last-child{margin-bottom:0;}
 .format-row b{display:block;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--gray-soft);font-weight:600;margin:0 0 2px;}
+.propose-btn{
+  display:block;width:100%;margin-top:14px;padding:8px 12px;
+  border:1px dashed var(--brand-core);border-radius:8px;background:var(--paper-2);
+  color:var(--brand-deep-2);font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;
+  transition:background .15s ease;
+}
+.propose-btn:hover{background:#f0e6fe;}
+
+/* ---------- Propuestas de contenido ---------- */
+.proposal-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+.proposal-actions{display:flex;gap:8px;margin-top:14px;}
+.proposal-actions .status-btn{flex:none;padding:7px 16px;}
+
+.admin-toggle{width:100%;justify-content:flex-start;}
+.admin-toggle.active .led{background:var(--ok);}
+.admin-toggle.active{border-color:var(--ok);}
 
 .section-title{
   display:flex;
@@ -1008,6 +1024,19 @@ footer.doc-foot b{color:var(--brand-bright);}
   background:var(--paper);
 }
 .fb-dialog textarea:focus{outline:2px solid var(--brand-core);outline-offset:-1px;}
+.fb-dialog input[type="text"],.fb-dialog input[type="date"],.fb-dialog input[type="password"]{
+  width:100%;font-size:13px;color:var(--black);
+  border:1px solid var(--border);border-radius:10px;padding:9px 12px;background:var(--paper);
+  font-family:inherit;
+}
+.fb-dialog input[type="text"]:focus,.fb-dialog input[type="date"]:focus,.fb-dialog input[type="password"]:focus{
+  outline:2px solid var(--brand-core);outline-offset:-1px;
+}
+.proposal-seg-list{display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;
+  border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--paper);}
+.proposal-seg-opt{display:flex;align-items:center;gap:8px;font-size:12.5px;font-weight:500;color:var(--black);cursor:pointer;}
+.proposal-seg-opt input{flex-shrink:0;}
+.proposal-seg-all{padding-bottom:6px;margin-bottom:2px;border-bottom:1px dashed var(--border);}
 .fb-dialog .fb-msg{font-size:12px;margin:10px 0 0;line-height:1.5;min-height:16px;}
 .fb-dialog .fb-msg.ok{color:#0a7052;}
 .fb-dialog .fb-msg.err{color:#b91c1c;}
